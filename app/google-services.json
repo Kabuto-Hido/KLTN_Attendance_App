@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "687552807553",
+    "project_id": "attendance-app-ce80b",
+    "storage_bucket": "attendance-app-ce80b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687552807553:android:7145c1dbc5e6a334958380",
+        "android_client_info": {
+          "package_name": "hcmute.edu.vn.tlcn.attendanceapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "687552807553-9ii3ka04vhtoku7ljaiun161mr517egj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6iTlZj_ycw5Xh69UugP2opzV9zVDrUsI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "687552807553-9ii3ka04vhtoku7ljaiun161mr517egj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
