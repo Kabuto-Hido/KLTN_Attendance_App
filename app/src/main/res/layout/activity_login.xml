@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <ImageView
+        android:contentDescription="image login"
+        android:id="@+id/loginImage"
+        android:layout_width="250dp"
+        android:layout_height="280dp"
+        android:src="@drawable/login_img"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/loginLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LOGIN TO YOUR ACCOUNT"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/loginImage" />
+
+    <EditText
+        android:id="@+id/edittextPhone"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_below="@+id/loginLabel"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="20dp"
+        android:autofillHints="phone"
+        android:background="@drawable/custom_login_input"
+        android:drawableStart="@drawable/ic_phone"
+        android:drawablePadding="10dp"
+        android:hint="Phone Number"
+        android:inputType="phone"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/edtLayout"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        app:passwordToggleEnabled="true"
+        app:passwordToggleTint="#3D77BB"
+        android:layout_marginStart="80dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/edittextPhone">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edittextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:inputType="textPassword"
+            android:paddingStart="10dp"
+            android:hint="Password"
+            android:paddingEnd="10dp"
+            android:drawableStart="@drawable/ic_password"
+            android:drawablePadding="10dp"
+            android:background="@drawable/custom_login_input"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/txtForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        android:text="Forgot Password?"
+        android:textColor="#3D77BB"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogin"
+        android:layout_width="340sp"
+        android:layout_height="70sp"
+        android:layout_below="@+id/txtForgotPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:backgroundTint="#2196F3"
+        android:fontFamily="sans-serif-medium"
+        android:text="LOGIN"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:cornerRadius="30sp" />
+
+</RelativeLayout>
