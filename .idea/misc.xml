@@ -3,13 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Android/TLCN/app/src/main/res/layout/activity_main.xml" value="0.21422101449275363" />
-      </map>
-    </option>
-  </component>
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
+        <entry key="..\:/AndroidStudioProjects/TLCN/app/src/main/res/drawable-v24/border_line.xml" value="0.137" />
         <entry key="..\:/AndroidStudioProjects/TLCN/app/src/main/res/drawable/bg_begin.xml" value="0.1675" />
         <entry key="..\:/AndroidStudioProjects/TLCN/app/src/main/res/drawable/custom_login_input.xml" value="0.1475" />
         <entry key="..\:/AndroidStudioProjects/TLCN/app/src/main/res/drawable/gradient_bg.xml" value="0.1475" />
@@ -17,6 +11,7 @@
         <entry key="..\:/AndroidStudioProjects/TLCN/app/src/main/res/drawable/phone_white.xml" value="0.1475" />
         <entry key="..\:/AndroidStudioProjects/TLCN/app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProjects/TLCN/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/AndroidStudioProjects/TLCN/app/src/main/res/layout/admin_home.xml" value="0.33" />
       </map>
     </option>
   </component>

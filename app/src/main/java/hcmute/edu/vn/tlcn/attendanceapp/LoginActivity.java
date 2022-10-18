@@ -36,12 +36,12 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.admin_home);
+        setContentView(R.layout.activity_login);
 
-//        edittextPhone = (EditText) findViewById(R.id.edittextPhone);
-//        edittextPassword = (EditText) findViewById(R.id.edittextPassword);
-//        txtForgotPassword = (TextView) findViewById(R.id.txtForgotPassword);
-//        btnLogin = (Button) findViewById(R.id.btnLogin);
+        edittextPhone = (EditText) findViewById(R.id.edittextPhone);
+        edittextPassword = (EditText) findViewById(R.id.edittextPassword);
+        txtForgotPassword = (TextView) findViewById(R.id.txtForgotPassword);
+        btnLogin = (Button) findViewById(R.id.btnLogin);
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,7 +131,9 @@ public class LoginActivity extends AppCompatActivity {
                                 User_singeton user_singeton = User_singeton.getInstance();
                                 user_singeton.setUser(user);
                                 progressDialog.dismiss();
-                                Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
+                                if(user.getRole() == 0) {
+                                    Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
+                                }
                             }
                             else{
                                 progressDialog.dismiss();
