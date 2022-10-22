@@ -1,10 +1,10 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,12 +12,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -62,15 +71,40 @@ public class LoginActivity extends AppCompatActivity {
 //
 //                String password = "123456";
 //                String hashPass = BCrypt.withDefaults().hashToString(12, password.toCharArray());
-//                BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(),hashPass);
-//                if(result.verified)
+//                //BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(),hashPass);
 //                String birthday = format.format(birth);
-//                String defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/cnpm-30771.appspot.com/o/no-user.png?alt=media&token=517e08ab-6aa4-42eb-9547-b1b10f17caf0";
 //
-//                //admin 0937302331 - 123456
+////                //admin 0937302331 - 123456
 //                User user = new User("admin","0937302331",hashPass,birthday,
-//                        "User Administration",true,defaultAvatar,0);
+//                        "User Administration",true,"",0);
 //
+//                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.man_placeholder);
+//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+//                byte[] bitMapData = stream.toByteArray();
+//
+//                FirebaseStorage storage = FirebaseStorage.getInstance();
+//                StorageReference ref = storage.getReference();
+//                UploadTask uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(bitMapData);
+//                uploadTask
+//                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                            @Override
+//                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                                user.setAvatar("images/" + user.getPhone() + "_avatar");
+//                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+//                                DatabaseReference myRef = database.getReference("users");
+//                                myRef.child(user.getPhone()).setValue(user);
+//                                Toast.makeText(LoginActivity.this, "Update successful!!", Toast.LENGTH_SHORT).show();
+//                            }
+//                        })
+//                        .addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                Toast.makeText(LoginActivity.this,"Update failed. Error: " + e.getMessage(),Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+
+
 //                FirebaseDatabase database = FirebaseDatabase.getInstance();
 //                DatabaseReference myRef = database.getReference("users");
 //

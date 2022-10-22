@@ -24,7 +24,7 @@ public class BeginActivity extends AppCompatActivity {
                 startActivity(new Intent(BeginActivity.this,LoginActivity.class));
                 finish();
             }
-        },2000);
+        },1000);
 
 
     }

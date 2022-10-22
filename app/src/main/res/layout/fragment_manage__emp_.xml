@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Manage_Emp_Fragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/layout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2196F3"
+            android:padding="6dp">
+            <ImageView
+                android:id="@+id/btnBackPageMngEmp"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/baseline_arrow_back_white_24"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Manage Employees"
+                android:textStyle="bold"
+                android:layout_marginStart="30dp"
+                android:textColor="@color/white"
+                android:textSize="25sp"
+                android:layout_marginBottom="2dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvEmpList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout1"
+            android:text="Employees List"
+            android:textSize="18sp"
+            android:textColor="@color/black"
+            android:paddingTop="10sp"
+            android:layout_marginStart="15sp"/>
+
+        <ListView
+            android:id="@+id/listviewEmp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/tvEmpList" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btnAddEmp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_person_add"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="10dp"/>
+
+    </RelativeLayout>
+
+</FrameLayout>

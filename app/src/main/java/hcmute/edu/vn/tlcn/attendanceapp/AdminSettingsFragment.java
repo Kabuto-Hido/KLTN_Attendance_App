@@ -1,5 +1,6 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,6 +8,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,10 +59,31 @@ public class AdminSettingsFragment extends Fragment {
         }
     }
 
+    View view;
+    TextView txtEmployee;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin_settings, container, false);
+
+        view = inflater.inflate(R.layout.fragment_admin_settings, container, false);
+        User_singeton user_singeton = User_singeton.getInstance();
+
+        if(user_singeton.getUser() == null)
+        {
+            startActivity(new Intent(getActivity(), LoginActivity.class));
+            getActivity().finish();
+        }
+        
+        txtEmployee = (TextView) view.findViewById(R.id.txtEmployee);
+
+        txtEmployee.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Manage_Emp_Fragment manage_emp_fragment = new Manage_Emp_Fragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,manage_emp_fragment).commit();
+            }
+        });
+
+        return view;
     }
 }
