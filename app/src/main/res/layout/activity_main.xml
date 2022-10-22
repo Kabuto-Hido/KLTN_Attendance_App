@@ -1,57 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical"
-    android:background="#97BCE8">
+    tools:context=".MainActivity">
 
-    <ImageView
-        android:layout_width="250dp"
-        android:layout_height="220dp"
-        android:src="@drawable/app_ic"
-        android:layout_gravity="center"
-        android:layout_marginTop="120dp"/>
+    <FrameLayout
+        android:id="@+id/flFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loading..."
-        android:textAlignment="center"
-        android:layout_gravity="center"
-        android:textColor="#1C2D40"
-        android:textSize="45dp"
-        android:layout_marginTop="12dp"/>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:itemIconTint="@drawable/bottom_nav_icon_color_selector"
+        app:itemTextColor="@drawable/bottom_nav_icon_color_selector"
+        android:background="@color/white"
+        app:menu="@menu/bottom_nav"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mark you attendance at"
-        android:textAlignment="center"
-        android:layout_gravity="center"
-        android:textColor="#1C2D40"
-        android:textSize="33dp"
-        android:layout_marginTop="40dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Attendity"
-        android:textAlignment="center"
-        android:layout_gravity="center"
-        android:textColor="#1C2D40"
-        android:textSize="50dp"/>
-
-    <TextView
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:text="There is no time like the PRESENT"
-        android:textAlignment="center"
-        android:layout_gravity="center_horizontal"
-        android:textColor="#FFFFFF"
-        android:textSize="25dp"
-        android:layout_marginTop="40dp"/>
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

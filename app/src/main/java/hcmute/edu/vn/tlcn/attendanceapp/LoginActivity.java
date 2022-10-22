@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -133,6 +134,8 @@ public class LoginActivity extends AppCompatActivity {
                                 progressDialog.dismiss();
                                 if(user.getRole() == 0) {
                                     Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                    finish();
                                 }
                             }
                             else{
@@ -150,7 +153,5 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-    //Hash password
-
 
 }
