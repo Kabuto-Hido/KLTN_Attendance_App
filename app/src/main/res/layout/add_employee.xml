@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-medium"
+        android:paddingTop="15sp"
+        android:text="NEW EMPLOYEE"
+        android:textColor="#2196F3"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgAvatarProfile"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/textView2"
+        android:layout_marginStart="20sp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/man_placeholder"
+        android:layout_centerHorizontal="true"
+        />
+
+    <TextView
+        android:id="@+id/txtPhonenum1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imgAvatarProfile"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20sp"
+        android:text="How could we contact new employee?"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/edtPhonenum"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtPhonenum1"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/edt_background"
+        android:drawableLeft="@drawable/phone_white"
+        android:drawablePadding="15dp"
+        android:hint="Phone number"
+        android:inputType="phone"
+        android:padding="15dp"
+        android:textColorHint="#AA4B5151"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtFullName1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtPhonenum"
+        android:layout_marginLeft="10dp"
+        android:text="What is your employee's name?"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/edtName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtFullName1"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/edt_background"
+        android:drawableLeft="@drawable/person_white"
+        android:drawablePadding="15sp"
+        android:hint="Fullname"
+        android:inputType="textPersonName"
+        android:padding="15dp"
+        android:textColorHint="#AA4B5151"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/edtBirthday1"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edtName"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/edt_background"
+        android:drawableLeft="@drawable/calendar_white"
+        android:drawablePadding="15sp"
+        android:hint="Birthday"
+        android:padding="15dp"
+        android:textColorHint="#AA4B5151"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtSex1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edtName"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="50sp"
+        android:layout_marginStart="20sp"
+        android:layout_toRightOf="@id/edtBirthday1"
+        android:text="Gender: "
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.radiobutton.MaterialRadioButton
+        android:id="@+id/checkMale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtSex1"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/edtBirthday1"
+        android:buttonTint="#0dd1fc"
+        android:text="Male"
+        android:textColor="#AA4B5151"
+        android:textStyle="bold" />
+
+    <com.google.android.material.radiobutton.MaterialRadioButton
+        android:id="@+id/checkFemale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtSex1"
+        android:layout_toRightOf="@id/checkMale"
+        android:buttonTint="#0dd1fc"
+        android:text="Female"
+        android:textColor="#AA4B5151"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtPassword1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/checkMale"
+        android:layout_marginLeft="10sp"
+        android:text="Secret word"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/edtPassword1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtPassword1"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/edt_background"
+        android:drawableLeft="@drawable/lock_white"
+        android:drawablePadding="15sp"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:padding="15dp"
+        android:textColorHint="#AA4B5151"
+        android:textStyle="bold" />
+
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogin"
+        android:layout_width="350sp"
+        android:layout_height="75sp"
+        android:layout_below="@+id/edtPassword1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10sp"
+        android:backgroundTint="#2196F3"
+        android:fontFamily="sans-serif-thin"
+        android:text="Add Employee"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:cornerRadius="30sp" />
+
+    <TextView
+        android:id="@+id/txtRegisterToLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnLogin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10sp"
+        android:text="Cancel"
+        android:textColor="#E56C03"
+        android:textSize="16sp" />
+</RelativeLayout>
