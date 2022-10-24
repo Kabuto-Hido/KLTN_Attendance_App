@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".ProfileInformationFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorBlue">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="15dp"
+                android:src="@drawable/baseline_arrow_back_white_24"
+                />
+
+        </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="@color/colorBlue"
+            android:padding="20dp">
+            
+            <ImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/profile_person"
+                />
+            <TextView
+                android:id="@+id/txtFullName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Username"
+                android:layout_marginStart="20dp"
+                android:layout_toEndOf="@id/imgProfile"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:includeFontPadding="false"
+                android:textSize="20sp"
+                android:layout_marginBottom="10dp"/>
+            <TextView
+                android:id="@+id/txtGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gender: "
+                android:textColor="@color/white"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
+                android:layout_toEndOf="@id/imgProfile"
+                android:layout_below="@id/txtFullName"
+                android:textStyle="bold"
+                android:includeFontPadding="false"
+                android:textSize="20sp" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/checkMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtGender"
+                android:layout_toEndOf="@id/imgProfile"
+                android:buttonTint="#0dd1fc"
+                android:text="Male"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_marginStart="15dp"/>
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/checkFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtGender"
+                android:layout_toRightOf="@id/checkMale"
+                android:buttonTint="#0dd1fc"
+                android:text="Female"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/edittext_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:hint="Full Name">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/profile_person"
+                    android:drawablePadding="10dp"
+                    android:text="fullnameuser">
+                </com.google.android.material.textfield.TextInputEditText>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/edittext_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:hint="Phone Number">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_phone2"
+                    android:drawablePadding="10dp"
+                    android:text="phonenumber"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edittext_birthday"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:hint="Birthday">
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/profile_calendar"
+                android:drawablePadding="10dp"
+                android:text="birthday"/>
+        </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/edittext_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:hint="Password">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/profile_password"
+                    android:drawablePadding="10dp"
+                    android:text="password"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Update"
+                android:backgroundTint="@color/colorBlue"
+                app:cornerRadius="30dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</ScrollView>
