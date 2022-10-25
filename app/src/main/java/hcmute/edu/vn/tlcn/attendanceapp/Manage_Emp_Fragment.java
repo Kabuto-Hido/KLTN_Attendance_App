@@ -1,5 +1,7 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -7,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +17,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.SuccessContinuation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
@@ -90,11 +99,9 @@ public class Manage_Emp_Fragment extends Fragment {
             getActivity().finish();
         }
 
-        btnBackPageMngEmp = (ImageView) view.findViewById(R.id.btnBackPageMngEmp);
-        listviewEmp = (ListView) view.findViewById(R.id.listviewEmp);
-        btnAddEmp = (FloatingActionButton) view.findViewById(R.id.btnAddEmp);
+        mapping();
 
-        employeeAdapter = new EmployeeAdapter(getActivity(),R.layout.emp_row,empList);
+        employeeAdapter = new EmployeeAdapter(getActivity(),R.layout.emp_row,empList,Manage_Emp_Fragment.this);
         listviewEmp.setAdapter(employeeAdapter);
 
         btnBackPageMngEmp.setOnClickListener(new View.OnClickListener() {
@@ -105,15 +112,29 @@ public class Manage_Emp_Fragment extends Fragment {
             }
         });
 
+        btnAddEmp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddEmployee addEmployee = new AddEmployee();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, addEmployee).commit();
+            }
+        });
+
         getListEmp();
 
         return view;
     }
 
+    private void mapping(){
+        btnBackPageMngEmp = (ImageView) view.findViewById(R.id.btnBackPageMngEmp);
+        listviewEmp = (ListView) view.findViewById(R.id.listviewEmp);
+        btnAddEmp = (FloatingActionButton) view.findViewById(R.id.btnAddEmp);
+    }
+
     private void getListEmp(){
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("users");
-        ref.orderByChild("role").equalTo(0).addListenerForSingleValueEvent(new ValueEventListener() {
+        ref.orderByChild("role").equalTo(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 empList.clear();
@@ -129,5 +150,55 @@ public class Manage_Emp_Fragment extends Fragment {
                 Toast.makeText(getActivity(), "Get list employees failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void DialogEmpDelete(User user){
+        AlertDialog.Builder dialogDelete = new AlertDialog.Builder(getActivity());
+        dialogDelete.setMessage("Do you want to delete employee have phone "+user.getPhone()+" ?");
+        dialogDelete.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageReference = storage.getReference(user.getAvatar());
+                storageReference.delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference ref = database.getReference("users");
+                                ref.child(user.getPhone()).removeValue()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                getListEmp();
+                                                Toast.makeText(getActivity(),"Delete successful!!",Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.d("deleteEmp",e.getMessage());
+                                                Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("deleteEmp",e.getMessage());
+                                Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        });
+
+        dialogDelete.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        dialogDelete.show();
     }
 }

@@ -24,6 +24,8 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import hcmute.edu.vn.tlcn.attendanceapp.MainActivity;
+import hcmute.edu.vn.tlcn.attendanceapp.Manage_Emp_Fragment;
 import hcmute.edu.vn.tlcn.attendanceapp.R;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
@@ -31,11 +33,13 @@ public class EmployeeAdapter extends BaseAdapter {
     private Context context;
     private int layout;
     private List<User> lstEmp;
+    private Manage_Emp_Fragment fragment;
 
-    public EmployeeAdapter(Context context, int layout, List<User> lstEmp) {
+    public EmployeeAdapter(Context context, int layout, List<User> lstEmp, Manage_Emp_Fragment fragment) {
         this.context = context;
         this.layout = layout;
         this.lstEmp = lstEmp;
+        this.fragment = fragment;
     }
 
     @Override
@@ -78,7 +82,7 @@ public class EmployeeAdapter extends BaseAdapter {
         }
 
         User user = lstEmp.get(position);
-        holder.empName.setText(user.getFullName());
+
         if(!user.getAvatar().equals("")){
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageReference = storage.getReference(user.getAvatar());
@@ -97,6 +101,7 @@ public class EmployeeAdapter extends BaseAdapter {
         else{
             holder.empAvatar.setImageResource(R.drawable.man_placeholder);
         }
+        holder.empName.setText(user.getFullName());
 
         holder.btnMore.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,10 +112,10 @@ public class EmployeeAdapter extends BaseAdapter {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
-                            case R.id.btnAddEmp:
+                            case R.id.btnEditEmp:
                                 return true;
                             case R.id.btnDeleteEmp:
-                                Toast.makeText(context,"Success!!",Toast.LENGTH_SHORT).show();
+                                fragment.DialogEmpDelete(user);
                                 return true;
                             default:
                                 return false;
