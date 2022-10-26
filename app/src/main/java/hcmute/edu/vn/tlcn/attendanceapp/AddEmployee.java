@@ -102,7 +102,7 @@ public class AddEmployee extends Fragment {
     TextView btnCancelAdd;
     RadioButton checkMale, checkFemale;
     private final int PICK_IMAGE_REQUEST = 22;
-    private boolean isCamera = true;
+    private boolean isCamera = false;
     private Uri filePath;
     private byte[] byteArray;
 
@@ -170,7 +170,6 @@ public class AddEmployee extends Fragment {
                 photo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        isCamera = false;
                         Intent intent = new Intent();
                         intent.setType("image/*");
                         intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -254,7 +253,8 @@ public class AddEmployee extends Fragment {
 
                                         @Override
                                         public void onCancelled(@NonNull DatabaseError error) {
-
+                                            Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                                            progressDialog.dismiss();
                                         }
                                     });
                                 }
@@ -262,6 +262,8 @@ public class AddEmployee extends Fragment {
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
                                 }
                             });
 
@@ -279,11 +281,13 @@ public class AddEmployee extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK
                 && data != null && data.getData() != null) {
+            isCamera = false;
             filePath = data.getData();
             imgAvatarProfile.setImageURI(filePath);
         }
         else if(requestCode == 0 && resultCode == getActivity().RESULT_OK
                 && data != null){
+            isCamera = true;
             Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             selectedImage.compress(Bitmap.CompressFormat.PNG,100,stream);
@@ -338,17 +342,15 @@ public class AddEmployee extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_AUDIO_PERMISSION_CODE:
-                if (grantResults.length > 0) {
-                    boolean permissionToCamera = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                    if (permissionToCamera) {
-                        Toast.makeText(getActivity().getApplicationContext(), "Permission Granted", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getActivity().getApplicationContext(), "Permission Denied", Toast.LENGTH_LONG).show();
-                    }
+        if (requestCode == REQUEST_AUDIO_PERMISSION_CODE) {
+            if (grantResults.length > 0) {
+                boolean permissionToCamera = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                if (permissionToCamera) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Permission Granted", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity().getApplicationContext(), "Permission Denied", Toast.LENGTH_LONG).show();
                 }
-                break;
+            }
         }
     }
 }

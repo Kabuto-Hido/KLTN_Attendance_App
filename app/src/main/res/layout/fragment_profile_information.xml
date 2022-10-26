@@ -10,7 +10,7 @@
     <!-- TODO: Update blank fragment layout -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
@@ -19,141 +19,148 @@
             android:background="@color/colorBlue">
 
             <ImageView
-                android:id="@+id/btnBack"
+                android:contentDescription="avatar"
+                android:id="@+id/btnBackProfile"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="15dp"
-                android:src="@drawable/baseline_arrow_back_white_24"
-                />
+                android:src="@drawable/baseline_arrow_back_white_24" />
 
         </LinearLayout>
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="match_parent"
             android:background="@color/colorBlue"
             android:padding="20dp">
             
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imgProfile"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_centerVertical="true"
-                android:src="@drawable/profile_person"
-                />
-            <TextView
-                android:id="@+id/txtFullName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Username"
-                android:layout_marginStart="20dp"
-                android:layout_toEndOf="@id/imgProfile"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:textColor="@color/white"
-                android:includeFontPadding="false"
-                android:textSize="20sp"
-                android:layout_marginBottom="10dp"/>
+                android:src="@drawable/person_white" />
+
             <TextView
                 android:id="@+id/txtGender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gender: "
                 android:textColor="@color/white"
-                android:layout_centerVertical="true"
                 android:layout_marginStart="20dp"
                 android:layout_toEndOf="@id/imgProfile"
-                android:layout_below="@id/txtFullName"
                 android:textStyle="bold"
                 android:includeFontPadding="false"
                 android:textSize="20sp" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/checkMale"
+                android:id="@+id/rMale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 android:layout_below="@+id/txtGender"
-                android:layout_toEndOf="@id/imgProfile"
+                android:layout_toEndOf="@+id/imgProfile"
                 android:buttonTint="#0dd1fc"
+                android:minHeight="48dp"
                 android:text="Male"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:layout_marginStart="15dp"/>
+                android:textStyle="bold" />
+
             <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/checkFemale"
+                android:id="@+id/rFemale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txtGender"
-                android:layout_toRightOf="@id/checkMale"
+                android:layout_toEndOf="@id/rMale"
                 android:buttonTint="#0dd1fc"
+                android:minHeight="48dp"
                 android:text="Female"
                 android:textColor="@color/white"
                 android:textStyle="bold" />
         </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="16dp">
-
+            android:padding="20dp">
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edittext_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:layout_height="65dp"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/colorBlue"
                 android:hint="Full Name">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edittext_name"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="65dp"
                     android:drawableStart="@drawable/profile_person"
                     android:drawablePadding="10dp"
-                    android:text="fullnameuser">
-                </com.google.android.material.textfield.TextInputEditText>
-            </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edittext_phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:hint="Phone Number">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_phone2"
-                    android:drawablePadding="10dp"
-                    android:text="phonenumber"/>
+                    android:textSize="20sp"
+                    android:text="fullnameuser"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/edittext_birthday"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:hint="Birthday">
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/profile_calendar"
-                android:drawablePadding="10dp"
-                android:text="birthday"/>
-        </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/edittext_password"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:hint="Password">
+                android:layout_height="65dp"
+                android:textColorHint="@color/colorBlue"
+                android:layout_marginBottom="20dp"
+                android:hint="Phone Number">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edittext_phone"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/profile_password"
+                    android:layout_height="65dp"
+                    android:drawableStart="@drawable/ic_phone2"
                     android:drawablePadding="10dp"
-                    android:text="password"/>
+                    android:textSize="20sp"
+                    android:text="phonenumber"
+                    android:focusable="false"/>
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:layout_marginBottom="20dp"
+                android:textColorHint="@color/colorBlue"
+                android:hint="Description">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edittext_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="90dp"
+                    android:drawableStart="@drawable/ic_description"
+                    android:drawablePadding="10dp"
+                    android:textSize="20sp"
+                    android:lines="5"
+                    android:inputType="textMultiLine"
+                    android:maxLines="5"
+                    android:gravity="top|start"
+                    android:scrollbars="vertical"
+                    android:text="description"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_marginBottom="40dp"
+                android:textColorHint="@color/colorBlue"
+                android:hint="Birthday">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edittext_birthday"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:drawableStart="@drawable/profile_calendar"
+                    android:drawablePadding="10dp"
+                    android:textSize="20sp"
+                    android:text="birthday"
+                    android:focusable="false"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_update"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="300dp"
+                android:layout_height="65dp"
                 android:text="Update"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
                 android:backgroundTint="@color/colorBlue"
                 app:cornerRadius="30dp"/>
         </LinearLayout>
