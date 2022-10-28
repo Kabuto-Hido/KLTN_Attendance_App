@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ConfirmOTPActivity">
+
+    <ImageView
+        android:id="@+id/img_logo_verify_otp"
+        android:layout_width="150sp"
+        android:layout_height="150sp"
+        android:layout_marginTop="70sp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logo_verify_otp"/>
+
+    <TextView
+        android:id="@+id/txt_noti1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img_logo_verify_otp"
+        android:layout_marginTop="34sp"
+        android:text="OTP Verification"
+        android:textSize="30sp"
+        android:textColor="#0F1828"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/txt_noti2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_noti1"
+        android:layout_marginTop="20sp"
+        android:text="Enter Code"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:textColor="#0F1828"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/nofi3"
+        android:layout_width="220sp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txt_noti2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10sp"
+        android:text="We have sent you an SMS with the code to 0584577843"
+        android:textAlignment="center"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/linearCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="40sp"
+        android:layout_below="@+id/nofi3">
+
+        <EditText
+            android:id="@+id/editTextInput1"
+            android:layout_width="50sp"
+            android:layout_height="55sp"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:textAlignment="center"
+            android:maxLength="1"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:background="@drawable/otp_background"/>
+
+        <EditText
+            android:id="@+id/editTextInput2"
+            android:layout_width="50sp"
+            android:layout_height="55sp"
+            android:layout_marginStart="10sp"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="no"
+            android:textAlignment="center"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:background="@drawable/otp_background"/>
+
+        <EditText
+            android:id="@+id/editTextInput3"
+            android:layout_width="50sp"
+            android:layout_height="55sp"
+            android:layout_marginStart="10sp"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:textAlignment="center"
+            android:maxLength="1"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:background="@drawable/otp_background"/>
+
+        <EditText
+            android:id="@+id/editTextInput4"
+            android:layout_width="50sp"
+            android:layout_height="55sp"
+            android:layout_marginStart="10sp"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:textAlignment="center"
+            android:maxLength="1"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:background="@drawable/otp_background"/>
+
+        <EditText
+            android:id="@+id/editTextInput5"
+            android:layout_width="50sp"
+            android:layout_height="55sp"
+            android:layout_marginStart="10sp"
+            android:imeOptions="actionNext"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:textAlignment="center"
+            android:maxLength="1"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:background="@drawable/otp_background"/>
+
+        <EditText
+            android:id="@+id/editTextInput6"
+            android:layout_width="50sp"
+            android:layout_height="55sp"
+            android:layout_marginStart="10sp"
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:textAlignment="center"
+            android:maxLength="1"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:background="@drawable/otp_background"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_confirmOtp"
+        android:layout_width="match_parent"
+        android:layout_height="70sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="80dp"
+        android:layout_marginTop="50dp"
+        android:layout_below="@+id/linearCode"
+        android:backgroundTint="#2196F3"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:cornerRadius="30sp"
+        android:text="Confirm" />
+
+    <TextView
+        android:id="@+id/btn_resendCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_confirmOtp"
+        android:textSize="16sp"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:text="Resend Code" />
+
+</RelativeLayout>

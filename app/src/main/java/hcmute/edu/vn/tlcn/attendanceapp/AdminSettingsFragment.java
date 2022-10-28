@@ -60,7 +60,7 @@ public class AdminSettingsFragment extends Fragment {
     }
 
     View view;
-    TextView txtEmployee, txtProfile;
+    TextView txtEmployee, txtProfile, txtChangePassword;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -92,11 +92,19 @@ public class AdminSettingsFragment extends Fragment {
             }
         });
 
+        txtChangePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ChangePasswordFragment changePasswordFragment = new ChangePasswordFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,changePasswordFragment).commit();
+            }
+        });
         return view;
     }
 
     private void mapping(){
         txtEmployee = (TextView) view.findViewById(R.id.txtEmployee);
         txtProfile = (TextView) view.findViewById(R.id.txtProfile);
+        txtChangePassword = (TextView) view.findViewById(R.id.txtChangePassword);
     }
 }
