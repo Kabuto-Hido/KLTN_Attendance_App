@@ -1,6 +1,8 @@
 package hcmute.edu.vn.tlcn.attendanceapp.model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     public String fullName;
     public String phone;
     private String password;

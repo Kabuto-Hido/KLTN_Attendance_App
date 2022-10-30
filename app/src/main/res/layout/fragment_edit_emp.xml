@@ -8,7 +8,7 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/labelNameEmp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -21,14 +21,13 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgAvatarProfile"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_below="@+id/textView2"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_below="@+id/labelNameEmp"
         android:layout_marginStart="20sp"
         android:layout_marginTop="20dp"
         android:src="@drawable/person_white"
-        android:layout_centerHorizontal="true"
-        />
+        android:layout_centerHorizontal="true" />
 
     <EditText
         android:id="@+id/edtPhonenum"
@@ -36,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/imgAvatarProfile"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/edt_background"
@@ -101,7 +100,7 @@
         android:textStyle="bold" />
 
     <com.google.android.material.radiobutton.MaterialRadioButton
-        android:id="@+id/checkMale"
+        android:id="@+id/radioMale"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtSex1"
@@ -113,43 +112,24 @@
         android:textStyle="bold" />
 
     <com.google.android.material.radiobutton.MaterialRadioButton
-        android:id="@+id/checkFemale"
+        android:id="@+id/radioFemale"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtSex1"
-        android:layout_toRightOf="@id/checkMale"
+        android:layout_toRightOf="@id/radioMale"
         android:buttonTint="#0dd1fc"
         android:text="Female"
         android:textColor="#AA4B5151"
         android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/edtPassword1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/edtBirthday1"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
-        android:background="@drawable/edt_background"
-        android:drawableLeft="@drawable/lock_white"
-        android:drawablePadding="15sp"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="15dp"
-        android:textColorHint="#AA4B5151"
-        android:textStyle="bold" />
-
-
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnAdd"
+        android:id="@+id/btnConfirmEdit"
         android:layout_width="350sp"
         android:layout_height="75sp"
-        android:layout_below="@+id/edtPassword1"
+        android:layout_below="@+id/edtBirthday1"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10sp"
+        android:layout_marginTop="30sp"
         android:backgroundTint="#2196F3"
         android:fontFamily="sans-serif-thin"
         android:text="Confirm"
@@ -158,12 +138,13 @@
         app:cornerRadius="30sp" />
 
     <TextView
-        android:id="@+id/btnCancelAdd"
+        android:id="@+id/btnCancelEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btnAdd"
         android:layout_centerHorizontal="true"
+        android:layout_below="@+id/btnConfirmEdit"
         android:layout_marginTop="10sp"
+        android:layout_marginBottom="20dp"
         android:text="Cancel"
         android:textColor="#E56C03"
         android:textSize="16sp" />

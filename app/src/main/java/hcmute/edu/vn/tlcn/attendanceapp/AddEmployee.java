@@ -105,6 +105,7 @@ public class AddEmployee extends Fragment {
     private boolean isCamera = false;
     private Uri filePath;
     private byte[] byteArray;
+    private Dialog dialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,7 +161,7 @@ public class AddEmployee extends Fragment {
         imgAvatarProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Dialog dialog = new Dialog(getActivity());
+                dialog = new Dialog(getActivity());
                 dialog.setContentView(R.layout.dialog_image_picker);
                 dialog.show();
 
@@ -201,14 +202,14 @@ public class AddEmployee extends Fragment {
                 String password = edtPassword1.getText().toString();
                 boolean sex = !checkFemale.isChecked();
 
+                ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setTitle("Checking...");
+                progressDialog.setMessage("Please wait");
+                progressDialog.show();
+
                 if(validate(phoneNumber,fullName,birthday,password)) {
                     //hash password
                     String hashPass = BCrypt.withDefaults().hashToString(12, password.toCharArray());
-
-                    ProgressDialog progressDialog = new ProgressDialog(getActivity());
-                    progressDialog.setTitle("Checking...");
-                    progressDialog.setMessage("Please wait");
-                    progressDialog.show();
 
                     User user = new User(fullName, phoneNumber, hashPass, birthday, "", sex, "", 1);
 
@@ -269,6 +270,9 @@ public class AddEmployee extends Fragment {
 
 
                 }
+                else{
+                    progressDialog.dismiss();
+                }
             }
         });
 
@@ -284,6 +288,7 @@ public class AddEmployee extends Fragment {
             isCamera = false;
             filePath = data.getData();
             imgAvatarProfile.setImageURI(filePath);
+            dialog.dismiss();
         }
         else if(requestCode == 0 && resultCode == getActivity().RESULT_OK
                 && data != null){
@@ -295,7 +300,7 @@ public class AddEmployee extends Fragment {
 
             Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.length);
             imgAvatarProfile.setImageBitmap(bitmap);
-
+            dialog.dismiss();
         }
     }
 

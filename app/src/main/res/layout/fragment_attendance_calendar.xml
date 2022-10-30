@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/off_white"
+        android:gravity="center"
         app:calendarBackgroundColor="@color/off_white"
         app:calendarTitleTextColor="@color/black"
         app:currentDayOfMonthColor="@color/colorBlue"
@@ -20,9 +21,7 @@
         app:disabledDayTextColor="@color/grey"
         app:selectedDayBackgroundColor="@color/colorBlue"
         app:titleLayoutBackgroundColor="@color/white"
-        app:weekLayoutBackgroundColor="@color/white"
-        android:gravity="center"
-        />
+        app:weekLayoutBackgroundColor="@color/white" />
 
 
 </RelativeLayout>

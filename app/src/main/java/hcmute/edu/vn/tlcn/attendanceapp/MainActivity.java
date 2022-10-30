@@ -21,12 +21,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     AdminSettingsFragment adminSettingsFragment = new AdminSettingsFragment();
+    AttendanceCalendarFragment attendanceCalendarFragment = new AttendanceCalendarFragment();
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.navSettings:
                 getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, adminSettingsFragment).commit();
+                return true;
+            case R.id.navLogs:
+                getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, attendanceCalendarFragment).commit();
                 return true;
         }
         return false;

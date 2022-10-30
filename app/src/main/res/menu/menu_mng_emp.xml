@@ -6,4 +6,7 @@
     <item
         android:id="@+id/btnDeleteEmp"
         android:title="Delete"/>
+    <item
+        android:id="@+id/btnResetPass"
+        android:title="Reset Password"/>
 </menu>

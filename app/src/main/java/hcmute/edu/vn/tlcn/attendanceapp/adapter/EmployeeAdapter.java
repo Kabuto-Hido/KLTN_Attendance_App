@@ -2,6 +2,7 @@ package hcmute.edu.vn.tlcn.attendanceapp.adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import hcmute.edu.vn.tlcn.attendanceapp.EditEmpFragment;
 import hcmute.edu.vn.tlcn.attendanceapp.MainActivity;
 import hcmute.edu.vn.tlcn.attendanceapp.Manage_Emp_Fragment;
 import hcmute.edu.vn.tlcn.attendanceapp.R;
@@ -113,9 +115,18 @@ public class EmployeeAdapter extends BaseAdapter {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
                             case R.id.btnEditEmp:
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("edtUser",user);
+                                //bundle.putString("edtUser", user.getPhone());
+                                EditEmpFragment editEmpFragment = new EditEmpFragment();
+                                editEmpFragment.setArguments(bundle);
+                                ((MainActivity)context).getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, editEmpFragment).commit();
                                 return true;
                             case R.id.btnDeleteEmp:
                                 fragment.DialogEmpDelete(user);
+                                return true;
+                            case R.id.btnResetPass:
+                                fragment.dialogResetPass(user);
                                 return true;
                             default:
                                 return false;

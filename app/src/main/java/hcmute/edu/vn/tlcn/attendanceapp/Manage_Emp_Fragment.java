@@ -32,6 +32,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.EmployeeAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
@@ -152,6 +153,55 @@ public class Manage_Emp_Fragment extends Fragment {
         });
     }
 
+    public void dialogResetPass(User user){
+        AlertDialog.Builder dialogResetPass = new AlertDialog.Builder(getActivity());
+        dialogResetPass.setMessage("Do you sure want to reset password for employee have phone "+user.getPhone()+" ?");
+        dialogResetPass.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //reset pass emp - default: 123456
+                String defaultPassword = "123456";
+                String hashPass = BCrypt.withDefaults().hashToString(12, defaultPassword.toCharArray());
+                user.setPassword(hashPass);
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference userRef = database.getReference("users");
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.hasChild(user.getPhone())) {
+                            userRef.child(user.getPhone()).setValue(user);
+                            Toast.makeText(getActivity(),"New " + user.getPhone()
+                                    +"'s password is 123456",Toast.LENGTH_SHORT).show();
+
+                            dialog.dismiss();
+
+                        }
+                        else{
+                            Toast.makeText(getContext(), "User not exist !", Toast.LENGTH_SHORT).show();
+                            dialog.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+
+        dialogResetPass.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        dialogResetPass.show();
+    }
+
     public void DialogEmpDelete(User user){
         AlertDialog.Builder dialogDelete = new AlertDialog.Builder(getActivity());
         dialogDelete.setMessage("Do you want to delete employee have phone "+user.getPhone()+" ?");
@@ -171,6 +221,7 @@ public class Manage_Emp_Fragment extends Fragment {
                                             @Override
                                             public void onSuccess(Void unused) {
                                                 getListEmp();
+                                                dialog.dismiss();
                                                 Toast.makeText(getActivity(),"Delete successful!!",Toast.LENGTH_SHORT).show();
                                             }
                                         })
@@ -178,6 +229,7 @@ public class Manage_Emp_Fragment extends Fragment {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 Log.d("deleteEmp",e.getMessage());
+                                                dialog.dismiss();
                                                 Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
                                             }
                                         });
@@ -187,6 +239,7 @@ public class Manage_Emp_Fragment extends Fragment {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.d("deleteEmp",e.getMessage());
+                                dialog.dismiss();
                                 Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -196,7 +249,7 @@ public class Manage_Emp_Fragment extends Fragment {
         dialogDelete.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                dialog.dismiss();
             }
         });
         dialogDelete.show();

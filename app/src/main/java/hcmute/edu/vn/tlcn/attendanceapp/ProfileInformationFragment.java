@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -108,6 +109,7 @@ public class ProfileInformationFragment extends Fragment {
     private boolean isCamera = false;
     private Uri filePath;
     private byte[] byteArray;
+    private Dialog dialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -162,7 +164,7 @@ public class ProfileInformationFragment extends Fragment {
         imgProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Dialog dialog = new Dialog(getActivity());
+                dialog = new Dialog(getActivity());
                 dialog.setContentView(R.layout.dialog_image_picker);
                 dialog.show();
 
@@ -208,6 +210,7 @@ public class ProfileInformationFragment extends Fragment {
 
                 if(fullName.equals("") || birthday.equals("")) {
                     Toast.makeText(getActivity(), "Invalid input !", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
                     return;
                 }
 
@@ -215,17 +218,36 @@ public class ProfileInformationFragment extends Fragment {
                 user.setBirthday(birthday);
                 user.setDescription(description);
                 user.setSex(sex);
+
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference ref = storage.getReference();
-                if(filePath == null){
-                    filePath = Uri.parse("android.resource://"+ R.class.getPackage().getName()+"/"+R.drawable.man_placeholder);
-                }
+
                 UploadTask uploadTask;
-                if(isCamera){
-                    uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(byteArray);
+                if(imgProfile.isSelected()){
+                    if(filePath == null){
+                        Bitmap bitmap = ((BitmapDrawable) imgProfile.getDrawable()).getBitmap();
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                        byte[] imageInByte = stream.toByteArray();
+
+                        uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(imageInByte);
+                    }
+
+                    else if(isCamera){
+                        uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(byteArray);
+                    }
+                    else {
+                        uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putFile(filePath);
+                    }
+
                 }
-                else {
-                    uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putFile(filePath);
+                else{
+                    Bitmap bitmap = ((BitmapDrawable) imgProfile.getDrawable()).getBitmap();
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    byte[] imageInByte = stream.toByteArray();
+
+                    uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(imageInByte);
                 }
 
                 uploadTask
@@ -265,6 +287,7 @@ public class ProfileInformationFragment extends Fragment {
             isCamera = false;
             filePath = data.getData();
             imgProfile.setImageURI(filePath);
+            dialog.dismiss();
         }
         else if(requestCode == 0 && resultCode == getActivity().RESULT_OK
                 && data != null){
@@ -276,15 +299,10 @@ public class ProfileInformationFragment extends Fragment {
 
             Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.length);
             imgProfile.setImageBitmap(bitmap);
+            dialog.dismiss();
 
         }
     }
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        putDataToView();
-//    }
 
     private void putDataToView(){
         user = user_singeton.getUser();
