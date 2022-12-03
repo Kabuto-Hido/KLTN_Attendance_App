@@ -37,7 +37,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -242,6 +241,13 @@ public class AddEmployee extends Fragment {
                                             else{
                                                 user.setAvatar("images/" + user.getPhone() + "_avatar");
                                                 userRef.child(user.getPhone()).setValue(user);
+
+
+                                                if(imgAvatarProfile.getDrawable().getConstantState() !=
+                                                        getActivity().getResources().getDrawable(R.drawable.man_placeholder).getConstantState()){
+
+                                                }
+
                                                 progressDialog.dismiss();
                                                 Toast.makeText(getContext(), "New employee added", Toast.LENGTH_SHORT).show();
 
@@ -278,7 +284,6 @@ public class AddEmployee extends Fragment {
 
         return view;
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

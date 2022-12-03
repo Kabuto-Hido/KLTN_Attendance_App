@@ -109,7 +109,7 @@ public class AttendanceCalendarFragment extends Fragment {
 
     }
     private void mapping(){
-        calendarView = (CustomCalendarView) view.findViewById(R.id.calendar_view);
+        //calendarView = (CustomCalendarView) view.findViewById(R.id.calendar_view);
     }
 
 

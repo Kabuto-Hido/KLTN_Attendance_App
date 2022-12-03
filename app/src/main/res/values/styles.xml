@@ -1,7 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="roundImageView"  parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">35sp</item>
-    </style>
-</resources>
+<resources></resources>

@@ -18,13 +18,11 @@
             android:padding="6dp">
 
             <ImageView
-                android:id="@+id/btnBack"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_baseline_option" />
 
             <TextView
-                android:id="@+id/txtSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Settings"
@@ -52,7 +50,6 @@
             android:layout_height="1dp"
             android:background="#AEAEAE"/>
         <TextView
-            android:id="@+id/txtShift"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Manage Shifts"
@@ -68,7 +65,6 @@
             android:layout_height="1dp"
             android:background="#AEAEAE"/>
         <TextView
-            android:id="@+id/txtChangeAvatar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Notification"

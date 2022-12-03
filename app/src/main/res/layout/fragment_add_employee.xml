@@ -26,7 +26,7 @@
         android:layout_below="@+id/textView2"
         android:layout_marginStart="20sp"
         android:layout_marginTop="20dp"
-        android:src="@drawable/person_white"
+        android:src="@drawable/man_placeholder"
         android:layout_centerHorizontal="true"
         />
 

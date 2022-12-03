@@ -94,11 +94,11 @@ public class LoginActivity extends AppCompatActivity {
                                 User_singeton user_singeton = User_singeton.getInstance();
                                 user_singeton.setUser(user);
                                 progressDialog.dismiss();
-                                if(user.getRole() == 0) {
+                                //if(user.getRole() == 0) {
                                     Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(LoginActivity.this,MainActivity.class));
                                     finish();
-                                }
+                                //}
                             }
                             else{
                                 progressDialog.dismiss();

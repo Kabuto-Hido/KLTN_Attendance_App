@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     AdminSettingsFragment adminSettingsFragment = new AdminSettingsFragment();
     AttendanceCalendarFragment attendanceCalendarFragment = new AttendanceCalendarFragment();
+    HomeFragment homeFragment = new HomeFragment();
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -31,6 +32,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 return true;
             case R.id.navLogs:
                 getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, attendanceCalendarFragment).commit();
+                return true;
+            case R.id.navHome:
+                getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, homeFragment).commit();
                 return true;
         }
         return false;

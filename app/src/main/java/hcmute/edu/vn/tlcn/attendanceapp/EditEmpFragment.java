@@ -122,8 +122,6 @@ public class EditEmpFragment extends Fragment {
         mapping();
         editUser = (User) getArguments().getSerializable("edtUser");
 
-        System.out.println(editUser.getFullName());
-
         putDataToView();
 
         btnCancelEdit.setOnClickListener(new View.OnClickListener() {

@@ -9,7 +9,6 @@
         android:title="Logs"
         android:icon="@drawable/ic_baseline_settings_24"/>
     <item
-        android:id="@+id/navReports"
         android:icon="@drawable/ic_baseline_reports_24"
         android:title="Reports" />
     <item
