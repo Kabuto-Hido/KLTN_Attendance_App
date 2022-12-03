@@ -166,7 +166,7 @@
             android:backgroundTint="#2196F3"
             android:fontFamily="sans-serif-medium"
             android:text="Time out"
-            android:visibility="gone"
+            android:visibility="invisible"
             android:textSize="20sp"
             android:textStyle="bold"
             app:cornerRadius="10sp" />

@@ -173,8 +173,9 @@ public class HomeFragment extends Fragment {
 
         putDataToView();
 
-        if(!txtTimeCheckIn.getText().toString().equals("")){
+        if(!txtTimeCheckIn.getText().toString().equals("--/--")){
             btnTimeIn.setEnabled(false);
+            btnTimeOut.setVisibility(View.VISIBLE);
         }
 
         btnTimeIn.setOnClickListener(new View.OnClickListener() {
@@ -240,20 +241,42 @@ public class HomeFragment extends Fragment {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
 
-        String checkInDate = dateFormat.format(currentTime);
+        String currentDate = dateFormat.format(currentTime);
         recordRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                DataSnapshot dataSnapshot1 = snapshot.child(checkInDate).child("checkIn");
+                DataSnapshot dataSnapshot1 = snapshot.child(currentDate).child("checkIn");
                 Record checkInRecord = dataSnapshot1.getValue(Record.class);
-                if(!checkInRecord.getTime().equals("")){
+                if (checkInRecord == null) {
+                    return;
+                }
+                else if (!checkInRecord.getTime().equals("")) {
                     txtTimeCheckIn.setText(checkInRecord.getTime());
+                    btnTimeIn.setVisibility(View.INVISIBLE);
+                    btnTimeOut.setVisibility(View.VISIBLE);
                 }
 
-                DataSnapshot dataSnapshot2 = snapshot.child(checkInDate).child("checkOut");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        recordRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                DataSnapshot dataSnapshot2 = snapshot.child(currentDate).child("checkOut");
                 Record checkOutRecord = dataSnapshot2.getValue(Record.class);
-                if(!checkOutRecord.getTime().equals("")){
-                    txtTimeCheckIn.setText(checkOutRecord.getTime());
+                if (checkOutRecord == null) {
+                    return;
+                }
+                else if (!checkOutRecord.getTime().equals("")) {
+                    txtTimeCheckOut.setText(checkOutRecord.getTime());
+                    btnTimeIn.setVisibility(View.VISIBLE);
+                    btnTimeIn.setEnabled(false);
+                    btnTimeOut.setVisibility(View.INVISIBLE);
                 }
             }
 
