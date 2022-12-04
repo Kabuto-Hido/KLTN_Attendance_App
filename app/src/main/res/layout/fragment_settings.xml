@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdminSettingsFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".SettingsFragment">
 
     <LinearLayout
         android:orientation="vertical"
@@ -30,37 +30,6 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/txtEmployee"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Manage Employees"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:background="@drawable/border_line"
-            android:drawablePadding="24dp"
-            android:textStyle="bold"
-            app:drawableStartCompat="@drawable/ic_baseline_manage_employee" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#AEAEAE"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Manage Shifts"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:background="@drawable/border_line"
-            android:drawablePadding="24dp"
-            app:drawableStartCompat="@drawable/ic_baseline_access_time_filled_24" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#AEAEAE"/>
-        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Notification"
@@ -76,7 +45,7 @@
             android:layout_height="1dp"
             android:background="#AEAEAE"/>
         <TextView
-            android:id="@+id/txtAdminChangePassword"
+            android:id="@+id/txtChangePassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Change Password"
@@ -92,7 +61,7 @@
             android:layout_height="1dp"
             android:background="#AEAEAE"/>
         <TextView
-            android:id="@+id/txtAdminProfile"
+            android:id="@+id/txtProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Profile"
@@ -107,9 +76,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#AEAEAE"/>
-
         <TextView
-            android:id="@+id/txtAdminLogOut"
+            android:id="@+id/txtLogOut"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Log out"
@@ -119,7 +87,6 @@
             android:textSize="20sp"
             android:drawablePadding="24dp"
             app:drawableStartCompat="@drawable/ic_logout" />
-
     </LinearLayout>
 
 </FrameLayout>

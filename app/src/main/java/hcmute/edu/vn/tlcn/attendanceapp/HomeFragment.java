@@ -68,6 +68,7 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -136,10 +137,12 @@ public class HomeFragment extends Fragment {
     User_singeton user_singeton = User_singeton.getInstance();
     User user;
     String status;
+    String type;
+    String absent1 = "absent with permission";
+    String absent2 = "absent without permission";
+    boolean absent = false;
 
     Interpreter tflite;
-    int imageSizeX;
-    int imageSizeY;
     Bitmap bitmapOrigin;
     int[] intValues;
     int inputSize = 112;
@@ -173,20 +176,53 @@ public class HomeFragment extends Fragment {
 
         putDataToView();
 
-        if(!txtTimeCheckIn.getText().toString().equals("--/--")){
-            btnTimeIn.setEnabled(false);
-            btnTimeOut.setVisibility(View.VISIBLE);
-        }
-
         btnTimeIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                status = "checkIn";
-                if(CheckPermissions()) {
-                    Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(takePicture, 0);
-                }else {
-                    RequestPermissions();
+                type = "checkIn";
+                try {
+                    Date nine = timeFormat.parse("09:00");
+                    Date haftNine = timeFormat.parse("09:30");
+
+                    currentTime = Calendar.getInstance().getTime();
+                    String strCurTime = timeFormat.format(currentTime);
+                    Date dateCurTime = timeFormat.parse(strCurTime);
+
+                    if(dateCurTime.before(nine)){
+                        status = "on time";
+                    }
+                    else if(dateCurTime.after(nine) && dateCurTime.before(haftNine)){
+                        status = "late";
+                    }
+                    else if(dateCurTime.after(haftNine)){
+                        absent = true;
+                    }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    Log.v("convertTimeErr",e.getMessage());
+                }
+
+                if(absent){
+                    btnTimeIn.setEnabled(false);
+                    currentTime = Calendar.getInstance().getTime();
+                    String absentDate = dateFormat.format(currentTime);
+
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference recordRef = database.getReference("record")
+                            .child(user.getPhone()).child(absentDate).child("absent");
+
+                    Record absentRecord = new Record(user.getFullName(),absentDate,"",absent2, "absent");
+                    recordRef.setValue(absentRecord);
+                    Toast.makeText(getActivity(),"Attendance time has passed!!",Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    if (CheckPermissions()) {
+                        Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(takePicture, 0);
+                    } else {
+                        RequestPermissions();
+                    }
                 }
 
             }
@@ -195,7 +231,7 @@ public class HomeFragment extends Fragment {
         btnTimeOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                status = "checkOut";
+                type = "checkOut";
                 if(CheckPermissions()) {
                     Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(takePicture, 0);
@@ -238,6 +274,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
+
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
 
@@ -247,10 +285,7 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 DataSnapshot dataSnapshot1 = snapshot.child(currentDate).child("checkIn");
                 Record checkInRecord = dataSnapshot1.getValue(Record.class);
-                if (checkInRecord == null) {
-                    return;
-                }
-                else if (!checkInRecord.getTime().equals("")) {
+                if (checkInRecord != null && !checkInRecord.getTime().equals("")) {
                     txtTimeCheckIn.setText(checkInRecord.getTime());
                     btnTimeIn.setVisibility(View.INVISIBLE);
                     btnTimeOut.setVisibility(View.VISIBLE);
@@ -269,10 +304,7 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 DataSnapshot dataSnapshot2 = snapshot.child(currentDate).child("checkOut");
                 Record checkOutRecord = dataSnapshot2.getValue(Record.class);
-                if (checkOutRecord == null) {
-                    return;
-                }
-                else if (!checkOutRecord.getTime().equals("")) {
+                if (checkOutRecord != null && !checkOutRecord.getTime().equals("")) {
                     txtTimeCheckOut.setText(checkOutRecord.getTime());
                     btnTimeIn.setVisibility(View.VISIBLE);
                     btnTimeIn.setEnabled(false);
@@ -459,7 +491,7 @@ public class HomeFragment extends Fragment {
         if(dis < 1.0f){
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
-            if(status.equals("checkIn")) {
+            if(type.equals("checkIn")) {
                 Toast.makeText(getActivity(), "Check In Successfully", Toast.LENGTH_SHORT).show();
 
                 currentTime = Calendar.getInstance().getTime();
@@ -467,9 +499,9 @@ public class HomeFragment extends Fragment {
 
                 String checkInTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getFullName(),checkInDate,checkInTime,status);
+                Record record = new Record(user.getFullName(),checkInDate,checkInTime,type,status);
 
-                recordRef.child(checkInDate).child(status).setValue(record);
+                recordRef.child(checkInDate).child(type).setValue(record);
 
                 txtTimeCheckIn.setText(digitalClock.getText());
                 btnTimeIn.setVisibility(View.INVISIBLE);
@@ -478,22 +510,22 @@ public class HomeFragment extends Fragment {
             else{
                 Toast.makeText(getActivity(), "Check Out Successfully", Toast.LENGTH_SHORT).show();
 
-                Date currentTime = Calendar.getInstance().getTime();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                currentTime = Calendar.getInstance().getTime();
                 String checkInDate = dateFormat.format(currentTime);
 
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
                 String checkInTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getFullName(),checkInDate,checkInTime,status);
+                Record record = new Record(user.getFullName(),checkInDate,checkInTime,"none",status);
 
-                recordRef.child(checkInDate).child(status).setValue(record);
+                recordRef.child(checkInDate).child(type).setValue(record);
 
                 txtTimeCheckOut.setText(digitalClock.getText());
                 btnTimeIn.setVisibility(View.VISIBLE);
+                btnTimeIn.setEnabled(false);
                 btnTimeOut.setVisibility(View.INVISIBLE);
             }
         }else {
+            bitmapOrigin = null;
             Toast.makeText(getActivity(),"Can't recognize face",Toast.LENGTH_SHORT).show();
         }
     }

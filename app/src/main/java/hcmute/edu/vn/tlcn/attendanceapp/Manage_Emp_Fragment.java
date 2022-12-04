@@ -109,7 +109,7 @@ public class Manage_Emp_Fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 AdminSettingsFragment adminSettingsFragment = new AdminSettingsFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, adminSettingsFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, adminSettingsFragment).commit();
             }
         });
 
@@ -117,7 +117,7 @@ public class Manage_Emp_Fragment extends Fragment {
             @Override
             public void onClick(View v) {
                 AddEmployee addEmployee = new AddEmployee();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, addEmployee).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, addEmployee).commit();
             }
         });
 

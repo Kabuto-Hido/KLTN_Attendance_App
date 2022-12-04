@@ -25,6 +25,7 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import hcmute.edu.vn.tlcn.attendanceapp.AdminMainActivity;
 import hcmute.edu.vn.tlcn.attendanceapp.EditEmpFragment;
 import hcmute.edu.vn.tlcn.attendanceapp.MainActivity;
 import hcmute.edu.vn.tlcn.attendanceapp.Manage_Emp_Fragment;
@@ -120,7 +121,7 @@ public class EmployeeAdapter extends BaseAdapter {
                                 //bundle.putString("edtUser", user.getPhone());
                                 EditEmpFragment editEmpFragment = new EditEmpFragment();
                                 editEmpFragment.setArguments(bundle);
-                                ((MainActivity)context).getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, editEmpFragment).commit();
+                                ((AdminMainActivity)context).getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, editEmpFragment).commit();
                                 return true;
                             case R.id.btnDeleteEmp:
                                 fragment.DialogEmpDelete(user);

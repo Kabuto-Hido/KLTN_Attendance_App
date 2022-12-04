@@ -44,11 +44,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.face.FaceDetection;
+import com.google.mlkit.vision.face.FaceDetector;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
@@ -113,6 +118,7 @@ public class EditEmpFragment extends Fragment {
     private byte[] byteArray;
     private Dialog dialog;
     User editUser;
+    boolean isRecognizeFace = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -128,7 +134,7 @@ public class EditEmpFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Manage_Emp_Fragment manage_emp_fragment = new Manage_Emp_Fragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, manage_emp_fragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, manage_emp_fragment).commit();
             }
         });
 
@@ -213,6 +219,12 @@ public class EditEmpFragment extends Fragment {
 
                 if(fullName.equals("") || birthday.equals("")) {
                     Toast.makeText(getActivity(), "Invalid input !", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                    return;
+                }
+
+                if(!isRecognizeFace){
+                    Toast.makeText(getActivity(), "Please take a photo with your face !", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                     return;
                 }
@@ -356,6 +368,12 @@ public class EditEmpFragment extends Fragment {
             isCamera = false;
             filePath = data.getData();
             imgAvatarProfile.setImageURI(filePath);
+
+            BitmapDrawable drawable = (BitmapDrawable) imgAvatarProfile.getDrawable();
+            Bitmap bitmapOrigin = Bitmap.createBitmap( drawable.getBitmap());
+            //check face
+            face_detector(bitmapOrigin);
+
             dialog.dismiss();
         }
         else if(requestCode == 0 && resultCode == getActivity().RESULT_OK
@@ -366,10 +384,33 @@ public class EditEmpFragment extends Fragment {
             selectedImage.compress(Bitmap.CompressFormat.PNG,100,stream);
             byteArray = stream.toByteArray();
 
+            //detect face
+            face_detector(selectedImage);
+
             Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.length);
             imgAvatarProfile.setImageBitmap(bitmap);
             dialog.dismiss();
         }
+    }
+
+    public void face_detector(Bitmap bitmap){
+        InputImage image = InputImage.fromBitmap(bitmap,0);
+        FaceDetector detector = FaceDetection.getClient();
+        detector.process(image)
+                .addOnSuccessListener(new OnSuccessListener<List<Face>>() {
+                    @Override
+                    public void onSuccess(List<Face> faces) {
+                        if(faces.size() != 0){
+                            isRecognizeFace = true;
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
 }

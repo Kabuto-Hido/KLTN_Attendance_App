@@ -53,9 +53,7 @@ public class ConfirmOTPActivity extends AppCompatActivity {
         editTextInput1.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if(editTextInput1.getText().toString().length()==1) {
-                    editTextInput2.requestFocus();
-                }
+
             }
 
             @Override
@@ -65,16 +63,16 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if(editTextInput1.getText().toString().length()==1) {
+                    editTextInput2.requestFocus();
+                }
             }
         });
 
         editTextInput2.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if(editTextInput2.getText().toString().length()==1) {
-                    editTextInput3.requestFocus();
-                }
+
             }
 
             @Override
@@ -84,16 +82,16 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if(editTextInput2.getText().toString().length()==1) {
+                    editTextInput3.requestFocus();
+                }
             }
         });
 
         editTextInput3.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if(editTextInput3.getText().toString().length()==1) {
-                    editTextInput4.requestFocus();
-                }
+
             }
 
             @Override
@@ -103,16 +101,16 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if(editTextInput3.getText().toString().length()==1) {
+                    editTextInput4.requestFocus();
+                }
             }
         });
 
         editTextInput4.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if(editTextInput4.getText().toString().length()==1){
-                    editTextInput5.requestFocus();
-                }
+
             }
 
             @Override
@@ -122,16 +120,16 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if(editTextInput4.getText().toString().length()==1){
+                    editTextInput5.requestFocus();
+                }
             }
         });
 
         editTextInput5.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if(editTextInput5.getText().toString().length()==1){
-                    editTextInput6.requestFocus();
-                }
+
             }
 
             @Override
@@ -141,7 +139,9 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                if(editTextInput5.getText().toString().length()==1){
+                    editTextInput6.requestFocus();
+                }
             }
         });
 

@@ -17,10 +17,10 @@ import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link AdminSettingsFragment#newInstance} factory method to
+ * Use the {@link SettingsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AdminSettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,7 +31,7 @@ public class AdminSettingsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public AdminSettingsFragment() {
+    public SettingsFragment() {
         // Required empty public constructor
     }
 
@@ -44,8 +44,8 @@ public class AdminSettingsFragment extends Fragment {
      * @return A new instance of fragment BlankFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static AdminSettingsFragment newInstance(String param1, String param2) {
-        AdminSettingsFragment fragment = new AdminSettingsFragment();
+    public static SettingsFragment newInstance(String param1, String param2) {
+        SettingsFragment fragment = new SettingsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -63,14 +63,17 @@ public class AdminSettingsFragment extends Fragment {
     }
 
     View view;
-    TextView txtEmployee, txtAdminProfile, txtAdminChangePassword, txtAdminLogOut;
+    TextView txtProfile, txtChangePassword, txtLogOut;
     User_singeton user_singeton;
     SharedPreferences sharedPreferences;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        view = inflater.inflate(R.layout.fragment_admin_settings, container, false);
+        mapping();
+
         user_singeton = User_singeton.getInstance();
 
         if(user_singeton.getUser() == null)
@@ -78,34 +81,24 @@ public class AdminSettingsFragment extends Fragment {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
         }
-        
-        mapping();
 
-        txtEmployee.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Manage_Emp_Fragment manage_emp_fragment = new Manage_Emp_Fragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,manage_emp_fragment).commit();
-            }
-        });
-
-        txtAdminProfile.setOnClickListener(new View.OnClickListener() {
+        txtProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ProfileInformationFragment profileInformationFragment = new ProfileInformationFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,profileInformationFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,profileInformationFragment).commit();
             }
         });
 
-        txtAdminChangePassword.setOnClickListener(new View.OnClickListener() {
+        txtChangePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ChangePasswordFragment changePasswordFragment = new ChangePasswordFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,changePasswordFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,changePasswordFragment).commit();
             }
         });
 
-        txtAdminLogOut.setOnClickListener(new View.OnClickListener() {
+        txtLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 user_singeton = User_singeton.getInstance();
@@ -118,17 +111,15 @@ public class AdminSettingsFragment extends Fragment {
                 editor.apply();
 
                 startActivity(new Intent(getActivity(), LoginActivity.class));
-                getActivity().finish();
-            }
+                getActivity().finish();            }
         });
 
         return view;
     }
 
-    private void mapping(){
-        txtEmployee = (TextView) view.findViewById(R.id.txtEmployee);
-        txtAdminProfile = (TextView) view.findViewById(R.id.txtAdminProfile);
-        txtAdminChangePassword = (TextView) view.findViewById(R.id.txtAdminChangePassword);
-        txtAdminLogOut = (TextView) view.findViewById(R.id.txtAdminLogOut);
+    private void mapping() {
+        txtProfile = (TextView) view.findViewById(R.id.txtProfile);
+        txtChangePassword = (TextView) view.findViewById(R.id.txtChangePassword);
+        txtLogOut = (TextView) view.findViewById(R.id.txtLogOut);
     }
 }

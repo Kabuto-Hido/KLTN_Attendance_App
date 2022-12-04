@@ -91,11 +91,22 @@ public class ChangePasswordFragment extends Fragment {
 
         mapping();
 
+        user_singeton = User_singeton.getInstance();
+        user = user_singeton.getUser();
+
         btnBackChangePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AdminSettingsFragment adminSettingsFragment = new AdminSettingsFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, adminSettingsFragment).commit();
+                SettingsFragment settingsFragment = new SettingsFragment();
+
+                if (user.getRole() == 0) {
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, adminSettingsFragment).commit();
+                }
+                else{
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, settingsFragment).commit();
+
+                }
             }
         });
 
@@ -127,9 +138,6 @@ public class ChangePasswordFragment extends Fragment {
                 String currentPassword = edittextCurrentPassword.getText().toString();
                 newPassword = edittextNewPassword.getText().toString();
                 String confirmNewPassword = edittextConfirmNewPassword.getText().toString();
-
-                user_singeton = User_singeton.getInstance();
-                user = user_singeton.getUser();
 
                 BCrypt.Result result = BCrypt.verifyer().verify(currentPassword.toCharArray(),user.getPassword());
 

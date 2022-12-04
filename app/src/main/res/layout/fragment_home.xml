@@ -17,11 +17,6 @@
             android:background="#2196F3"
             android:padding="6dp">
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_baseline_option" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

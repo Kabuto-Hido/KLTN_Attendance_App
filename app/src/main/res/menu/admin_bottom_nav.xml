@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navHome"
+        android:id="@+id/navAdminHome"
         android:title="Home"
         android:icon="@drawable/ic_baseline_home_24"/>
     <item
-        android:id="@+id/navLogs"
+        android:id="@+id/navAdminLogs"
         android:title="Logs"
         android:icon="@drawable/ic_log"/>
     <item
-        android:id="@+id/navSettings"
+        android:id="@+id/navAdminReports"
+        android:icon="@drawable/ic_baseline_reports_24"
+        android:title="Reports" />
+    <item
+        android:id="@+id/navAdminSettings"
         android:title="Settings"
         android:icon="@drawable/ic_baseline_settings_24"/>
 </menu>

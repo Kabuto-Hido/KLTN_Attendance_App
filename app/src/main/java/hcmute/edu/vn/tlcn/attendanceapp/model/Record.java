@@ -6,13 +6,23 @@ public class Record implements Serializable {
     public String username;
     public String day;
     public String time;
-    public String status;
+    public String status; //on time - late - none
+    public String type; //checkIn - checkOut
 
-    public Record(String username, String day, String time, String status) {
+    public Record(String username, String day, String time, String status, String type) {
         this.username = username;
         this.day = day;
         this.time = time;
         this.status = status;
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getDay() {
