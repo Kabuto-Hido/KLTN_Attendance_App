@@ -1,23 +1,34 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.stacktips.view.CalendarListener;
-import com.stacktips.view.CustomCalendarView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
+import hcmute.edu.vn.tlcn.attendanceapp.adapter.CalendarAdapter;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
+import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 /**
@@ -25,7 +36,7 @@ import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
  * Use the {@link AttendanceCalendarFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AttendanceCalendarFragment extends Fragment {
+public class AttendanceCalendarFragment extends Fragment implements CalendarAdapter.OnItemListener{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -66,51 +77,165 @@ public class AttendanceCalendarFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-    CustomCalendarView calendarView;
+
     View view;
+    TextView monthYearTV;
+    RecyclerView calendarRecyclerView;
+    Button btnPrevMonth, btnNextMonth;
+    LocalDate selectedDate;
+    User_singeton user_singeton = User_singeton.getInstance();
+    User user;
+    CalendarAdapter calendarAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        view =  inflater.inflate(R.layout.fragment_manage__emp_, container, false);
+        view = inflater.inflate(R.layout.fragment_attendance_calendar, container, false);
+
         mapping();
-        if(User_singeton.getInstance().getUser() == null) {
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-            getActivity().finish();
-        }
-        //Initialize calendar with date
-        Calendar currentCalendar = Calendar.getInstance(Locale.getDefault());
+        user = user_singeton.getUser();
+        selectedDate = LocalDate.now();
+        setMonthView();
 
-        //Show Monday as first date of week
-        calendarView.setFirstDayOfWeek(Calendar.MONDAY);
-
-        //Show/hide overflow days of a month
-        calendarView.setShowOverflowDate(false);
-
-        //call refreshCalendar to update calendar the view
-        calendarView.refreshCalendar(currentCalendar);
-
-        //Handling custom calendar events
-        calendarView.setCalendarListener(new CalendarListener() {
+        btnPrevMonth.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDateSelected(Date date) {
-                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-                Toast.makeText(getActivity(), df.format(date), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onMonthChanged(Date date) {
-                SimpleDateFormat df = new SimpleDateFormat("MM-yyyy");
-                Toast.makeText(getActivity(), df.format(date), Toast.LENGTH_SHORT).show();
+            public void onClick(View v) {
+                selectedDate = selectedDate.minusMonths(1);
+                setMonthView();
             }
         });
+
+        btnNextMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedDate = selectedDate.plusMonths(1);
+                setMonthView();
+            }
+        });
+
         return view;
-
-    }
-    private void mapping(){
-        //calendarView = (CustomCalendarView) view.findViewById(R.id.calendar_view);
     }
 
+    private void setMonthView() {
+        monthYearTV.setText(monthYearFromDate(selectedDate));
+        //ArrayList<String> dayInMonth = daysInMonthArray(selectedDate);
+        LinkedHashMap<String, String> dayInMonth = daysInMonthMap(selectedDate);
 
+        calendarAdapter = new CalendarAdapter(dayInMonth,getContext(),this);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(),7);
+        calendarRecyclerView.setLayoutManager(layoutManager);
+        calendarRecyclerView.setAdapter(calendarAdapter);
+    }
+
+    private LinkedHashMap<String,String> daysInMonthMap(LocalDate date){
+        LinkedHashMap<String,String> daysInMonthMap = new LinkedHashMap<>();
+        YearMonth yearMonth = YearMonth.from(date);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        String yM = date.format(formatter);
+
+        int daysInMonth = yearMonth.lengthOfMonth();
+        LocalDate firstOfMonth = selectedDate.withDayOfMonth(1);
+        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
+        int maxDayInMonth = daysInMonth + dayOfWeek;
+
+        for(int i = 1; i<=42; i++){
+            if(i <= dayOfWeek){
+                daysInMonthMap.put(String.valueOf(i-dayOfWeek),"");
+            }
+            else if(i <= maxDayInMonth){
+                String dateReport;
+                if(String.valueOf(i - dayOfWeek).length()==1){
+                    dateReport = yM + "-0" + (i - dayOfWeek);
+                }
+                else {
+                    dateReport = yM + "-" + (i - dayOfWeek);
+                }
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference recordRef = database.getReference("record");
+                int finalI = i;
+                recordRef.child(user.getPhone()).addValueEventListener(new ValueEventListener() {
+                            @SuppressLint("NotifyDataSetChanged")
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                //check-in
+                                DataSnapshot dataSnapshot = snapshot.child(dateReport).child("checkIn");
+                                Record record = dataSnapshot.getValue(Record.class);
+
+                                String getDate;
+                                String day;
+                                if (record != null) {
+                                    getDate = record.getDay();
+                                    if(getDate.charAt(8) == '0'){
+                                        day = getDate.substring(9,10);
+                                    }else {
+                                        day = getDate.substring(8, 10);
+                                    }
+                                    boolean equals = day.equals(String.valueOf(finalI - dayOfWeek));
+                                    if(equals){
+                                        daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),record.getStatus());
+                                    }
+                                    else{
+                                        daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),"not yet");
+                                    }
+                                }
+                                else{
+                                    DataSnapshot dataSnapshot3 = snapshot.child(dateReport).child("absent");
+                                    Record absentRecord = dataSnapshot3.getValue(Record.class);
+                                    if (absentRecord != null) {
+                                        getDate = absentRecord.getDay();
+                                        if(getDate.charAt(8) == '0'){
+                                            day = getDate.substring(9,10);
+                                        }else {
+                                            day = getDate.substring(8, 10);
+                                        }
+                                        boolean equals = day.equals(String.valueOf(finalI - dayOfWeek));
+                                        if(equals){
+                                            daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),absentRecord.getStatus());
+                                        }
+                                        else{
+                                            daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),"not yet");
+                                        }
+                                    }
+                                    else{
+                                        daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),"not yet");
+                                    }
+
+                                }
+
+                                calendarAdapter.notifyDataSetChanged();
+
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+            }
+        }
+        System.out.println(daysInMonthMap);
+        return daysInMonthMap;
+    }
+
+    private void mapping() {
+        monthYearTV = view.findViewById(R.id.monthYearTV);
+        calendarRecyclerView = view.findViewById(R.id.calendarRecyclerView);
+
+        btnPrevMonth = view.findViewById(R.id.btnPrevMonth);
+        btnNextMonth = view.findViewById(R.id.btnNextMonth);
+    }
+
+    private String monthYearFromDate(LocalDate date){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
+        return date.format(formatter);
+    }
+
+
+    @Override
+    public void onItemClick(int pos, String dayText) {
+        if(dayText.equals("")){
+            Toast.makeText(getActivity(), dayText+" "+ monthYearFromDate(selectedDate), Toast.LENGTH_SHORT).show();
+        }
+    }
 }

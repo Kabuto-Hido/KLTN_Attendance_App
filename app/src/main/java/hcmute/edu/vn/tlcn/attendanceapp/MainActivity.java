@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         SettingsFragment settingsFragment = new SettingsFragment();
         HomeFragment homeFragment = new HomeFragment();
+        AttendanceCalendarFragment attendanceCalendarFragment = new AttendanceCalendarFragment();
 
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
                         getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, settingsFragment).commit();
                         break;
                     case R.id.navLogs:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, attendanceCalendarFragment).commit();
+
                         break;
                     case R.id.navHome:
                         getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, homeFragment).commit();

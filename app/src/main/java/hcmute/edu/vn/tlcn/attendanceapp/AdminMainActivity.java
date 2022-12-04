@@ -24,6 +24,7 @@ public class AdminMainActivity extends AppCompatActivity implements BottomNaviga
 
     AdminSettingsFragment adminSettingsFragment = new AdminSettingsFragment();
     HomeFragment homeFragment = new HomeFragment();
+    AttendanceCalendarFragment attendanceCalendarFragment = new AttendanceCalendarFragment();
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -32,7 +33,7 @@ public class AdminMainActivity extends AppCompatActivity implements BottomNaviga
                 getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, adminSettingsFragment).commit();
                 return true;
             case R.id.navAdminLogs:
-                //getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, attendanceCalendarFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, attendanceCalendarFragment).commit();
                 return true;
             case R.id.navAdminHome:
                 getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, homeFragment).commit();

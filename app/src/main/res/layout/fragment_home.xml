@@ -135,6 +135,16 @@
             android:layout_marginStart="20dp"
             android:textSize="20sp"/>
 
+        <TextView
+            android:id="@+id/notifiDone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="23dp"
+            android:visibility="invisible"
+            android:textAlignment="center"
+            android:text="You have complete this day!"/>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnTimeIn"
             android:layout_width="340sp"

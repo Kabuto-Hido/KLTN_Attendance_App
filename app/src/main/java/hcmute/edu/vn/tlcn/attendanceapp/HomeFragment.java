@@ -3,7 +3,9 @@ package hcmute.edu.vn.tlcn.attendanceapp;
 import static android.Manifest.permission.CAMERA;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
@@ -130,7 +132,7 @@ public class HomeFragment extends Fragment {
     }
 
     View view;
-    TextView txtNameUser, txtTimeCheckIn, txtTimeCheckOut, txtDayNow;
+    TextView txtNameUser, txtTimeCheckIn, txtTimeCheckOut, txtDayNow, notifiDone;
     CircleImageView avatarUser;
     DigitalClock digitalClock;
     Button btnTimeIn, btnTimeOut;
@@ -156,6 +158,8 @@ public class HomeFragment extends Fragment {
     Date currentTime;
     SimpleDateFormat dateFormat;
     SimpleDateFormat timeFormat;
+    SimpleDateFormat monthFormat;
+    SimpleDateFormat yearFormat;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -166,6 +170,8 @@ public class HomeFragment extends Fragment {
         currentTime = Calendar.getInstance().getTime();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         timeFormat = new SimpleDateFormat("HH:mm");
+        monthFormat = new SimpleDateFormat("MM");
+        yearFormat = new SimpleDateFormat("yyyy");
 
         try {
             tflite = new Interpreter(loadModelFile(getActivity()));
@@ -180,48 +186,48 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 type = "checkIn";
-                try {
-                    Date nine = timeFormat.parse("09:00");
-                    Date haftNine = timeFormat.parse("09:30");
 
-                    currentTime = Calendar.getInstance().getTime();
-                    String strCurTime = timeFormat.format(currentTime);
-                    Date dateCurTime = timeFormat.parse(strCurTime);
-
-                    if(dateCurTime.before(nine)){
-                        status = "on time";
-                    }
-                    else if(dateCurTime.after(nine) && dateCurTime.before(haftNine)){
-                        status = "late";
-                    }
-                    else if(dateCurTime.after(haftNine)){
-                        absent = true;
-                    }
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    Log.v("convertTimeErr",e.getMessage());
-                }
-
-                if(absent){
-                    btnTimeIn.setEnabled(false);
-                    currentTime = Calendar.getInstance().getTime();
-                    String absentDate = dateFormat.format(currentTime);
-
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference recordRef = database.getReference("record")
-                            .child(user.getPhone()).child(absentDate).child("absent");
-
-                    Record absentRecord = new Record(user.getFullName(),absentDate,"",absent2, "absent");
-                    recordRef.setValue(absentRecord);
-                    Toast.makeText(getActivity(),"Attendance time has passed!!",Toast.LENGTH_SHORT).show();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(currentTime);
+                if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                    dialog.setMessage("Today is sunday are you sure you want to take attendance ? ");
+                    dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            takeAttendance();
+                        }
+                    });
+                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            btnTimeIn.setVisibility(View.INVISIBLE);
+                            notifiDone.setText("Have a nice weekend!!");
+                            notifiDone.setVisibility(View.VISIBLE);
+                            return;
+                        }
+                    });
+                    dialog.show();
                 }
                 else {
-                    if (CheckPermissions()) {
-                        Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                        startActivityForResult(takePicture, 0);
+                    checkIsTimeCheckIn();
+                    if (absent) {
+                        btnTimeIn.setVisibility(View.INVISIBLE);
+                        notifiDone.setVisibility(View.VISIBLE);
+                        currentTime = Calendar.getInstance().getTime();
+                        String absentDate = dateFormat.format(currentTime);
+                        String absentMonth = monthFormat.format(currentTime);
+                        String absentYear = yearFormat.format(currentTime);
+
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference recordRef = database.getReference("record")
+                                .child(user.getPhone()).child(absentDate).child("absent");
+
+                        Record absentRecord = new Record(user.getFullName(), absentDate, "", absentMonth, absentYear, absent2, "absent");
+                        recordRef.setValue(absentRecord);
+                        Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
                     } else {
-                        RequestPermissions();
+                        takeAttendance();
                     }
                 }
 
@@ -244,6 +250,40 @@ public class HomeFragment extends Fragment {
 
 
         return view;
+    }
+
+    private void checkIsTimeCheckIn(){
+        try {
+            Date nine = timeFormat.parse("09:00");
+            Date haftNine = timeFormat.parse("09:30");
+
+            currentTime = Calendar.getInstance().getTime();
+            String strCurTime = timeFormat.format(currentTime);
+            Date dateCurTime = timeFormat.parse(strCurTime);
+
+            if (dateCurTime != null) {
+                if (dateCurTime.before(nine)) {
+                    status = "on time";
+                } else if (dateCurTime.after(nine) && dateCurTime.before(haftNine)) {
+                    status = "late";
+                } else if (dateCurTime.after(haftNine)) {
+                    absent = true;
+                }
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Log.v("convertTimeErr", e.getMessage());
+        }
+    }
+
+    private void takeAttendance(){
+        if (CheckPermissions()) {
+            Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(takePicture, 0);
+        } else {
+            RequestPermissions();
+        }
     }
 
     private void putDataToView() {
@@ -274,8 +314,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-
-
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
 
@@ -291,25 +329,21 @@ public class HomeFragment extends Fragment {
                     btnTimeOut.setVisibility(View.VISIBLE);
                 }
 
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        recordRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 DataSnapshot dataSnapshot2 = snapshot.child(currentDate).child("checkOut");
                 Record checkOutRecord = dataSnapshot2.getValue(Record.class);
                 if (checkOutRecord != null && !checkOutRecord.getTime().equals("")) {
                     txtTimeCheckOut.setText(checkOutRecord.getTime());
-                    btnTimeIn.setVisibility(View.VISIBLE);
-                    btnTimeIn.setEnabled(false);
                     btnTimeOut.setVisibility(View.INVISIBLE);
+                    notifiDone.setVisibility(View.VISIBLE);
                 }
+
+                DataSnapshot dataSnapshot3 = snapshot.child(currentDate).child("absent");
+                Record absentRecord = dataSnapshot3.getValue(Record.class);
+                if (absentRecord != null) {
+                    btnTimeIn.setVisibility(View.INVISIBLE);
+                    notifiDone.setVisibility(View.VISIBLE);
+                }
+
             }
 
             @Override
@@ -329,6 +363,7 @@ public class HomeFragment extends Fragment {
         digitalClock = (DigitalClock) view.findViewById(R.id.digitalClock);
         btnTimeIn = (Button) view.findViewById(R.id.btnTimeIn);
         btnTimeOut = (Button) view.findViewById(R.id.btnTimeOut);
+        notifiDone = (TextView) view.findViewById(R.id.notifiDone);
     }
 
     @Override
@@ -496,10 +531,11 @@ public class HomeFragment extends Fragment {
 
                 currentTime = Calendar.getInstance().getTime();
                 String checkInDate = dateFormat.format(currentTime);
-
                 String checkInTime = timeFormat.format(currentTime);
+                String checkInMonth = monthFormat.format(currentTime);
+                String checkInYear = yearFormat.format(currentTime);
 
-                Record record = new Record(user.getFullName(),checkInDate,checkInTime,type,status);
+                Record record = new Record(user.getFullName(),checkInDate,checkInTime,checkInMonth,checkInYear,status,type);
 
                 recordRef.child(checkInDate).child(type).setValue(record);
 
@@ -511,17 +547,17 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getActivity(), "Check Out Successfully", Toast.LENGTH_SHORT).show();
 
                 currentTime = Calendar.getInstance().getTime();
-                String checkInDate = dateFormat.format(currentTime);
+                String checkOutDate = dateFormat.format(currentTime);
+                String checkOutTime = timeFormat.format(currentTime);
+                String checkOutMonth = monthFormat.format(currentTime);
+                String checkOutYear = yearFormat.format(currentTime);
 
-                String checkInTime = timeFormat.format(currentTime);
+                Record record = new Record(user.getFullName(),checkOutDate,checkOutTime,checkOutMonth,checkOutYear,status,"none");
 
-                Record record = new Record(user.getFullName(),checkInDate,checkInTime,"none",status);
-
-                recordRef.child(checkInDate).child(type).setValue(record);
+                recordRef.child(checkOutDate).child(type).setValue(record);
 
                 txtTimeCheckOut.setText(digitalClock.getText());
-                btnTimeIn.setVisibility(View.VISIBLE);
-                btnTimeIn.setEnabled(false);
+                notifiDone.setVisibility(View.VISIBLE);
                 btnTimeOut.setVisibility(View.INVISIBLE);
             }
         }else {

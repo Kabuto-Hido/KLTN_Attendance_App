@@ -87,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                             }
 
                             User user = dataSnapshot.getValue(User.class);
+                            assert user != null;
                             String hashPass = user.getPassword();
                             BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(),hashPass);
 
