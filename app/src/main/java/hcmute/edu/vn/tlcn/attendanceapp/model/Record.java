@@ -3,38 +3,18 @@ package hcmute.edu.vn.tlcn.attendanceapp.model;
 import java.io.Serializable;
 
 public class Record implements Serializable {
-    public String username;
+    public String userPhone;
     public String day;
     public String time;
-    public String month;
-    public String year;
     public String status; //on time - late - none
     public String type; //checkIn - checkOut
 
-    public Record(String username, String day, String time, String month, String year, String status, String type) {
-        this.username = username;
+    public Record(String userPhone, String day, String time, String status, String type) {
+        this.userPhone = userPhone;
         this.day = day;
         this.time = time;
-        this.month = month;
-        this.year = year;
         this.status = status;
         this.type = type;
-    }
-
-    public String getYear() {
-        return year;
-    }
-
-    public void setYear(String year) {
-        this.year = year;
-    }
-
-    public String getMonth() {
-        return month;
-    }
-
-    public void setMonth(String month) {
-        this.month = month;
     }
 
     public String getType() {
@@ -56,12 +36,12 @@ public class Record implements Serializable {
     public Record() {
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserPhone() {
+        return userPhone;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 
     public String getTime() {

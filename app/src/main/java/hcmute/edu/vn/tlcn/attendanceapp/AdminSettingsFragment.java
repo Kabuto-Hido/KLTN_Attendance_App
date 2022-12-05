@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -12,6 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -63,7 +71,8 @@ public class AdminSettingsFragment extends Fragment {
     }
 
     View view;
-    TextView txtEmployee, txtAdminProfile, txtAdminChangePassword, txtAdminLogOut;
+    TextView txtEmployee, txtAdminProfile, txtAdminChangePassword,
+            txtAdminLogOut, txtListResignations, txtQuantityResignation;
     User_singeton user_singeton;
     SharedPreferences sharedPreferences;
     @Override
@@ -80,6 +89,7 @@ public class AdminSettingsFragment extends Fragment {
         }
         
         mapping();
+        getData();
 
         txtEmployee.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,7 +132,37 @@ public class AdminSettingsFragment extends Fragment {
             }
         });
 
+        txtListResignations.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ListResignationFragment listResignationFragment = new ListResignationFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,listResignationFragment).commit();
+
+            }
+        });
+
         return view;
+    }
+
+    private void getData() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
+
+        dayOffReportRef.orderByChild("status").startAt("waiting").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long amountWaitingForm = snapshot.getChildrenCount();
+                if(amountWaitingForm != 0L){
+                    txtQuantityResignation.setText(String.valueOf(amountWaitingForm));
+                    txtQuantityResignation.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void mapping(){
@@ -130,5 +170,7 @@ public class AdminSettingsFragment extends Fragment {
         txtAdminProfile = (TextView) view.findViewById(R.id.txtAdminProfile);
         txtAdminChangePassword = (TextView) view.findViewById(R.id.txtAdminChangePassword);
         txtAdminLogOut = (TextView) view.findViewById(R.id.txtAdminLogOut);
+        txtListResignations = (TextView) view.findViewById(R.id.txtListResignations);
+        txtQuantityResignation = (TextView) view.findViewById(R.id.txtQuantityResignation);
     }
 }

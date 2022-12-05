@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.navLogs:
                         getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, attendanceCalendarFragment).commit();
-
                         break;
                     case R.id.navHome:
                         getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, homeFragment).commit();

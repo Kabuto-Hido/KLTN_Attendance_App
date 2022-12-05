@@ -38,6 +38,9 @@ public class AdminMainActivity extends AppCompatActivity implements BottomNaviga
             case R.id.navAdminHome:
                 getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, homeFragment).commit();
                 return true;
+            case R.id.navAdminReports:
+                //getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, homeFragment).commit();
+                return true;
         }
         return false;
     }

@@ -158,8 +158,6 @@ public class HomeFragment extends Fragment {
     Date currentTime;
     SimpleDateFormat dateFormat;
     SimpleDateFormat timeFormat;
-    SimpleDateFormat monthFormat;
-    SimpleDateFormat yearFormat;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -170,8 +168,6 @@ public class HomeFragment extends Fragment {
         currentTime = Calendar.getInstance().getTime();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         timeFormat = new SimpleDateFormat("HH:mm");
-        monthFormat = new SimpleDateFormat("MM");
-        yearFormat = new SimpleDateFormat("yyyy");
 
         try {
             tflite = new Interpreter(loadModelFile(getActivity()));
@@ -213,17 +209,18 @@ public class HomeFragment extends Fragment {
                     checkIsTimeCheckIn();
                     if (absent) {
                         btnTimeIn.setVisibility(View.INVISIBLE);
+                        notifiDone.setText("Check in time has passed!!");
+                        notifiDone.setTextColor(Color.parseColor("#ff0000"));
                         notifiDone.setVisibility(View.VISIBLE);
+
                         currentTime = Calendar.getInstance().getTime();
                         String absentDate = dateFormat.format(currentTime);
-                        String absentMonth = monthFormat.format(currentTime);
-                        String absentYear = yearFormat.format(currentTime);
 
                         FirebaseDatabase database = FirebaseDatabase.getInstance();
                         DatabaseReference recordRef = database.getReference("record")
                                 .child(user.getPhone()).child(absentDate).child("absent");
 
-                        Record absentRecord = new Record(user.getFullName(), absentDate, "", absentMonth, absentYear, absent2, "absent");
+                        Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent");
                         recordRef.setValue(absentRecord);
                         Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
                     } else {
@@ -340,6 +337,12 @@ public class HomeFragment extends Fragment {
                 DataSnapshot dataSnapshot3 = snapshot.child(currentDate).child("absent");
                 Record absentRecord = dataSnapshot3.getValue(Record.class);
                 if (absentRecord != null) {
+                    if(absentRecord.getStatus().equals(absent1)){
+                        notifiDone.setText("You have the day off!!");
+                    }
+                    else{
+                        notifiDone.setText("You are absent today!!");
+                    }
                     btnTimeIn.setVisibility(View.INVISIBLE);
                     notifiDone.setVisibility(View.VISIBLE);
                 }
@@ -532,10 +535,8 @@ public class HomeFragment extends Fragment {
                 currentTime = Calendar.getInstance().getTime();
                 String checkInDate = dateFormat.format(currentTime);
                 String checkInTime = timeFormat.format(currentTime);
-                String checkInMonth = monthFormat.format(currentTime);
-                String checkInYear = yearFormat.format(currentTime);
 
-                Record record = new Record(user.getFullName(),checkInDate,checkInTime,checkInMonth,checkInYear,status,type);
+                Record record = new Record(user.getPhone(),checkInDate,checkInTime,status,type);
 
                 recordRef.child(checkInDate).child(type).setValue(record);
 
@@ -549,10 +550,8 @@ public class HomeFragment extends Fragment {
                 currentTime = Calendar.getInstance().getTime();
                 String checkOutDate = dateFormat.format(currentTime);
                 String checkOutTime = timeFormat.format(currentTime);
-                String checkOutMonth = monthFormat.format(currentTime);
-                String checkOutYear = yearFormat.format(currentTime);
 
-                Record record = new Record(user.getFullName(),checkOutDate,checkOutTime,checkOutMonth,checkOutYear,status,"none");
+                Record record = new Record(user.getPhone(),checkOutDate,checkOutTime,status,"none");
 
                 recordRef.child(checkOutDate).child(type).setValue(record);
 

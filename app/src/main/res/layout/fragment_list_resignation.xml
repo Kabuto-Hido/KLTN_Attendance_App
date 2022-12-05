@@ -4,27 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Manage_Emp_Fragment">
+    tools:context=".ListResignationFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/layout1"
+            android:id="@+id/layout2"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="#2196F3"
             android:padding="6dp">
             <ImageView
-                android:id="@+id/btnBackPageMngEmp"
+                android:id="@+id/btnBackResignation"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:src="@drawable/baseline_arrow_back_white_24"/>
+                android:src="@drawable/baseline_arrow_back_white_24"
+                android:contentDescription="TODO" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="Manage Employees"
+                android:text="List Resignations"
                 android:gravity="center_vertical"
                 android:textStyle="bold"
                 android:layout_marginStart="30dp"
@@ -33,32 +34,16 @@
                 android:layout_marginBottom="2dp"/>
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvEmpList"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/layout1"
-            android:text="Employees List"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:paddingTop="10sp"
-            android:layout_marginStart="15sp"/>
-
         <ListView
-            android:id="@+id/listviewEmp"
+            android:id="@+id/listviewResignation"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:dividerHeight="10sp"
+            android:divider="#F8F8F8"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/tvEmpList" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btnAddEmp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_person_add"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="20dp"
-            android:layout_marginEnd="10dp"/>
+            android:layout_below="@+id/layout2" />
 
     </RelativeLayout>
 

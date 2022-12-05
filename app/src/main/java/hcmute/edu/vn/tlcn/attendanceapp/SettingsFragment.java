@@ -5,13 +5,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -63,7 +76,7 @@ public class SettingsFragment extends Fragment {
     }
 
     View view;
-    TextView txtProfile, txtChangePassword, txtLogOut;
+    TextView txtProfile, txtChangePassword, txtLogOut, txtDay_off;
     User_singeton user_singeton;
     SharedPreferences sharedPreferences;
 
@@ -87,6 +100,44 @@ public class SettingsFragment extends Fragment {
             public void onClick(View v) {
                 ProfileInformationFragment profileInformationFragment = new ProfileInformationFragment();
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,profileInformationFragment).commit();
+            }
+        });
+
+        txtDay_off.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date currentTime = Calendar.getInstance().getTime();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String currentDate = dateFormat.format(currentTime);
+
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference recordRef = database.getReference("record");
+                recordRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        DataSnapshot dataSnapshot1 = snapshot.child(currentDate).child("checkIn");
+                        Record checkInRecord = dataSnapshot1.getValue(Record.class);
+
+                        DataSnapshot dataSnapshot3 = snapshot.child(currentDate).child("absent");
+                        Record absentRecord = dataSnapshot3.getValue(Record.class);
+                        if (checkInRecord != null) {
+                            Toast.makeText(getActivity(), "You have already check in!!", Toast.LENGTH_SHORT).show();
+                        }
+                        else if (absentRecord != null) {
+                            Toast.makeText(getActivity(), "You have already absent!!", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            RequestADayOffFragment aDayOffFragment = new RequestADayOffFragment();
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,aDayOffFragment).commit();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
             }
         });
 
@@ -121,5 +172,6 @@ public class SettingsFragment extends Fragment {
         txtProfile = (TextView) view.findViewById(R.id.txtProfile);
         txtChangePassword = (TextView) view.findViewById(R.id.txtChangePassword);
         txtLogOut = (TextView) view.findViewById(R.id.txtLogOut);
+        txtDay_off = (TextView) view.findViewById(R.id.txtDay_off);
     }
 }

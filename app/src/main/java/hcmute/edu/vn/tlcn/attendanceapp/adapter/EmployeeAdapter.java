@@ -73,7 +73,7 @@ public class EmployeeAdapter extends BaseAdapter {
             holder = new ViewHolder();
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(layout,null);
-            //ánh xạ các view
+
             holder.empAvatar = (CircleImageView) convertView.findViewById(R.id.empAvatar);
             holder.empName = (TextView) convertView.findViewById(R.id.empName);
             holder.btnMore = (ImageView) convertView.findViewById(R.id.btnMore);

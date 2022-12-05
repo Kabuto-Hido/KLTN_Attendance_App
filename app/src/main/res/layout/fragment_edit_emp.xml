@@ -6,7 +6,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".EditEmpFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:id="@+id/labelNameEmp"
         android:layout_width="wrap_content"
@@ -39,14 +38,15 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/edt_background"
-        android:drawableLeft="@drawable/phone_white"
+        android:drawableStart="@drawable/phone_white"
         android:drawablePadding="15dp"
         android:hint="Phone number"
         android:inputType="phone"
         android:padding="15dp"
         android:textColorHint="#AA4B5151"
         android:textStyle="bold"
-        android:focusable="false"/>
+        android:focusable="false"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/edtName"
@@ -58,13 +58,14 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/edt_background"
-        android:drawableLeft="@drawable/person_white"
+        android:drawableStart="@drawable/person_white"
         android:drawablePadding="15sp"
         android:hint="Fullname"
         android:inputType="textPersonName"
         android:padding="15dp"
         android:textColorHint="#AA4B5151"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/edtBirthday1"
@@ -76,24 +77,24 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/edt_background"
-        android:drawableLeft="@drawable/calendar_white"
+        android:drawableStart="@drawable/calendar_white"
         android:drawablePadding="15sp"
         android:hint="Birthday"
         android:focusable="false"
         android:padding="15dp"
         android:textColorHint="#AA4B5151"
         android:textStyle="bold"
-        />
+        android:autofillHints=""
+        android:inputType="text" />
 
     <TextView
         android:id="@+id/txtSex1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/edtName"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="50sp"
+        android:layout_marginEnd="50sp"
         android:layout_marginStart="20sp"
-        android:layout_toRightOf="@id/edtBirthday1"
+        android:layout_toEndOf="@id/edtBirthday1"
         android:text="Gender: "
         android:textColor="@color/black"
         android:textSize="18sp"
@@ -104,8 +105,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtSex1"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@id/edtBirthday1"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@id/edtBirthday1"
         android:buttonTint="#0dd1fc"
         android:text="Male"
         android:textColor="#AA4B5151"
@@ -116,7 +117,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtSex1"
-        android:layout_toRightOf="@id/radioMale"
+        android:layout_toEndOf="@id/radioMale"
         android:buttonTint="#0dd1fc"
         android:text="Female"
         android:textColor="#AA4B5151"
