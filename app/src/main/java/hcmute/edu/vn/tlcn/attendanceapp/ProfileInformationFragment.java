@@ -108,7 +108,7 @@ public class ProfileInformationFragment extends Fragment {
     CircleImageView imgProfile;
     RadioButton rMale, rFemale;
     EditText edittext_name, edittext_phone, edittext_description, edittext_birthday;
-    User_singeton user_singeton = User_singeton.getInstance();;
+    User_singeton user_singeton = User_singeton.getInstance();
     User user;
     private final int PICK_IMAGE_REQUEST = 22;
     private boolean isCamera = false;
@@ -172,6 +172,7 @@ public class ProfileInformationFragment extends Fragment {
                         edittext_birthday.setText(format.format(calendar.getTime()));
                     }
                 },year,month,date);
+                datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
         });

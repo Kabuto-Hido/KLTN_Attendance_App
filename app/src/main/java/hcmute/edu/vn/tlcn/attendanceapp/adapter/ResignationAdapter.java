@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -112,14 +113,31 @@ public class ResignationAdapter extends BaseAdapter {
 
                             if(phone.equals(dayOffRequest.getUserPhone())
                                     && day.equals(dayOffRequest.getDateOff())){
+
                                 String reqId = dataSnapshot.getKey();
                                 dayOffReportRef.child(reqId).child("status").setValue("Accept");
+                                Toast.makeText(context, "Accept for "+holder.txtSenderName.getText().toString()+" successfully!!", Toast.LENGTH_SHORT).show();
                                 lstRequest.remove(position);
                                 notifyDataSetChanged();
 
                                 DatabaseReference recordRef = database.getReference("record");
-                                Record absentRecord = new Record(phone, day, "", "absent with permission", "absent");
-                                recordRef.child(phone).child(day).child("absent").setValue(absentRecord);
+                                recordRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        //check if user not check in
+                                        DataSnapshot dataSnapshot = snapshot.child(phone).child(day).child("checkIn");
+                                        Record checkInRecord = dataSnapshot.getValue(Record.class);
+                                        if (checkInRecord == null) {
+                                            Record absentRecord = new Record(phone, day, "", "absent with permission", "absent");
+                                            recordRef.child(phone).child(day).child("absent").setValue(absentRecord);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
                                 break;
                             }
 

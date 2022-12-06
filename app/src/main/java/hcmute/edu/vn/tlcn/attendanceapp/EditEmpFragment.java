@@ -167,6 +167,7 @@ public class EditEmpFragment extends Fragment {
                         edtBirthday1.setText(format.format(calendar.getTime()));
                     }
                 },year,month,date);
+                datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
         });

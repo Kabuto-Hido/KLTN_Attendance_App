@@ -78,6 +78,7 @@ public class SettingsFragment extends Fragment {
     View view;
     TextView txtProfile, txtChangePassword, txtLogOut, txtDay_off;
     User_singeton user_singeton;
+    User user;
     SharedPreferences sharedPreferences;
 
     @Override
@@ -88,8 +89,9 @@ public class SettingsFragment extends Fragment {
         mapping();
 
         user_singeton = User_singeton.getInstance();
+        user = user_singeton.getUser();
 
-        if(user_singeton.getUser() == null)
+        if(user == null)
         {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
@@ -106,38 +108,38 @@ public class SettingsFragment extends Fragment {
         txtDay_off.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date currentTime = Calendar.getInstance().getTime();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                String currentDate = dateFormat.format(currentTime);
-
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference recordRef = database.getReference("record");
-                recordRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        DataSnapshot dataSnapshot1 = snapshot.child(currentDate).child("checkIn");
-                        Record checkInRecord = dataSnapshot1.getValue(Record.class);
-
-                        DataSnapshot dataSnapshot3 = snapshot.child(currentDate).child("absent");
-                        Record absentRecord = dataSnapshot3.getValue(Record.class);
-                        if (checkInRecord != null) {
-                            Toast.makeText(getActivity(), "You have already check in!!", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (absentRecord != null) {
-                            Toast.makeText(getActivity(), "You have already absent!!", Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            RequestADayOffFragment aDayOffFragment = new RequestADayOffFragment();
-                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,aDayOffFragment).commit();
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
+                RequestADayOffFragment aDayOffFragment = new RequestADayOffFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,aDayOffFragment).commit();
+//                Date currentTime = Calendar.getInstance().getTime();
+//                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//                String currentDate = dateFormat.format(currentTime);
+//
+//                FirebaseDatabase database = FirebaseDatabase.getInstance();
+//                DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
+//                recordRef.addValueEventListener(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        DataSnapshot dataSnapshot1 = snapshot.child(currentDate).child("checkIn");
+//                        Record checkInRecord = dataSnapshot1.getValue(Record.class);
+//
+//                        DataSnapshot dataSnapshot3 = snapshot.child(currentDate).child("absent");
+//                        Record absentRecord = dataSnapshot3.getValue(Record.class);
+//                        if (checkInRecord != null) {
+//                            Toast.makeText(ListSendedRequestActivity.this, "You have already check in!!", Toast.LENGTH_SHORT).show();
+//                        }
+//                        else if (absentRecord != null) {
+//                            Toast.makeText(ListSendedRequestActivity.this, "You have already absent!!", Toast.LENGTH_SHORT).show();
+//                        }
+//                        else{
+//
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
             }
         });
 
