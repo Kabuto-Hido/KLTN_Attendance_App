@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ListSendedRequestActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="7dp"
+        android:background="#2196F3"
+        android:id="@+id/relativeLayout">
+        <ImageView
+            android:id="@+id/btnBackLstSent"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/baseline_arrow_back_white_24"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="30dp"
+            android:gravity="center_vertical"
+            android:layout_toEndOf="@+id/btnBackLstSent"
+            android:text="List day-off requests"
+            android:textColor="@color/white"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:padding="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/relativeLayout"
+        android:stretchColumns="*">
+        <TableRow>
+            <TextView
+                android:id="@+id/txtWaiting"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:text="Waiting"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_column="0"
+                android:textAlignment="center"
+                android:background="@drawable/top_bottom_border"/>
+            <TextView
+                android:id="@+id/txtResponded"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Responded"
+                android:textSize="18sp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:textColor="#808080"
+                android:textStyle="bold"
+                android:layout_column="1"
+                android:textAlignment="center" />
+        </TableRow>
+    </TableLayout>
+    <TextView
+        android:id="@+id/txtNoRequest"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tableLayout"
+        android:text="No friend request"
+        android:gravity="center"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:visibility="invisible" />
+
+    <ListView
+        android:id="@+id/lstSentReq"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tableLayout"
+        android:layout_marginTop="5dp" />
+
+</RelativeLayout>

@@ -1,6 +1,7 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,9 +25,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -78,12 +81,14 @@ public class RequestADayOffFragment extends Fragment {
     }
 
     View view;
-    ImageView btnBackDayOff;
+    ImageView btnBackDayOff, btnSeeListReq;
     EditText edtDayToOff, edtReason;
     Button btnSendRequestDayOff;
     TextView btnCancelRequest;
     User_singeton user_singeton = User_singeton.getInstance();;
     User user;
+    Calendar calendar;
+    FirebaseDatabase database;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,32 +98,18 @@ public class RequestADayOffFragment extends Fragment {
         mapping();
         user = user_singeton.getUser();
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
-        dayOffReportRef.orderByChild("userPhone").startAt(user.getPhone()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                System.out.println(snapshot);
-                if(snapshot.exists()){
-                    for(DataSnapshot dataSnapshot: snapshot.getChildren()){
-                        DayOffRequest dayOffRequest = dataSnapshot.getValue(DayOffRequest.class);
-                        System.out.println(dayOffRequest.getUserPhone());
-                        System.out.println(dataSnapshot);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
         btnBackDayOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SettingsFragment settingsFragment = new SettingsFragment();
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, settingsFragment).commit();
+            }
+        });
+
+        btnSeeListReq.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(),ListSendedRequestActivity.class));
             }
         });
 
@@ -133,18 +124,12 @@ public class RequestADayOffFragment extends Fragment {
         edtDayToOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
+                calendar = Calendar.getInstance();
                 int date = calendar.get(Calendar.DATE);
                 int month = calendar.get(Calendar.MONTH);
                 int year = calendar.get(Calendar.YEAR);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        calendar.set(year,month,dayOfMonth);
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                        edtDayToOff.setText(format.format(calendar.getTime()));
-                    }
-                },year,month,date);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), datePickerListener,year,month,date);
+                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
                 datePickerDialog.show();
             }
         });
@@ -163,7 +148,7 @@ public class RequestADayOffFragment extends Fragment {
 
                 DayOffRequest dayOffRequest = new DayOffRequest(user.getPhone(),reason,"waiting",dateDayOff);
 
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                database = FirebaseDatabase.getInstance();
                 DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
 
                 dayOffReportRef.child(reqId).setValue(dayOffRequest);
@@ -179,11 +164,79 @@ public class RequestADayOffFragment extends Fragment {
         return view;
     }
 
+    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+            calendar.set(year,month,dayOfMonth);
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String selectedDate = format.format(calendar.getTime());
+            edtDayToOff.setText(selectedDate);
+
+            btnSendRequestDayOff.setEnabled(true);
+            database = FirebaseDatabase.getInstance();
+            DatabaseReference dayOffRef = database.getReference("dayoffreport");
+
+            dayOffRef.orderByChild("userPhone").startAt(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                        DayOffRequest dayOff = dataSnapshot.getValue(DayOffRequest.class);
+                        String day = dayOff.getDateOff();
+
+                        if(day.equals(selectedDate)){
+                            btnSendRequestDayOff.setEnabled(false);
+                            Toast.makeText(getActivity(), "You have already sent request for "+day, Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                        else{
+                            database = FirebaseDatabase.getInstance();
+                            DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
+                            recordRef.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    DataSnapshot dataSnapshot1 = snapshot.child(selectedDate).child("checkIn");
+                                    Record checkInRecord = dataSnapshot1.getValue(Record.class);
+                                    DataSnapshot dataSnapshot3 = snapshot.child(selectedDate).child("absent");
+                                    Record absentRecord = dataSnapshot3.getValue(Record.class);
+                                    if (checkInRecord != null) {
+                                        btnSendRequestDayOff.setEnabled(false);
+                                        Toast.makeText(getActivity(), "You have already check in!!", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else if (absentRecord != null) {
+                                        btnSendRequestDayOff.setEnabled(false);
+                                        if(absentRecord.getStatus().equals("absent with permission")){
+                                            Toast.makeText(getActivity(), "You have already sent request for "+absentRecord.getDay(), Toast.LENGTH_SHORT).show();
+                                        }
+                                        else {
+                                            Toast.makeText(getActivity(), "You have already absent!!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+        }
+    };
+
     private void mapping() {
         btnBackDayOff = (ImageView) view.findViewById(R.id.btnBackDayOff);
         edtDayToOff = (EditText) view.findViewById(R.id.edtDayToOff);
         edtReason = (EditText) view.findViewById(R.id.edtReason);
         btnSendRequestDayOff = (Button) view.findViewById(R.id.btnSendRequestDayOff);
         btnCancelRequest = (TextView) view.findViewById(R.id.btnCancelRequest);
+        btnSeeListReq = (ImageView) view.findViewById(R.id.btnSeeListReq);
     }
 }
