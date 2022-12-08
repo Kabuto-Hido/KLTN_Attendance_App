@@ -254,12 +254,6 @@ public class AddEmployee extends Fragment {
                                                 user.setAvatar("images/" + user.getPhone() + "_avatar");
                                                 userRef.child(user.getPhone()).setValue(user);
 
-
-                                                if(imgAvatarProfile.getDrawable().getConstantState() !=
-                                                        getActivity().getResources().getDrawable(R.drawable.man_placeholder).getConstantState()){
-
-                                                }
-
                                                 progressDialog.dismiss();
                                                 Toast.makeText(getContext(), "New employee added", Toast.LENGTH_SHORT).show();
 

@@ -81,6 +81,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -158,6 +159,9 @@ public class HomeFragment extends Fragment {
     Date currentTime;
     SimpleDateFormat dateFormat;
     SimpleDateFormat timeFormat;
+    SimpleDateFormat dayFormat;
+    SimpleDateFormat monthFormat;
+    SimpleDateFormat yearFormat;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -167,7 +171,10 @@ public class HomeFragment extends Fragment {
         mapping();
         currentTime = Calendar.getInstance().getTime();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dayFormat = new SimpleDateFormat("dd");
         timeFormat = new SimpleDateFormat("HH:mm");
+        monthFormat = new SimpleDateFormat("MM");
+        yearFormat = new SimpleDateFormat("yyyy");
 
         try {
             tflite = new Interpreter(loadModelFile(getActivity()));
@@ -222,6 +229,7 @@ public class HomeFragment extends Fragment {
 
                         Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent");
                         recordRef.setValue(absentRecord);
+                        updateStatistic(absent2);
                         Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
                     } else {
                         takeAttendance();
@@ -247,6 +255,111 @@ public class HomeFragment extends Fragment {
 
 
         return view;
+    }
+
+    private void updateStatistic(String status){
+        String currentMonth = monthFormat.format(currentTime);
+        String currentYear = yearFormat.format(currentTime);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference statisticRef = database.getReference("statistic");
+        statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
+                Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
+
+                DataSnapshot dataSnapshot2 = snapshot.child(user.getPhone()).child(currentYear).child(currentMonth);
+                Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
+
+                int countOnTime;
+                int countLate;
+                int countAbsentWithoutPer;
+                //month statistic
+                if(monthStatistic == null){
+                    countOnTime = 0;
+                    countLate = 0;
+                    countAbsentWithoutPer = 0;
+                    if(status.equals("on time")){
+                        System.out.println("run");
+                        countOnTime = 1;
+                    }
+                    else if(status.equals("late")){
+                        countLate = 1;
+                    }
+                    else if(status.equals(absent2)){
+                        countAbsentWithoutPer = 1;
+                    }
+
+                    //month statistic
+                    Statistic newStatistic = new Statistic(countOnTime,countLate,0,countAbsentWithoutPer,currentMonth,currentYear);
+                    statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
+                    //emp statistic
+                    statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
+                }
+                else{
+                    countOnTime = monthStatistic.getOnTime();
+                    countLate = monthStatistic.getLate();
+                    countAbsentWithoutPer = monthStatistic.getAbsentWithoutPer();
+                    if(status.equals("on time")){
+                        countOnTime++;
+                        monthStatistic.setOnTime(countOnTime);
+                    }
+                    else if(status.equals("late")){
+                        countLate++;
+                        monthStatistic.setLate(countLate);
+                    }
+                    else if(status.equals(absent2)){
+                        countAbsentWithoutPer++;
+                        monthStatistic.setAbsentWithoutPer(countAbsentWithoutPer);
+                    }
+                    statisticRef.child(currentYear).child(currentMonth).setValue(monthStatistic);
+                }
+                //emp statistic
+                if(empStatistic == null){
+                    countOnTime = 0;
+                    countLate = 0;
+                    countAbsentWithoutPer = 0;
+                    if(status.equals("on time")){
+                        System.out.println("run");
+                        countOnTime = 1;
+                    }
+                    else if(status.equals("late")){
+                        countLate = 1;
+                    }
+                    else if(status.equals(absent2)){
+                        countAbsentWithoutPer = 1;
+                    }
+
+                    Statistic newStatistic = new Statistic(countOnTime,countLate,0,countAbsentWithoutPer,currentMonth,currentYear);
+                    statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
+                }
+                else{
+                    countOnTime = empStatistic.getOnTime();
+                    countLate = empStatistic.getLate();
+                    countAbsentWithoutPer = empStatistic.getAbsentWithoutPer();
+                    if(status.equals("on time")){
+                        countOnTime++;
+                        empStatistic.setOnTime(countOnTime);
+                    }
+                    else if(status.equals("late")){
+                        countLate++;
+                        empStatistic.setLate(countLate);
+                    }
+                    else if(status.equals(absent2)){
+                        countAbsentWithoutPer++;
+                        empStatistic.setAbsentWithoutPer(countAbsentWithoutPer);
+                    }
+
+                    statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(empStatistic);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void checkIsTimeCheckIn(){
@@ -539,6 +652,7 @@ public class HomeFragment extends Fragment {
                 Record record = new Record(user.getPhone(),checkInDate,checkInTime,status,type);
 
                 recordRef.child(checkInDate).child(type).setValue(record);
+                updateStatistic(status);
 
                 txtTimeCheckIn.setText(digitalClock.getText());
                 btnTimeIn.setVisibility(View.INVISIBLE);
@@ -551,7 +665,7 @@ public class HomeFragment extends Fragment {
                 String checkOutDate = dateFormat.format(currentTime);
                 String checkOutTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getPhone(),checkOutDate,checkOutTime,status,"none");
+                Record record = new Record(user.getPhone(),checkOutDate,checkOutTime,"",type);
 
                 recordRef.child(checkOutDate).child(type).setValue(record);
 

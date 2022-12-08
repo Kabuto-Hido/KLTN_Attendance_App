@@ -99,7 +99,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:background="@drawable/edt_background"
-        android:drawableLeft="@drawable/calendar_white"
+        android:drawableStart="@drawable/calendar_white"
         android:drawablePadding="15sp"
         android:hint="Birthday"
         android:focusable="false"

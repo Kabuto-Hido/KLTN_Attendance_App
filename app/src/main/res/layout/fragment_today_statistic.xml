@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="7dp"
+        android:background="#2196F3"
+        android:id="@+id/relativeLayout">
+        <ImageView
+            android:id="@+id/btnBackTodayStatistic"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/baseline_arrow_back_white_24"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="30dp"
+            android:gravity="center_vertical"
+            android:layout_toEndOf="@+id/btnBackTodayStatistic"
+            android:text="Today Statistic"
+            android:textColor="@color/white"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/txtDay"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:text="Today"
+        android:textSize="19sp"
+        android:textColor="@color/black"
+        android:drawablePadding="15sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        app:drawableStartCompat="@drawable/calendar_white" />
+
+    <TextView
+        android:id="@+id/txtnumcheckin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/black"
+        android:layout_marginStart="10dp"
+        android:layout_below="@+id/txtDay"
+        android:text="Total of check in: "
+        />
+    <TextView
+        android:id="@+id/txtNumAbsent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/black"
+        android:layout_marginStart="10dp"
+        android:layout_below="@+id/txtnumcheckin"
+        android:text="Total of absent: "
+        />
+    <TextView
+        android:id="@+id/txtTotalCheckin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15dp"
+        android:textColor="#49be25"
+        android:layout_below="@+id/txtDay"
+        android:layout_toRightOf="@id/txtnumcheckin"
+        android:text="10"
+        />
+
+    <TextView
+        android:id="@+id/txtTotalAbsent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:layout_below="@+id/txtnumcheckin"
+        android:layout_toEndOf="@id/txtNumAbsent"
+        android:text="10"
+        android:textColor="#BE4125" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/black"
+        android:layout_below="@+id/txtDay"
+        android:layout_toStartOf="@+id/txtTotalEmp"
+        android:text="Total employees: "
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:id="@+id/txtTotalEmp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:layout_below="@+id/txtDay"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="50dp"
+        android:text="10" />
+
+    <TextView
+        android:id="@+id/txtTb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/txtDay"
+        android:text="No List Statistic"
+        android:gravity="center"
+        android:textSize="25dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:visibility="invisible" />
+
+    <ListView
+        android:id="@+id/lstStat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/txtNumAbsent"
+        android:layout_marginTop="5dp" />
+</RelativeLayout>

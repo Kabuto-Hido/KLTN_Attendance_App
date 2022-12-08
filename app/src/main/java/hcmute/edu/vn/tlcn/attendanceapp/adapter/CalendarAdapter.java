@@ -41,17 +41,19 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarViewHolder> {
     public void onBindViewHolder(@NonNull CalendarViewHolder holder, int position) {
         ArrayList<String> day = new ArrayList<String>(recordDay.keySet());
         ArrayList<String> type = new ArrayList<String>(recordDay.values());
-        if(type.get(position).equals("on time")){
-            holder.cellDayText.setBackgroundColor(Color.parseColor("#00FF00"));
-        }
-        else if(type.get(position).equals("late")) {
-            holder.cellDayText.setBackgroundColor(Color.parseColor("#ffff33"));
-        }
-        else if(type.get(position).equals("absent without permission")){
-            holder.cellDayText.setBackgroundColor(Color.parseColor("#FF3131"));
-        }
-        else if(type.get(position).equals("absent with permission")){
-            holder.cellDayText.setBackgroundColor(Color.parseColor("#00ffff"));
+        switch (type.get(position)) {
+            case "on time":
+                holder.cellDayText.setBackgroundColor(Color.parseColor("#00FF00"));
+                break;
+            case "late":
+                holder.cellDayText.setBackgroundColor(Color.parseColor("#ffff33"));
+                break;
+            case "absent without permission":
+                holder.cellDayText.setBackgroundColor(Color.parseColor("#FF3131"));
+                break;
+            case "absent with permission":
+                holder.cellDayText.setBackgroundColor(Color.parseColor("#00ffff"));
+                break;
         }
 
         int dayValue = Integer.parseInt(day.get(position));

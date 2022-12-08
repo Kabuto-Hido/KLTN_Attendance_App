@@ -1,0 +1,72 @@
+package hcmute.edu.vn.tlcn.attendanceapp.model;
+
+import java.io.Serializable;
+
+public class Statistic implements Serializable {
+    public int onTime;
+    public int late;
+    public int absentWithPer;
+    public int absentWithoutPer;
+    public String statisticMonth;
+    public String statisticYear;
+
+    public Statistic(int onTime, int late, int absentWithPer, int absentWithoutPer, String statisticMonth, String statisticYear) {
+        this.onTime = onTime;
+        this.late = late;
+        this.absentWithPer = absentWithPer;
+        this.absentWithoutPer = absentWithoutPer;
+        this.statisticMonth = statisticMonth;
+        this.statisticYear = statisticYear;
+    }
+
+    public Statistic() {
+    }
+
+    public String getStatisticMonth() {
+        return statisticMonth;
+    }
+
+    public void setStatisticMonth(String statisticMonth) {
+        this.statisticMonth = statisticMonth;
+    }
+
+    public String getStatisticYear() {
+        return statisticYear;
+    }
+
+    public void setStatisticYear(String statisticYear) {
+        this.statisticYear = statisticYear;
+    }
+
+    public int getOnTime() {
+        return onTime;
+    }
+
+    public void setOnTime(int onTime) {
+        this.onTime = onTime;
+    }
+
+    public int getLate() {
+        return late;
+    }
+
+    public void setLate(int late) {
+        this.late = late;
+    }
+
+    public int getAbsentWithPer() {
+        return absentWithPer;
+    }
+
+    public void setAbsentWithPer(int absentWithPer) {
+        this.absentWithPer = absentWithPer;
+    }
+
+    public int getAbsentWithoutPer() {
+        return absentWithoutPer;
+    }
+
+    public void setAbsentWithoutPer(int absentWithoutPer) {
+        this.absentWithoutPer = absentWithoutPer;
+    }
+}

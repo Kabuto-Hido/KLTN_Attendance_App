@@ -147,7 +147,11 @@ public class ChangePasswordFragment extends Fragment {
                     return;
                 }
 
-                if(!newPassword.equals(confirmNewPassword)){
+                if(newPassword.length() < 6) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getActivity(), "Password too weak !", Toast.LENGTH_SHORT).show();
+                }
+                else if(!newPassword.equals(confirmNewPassword)){
                     progressDialog.dismiss();
                     Toast.makeText(getActivity(), "The confirm password does not match!!", Toast.LENGTH_SHORT).show();
                 }
@@ -167,7 +171,6 @@ public class ChangePasswordFragment extends Fragment {
         super.onResume();
         sharedPreferences = this.getActivity().getSharedPreferences("isVerifyOtp", Context.MODE_MULTI_PROCESS);
         boolean otp = sharedPreferences.getBoolean("otp",false);
-
         if(otp) {
             String newHashPass = BCrypt.withDefaults().hashToString(12, newPassword.toCharArray());
 
@@ -178,6 +181,7 @@ public class ChangePasswordFragment extends Fragment {
             Toast.makeText(getActivity(), "Change password successful.", Toast.LENGTH_SHORT).show();
             logout();
         }
+
     }
 
     private void logout() {

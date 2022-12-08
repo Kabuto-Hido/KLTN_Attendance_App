@@ -152,10 +152,10 @@ public class EditEmpFragment extends Fragment {
             }
         });
 
+        Calendar calendar = Calendar.getInstance();
         edtBirthday1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
                 int date = calendar.get(Calendar.DATE);
                 int month = calendar.get(Calendar.MONTH);
                 int year = calendar.get(Calendar.YEAR);

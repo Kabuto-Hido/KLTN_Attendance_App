@@ -118,7 +118,6 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
 
     private void setMonthView() {
         monthYearTV.setText(monthYearFromDate(selectedDate));
-        //ArrayList<String> dayInMonth = daysInMonthArray(selectedDate);
         LinkedHashMap<String, String> dayInMonth = daysInMonthMap(selectedDate);
 
         calendarAdapter = new CalendarAdapter(dayInMonth,getContext(),this);
@@ -214,7 +213,6 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
                         });
             }
         }
-        System.out.println(daysInMonthMap);
         return daysInMonthMap;
     }
 

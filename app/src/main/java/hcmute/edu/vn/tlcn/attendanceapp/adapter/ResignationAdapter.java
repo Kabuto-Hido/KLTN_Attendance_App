@@ -24,6 +24,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.R;
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
 public class ResignationAdapter extends BaseAdapter {
@@ -130,6 +131,56 @@ public class ResignationAdapter extends BaseAdapter {
                                         if (checkInRecord == null) {
                                             Record absentRecord = new Record(phone, day, "", "absent with permission", "absent");
                                             recordRef.child(phone).child(day).child("absent").setValue(absentRecord);
+
+                                            String currentMonth = day.substring(5,7);
+                                            String currentYear = day.substring(0,4);
+
+                                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                            DatabaseReference statisticRef = database.getReference("statistic");
+                                            statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
+                                                    Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
+
+                                                    DataSnapshot dataSnapshot2 = snapshot.child(phone).child(currentYear).child(currentMonth);
+                                                    Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
+
+
+                                                    int countAbsentWithPer;
+                                                    if(monthStatistic == null){
+                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear);
+                                                        statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
+
+
+                                                    }
+                                                    else{
+                                                        countAbsentWithPer = monthStatistic.getAbsentWithPer();
+                                                        countAbsentWithPer++;
+                                                        monthStatistic.setAbsentWithPer(countAbsentWithPer);
+
+                                                        statisticRef.child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
+
+                                                    }
+
+                                                    if(empStatistic == null){
+                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear);
+                                                        statisticRef.child(phone).child(currentYear).child(currentMonth).setValue(newStatistic);
+                                                    }
+                                                    else{
+                                                        countAbsentWithPer = empStatistic.getAbsentWithPer();
+                                                        countAbsentWithPer++;
+                                                        empStatistic.setAbsentWithPer(countAbsentWithPer);
+
+                                                        statisticRef.child(phone).child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
                                         }
                                     }
 
