@@ -74,7 +74,7 @@
         android:textSize="15dp"
         android:textColor="#49be25"
         android:layout_below="@+id/txtDay"
-        android:layout_toRightOf="@id/txtnumcheckin"
+        android:layout_toEndOf="@id/txtnumcheckin"
         android:text="10"
         />
 

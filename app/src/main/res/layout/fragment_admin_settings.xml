@@ -82,22 +82,6 @@
             android:layout_height="1dp"
             android:background="#AEAEAE"/>
 
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Notification"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:background="@drawable/border_line"
-            android:drawablePadding="24dp"
-            app:drawableStartCompat="@drawable/ic_baseline_notifications_24" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#AEAEAE"/>
         <TextView
             android:id="@+id/txtAdminChangePassword"
             android:layout_width="match_parent"

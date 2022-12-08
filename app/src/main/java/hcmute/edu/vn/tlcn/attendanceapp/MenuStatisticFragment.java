@@ -82,6 +82,8 @@ public class MenuStatisticFragment extends Fragment {
         txtEmpReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                MonthlyEmpReportFragment monthlyEmpReportFragment = new MonthlyEmpReportFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,monthlyEmpReportFragment).commit();
 
             }
         });

@@ -130,6 +130,7 @@ public class TodayStatisticFragment extends Fragment {
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String currentDate = dateFormat.format(currentTime);
+        txtDay.setText(currentDate);
         putDataToView(currentDate);
 
         return view;
