@@ -25,7 +25,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
     EditText edtNewResetPassword, edtConfirmResetNewPassword;
     Button btnConfirmResetPass;
     SharedPreferences sharedPreferences;
-    String mPhone;
+    String mPhone, getPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +35,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         mapping();
 
         mPhone = getIntent().getStringExtra("forgetPhone");
+        getPhone = "0"+ mPhone.substring(3);
 
         txtShowNewPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +75,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                     String newHashPass = BCrypt.withDefaults().hashToString(12, newPass.toCharArray());
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference("users");
-                    myRef.child(mPhone).child("password").setValue(newHashPass);
+                    myRef.child(getPhone).child("password").setValue(newHashPass);
 
                     System.out.println("c");
 

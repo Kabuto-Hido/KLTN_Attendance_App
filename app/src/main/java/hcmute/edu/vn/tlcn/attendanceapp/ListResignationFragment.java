@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -73,6 +74,7 @@ public class ListResignationFragment extends Fragment {
     }
 
     View view;
+    TextView textviewNotifi;
     ImageView btnBackResignation;
     ListView listviewResignation;
     ResignationAdapter adapter;
@@ -104,7 +106,7 @@ public class ListResignationFragment extends Fragment {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
 
-        dayOffReportRef.orderByChild("status").startAt("waiting").addValueEventListener(new ValueEventListener() {
+        dayOffReportRef.orderByChild("status").startAt("waiting").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 requestList.clear();
@@ -113,6 +115,15 @@ public class ListResignationFragment extends Fragment {
                     requestList.add(dayOffRequest);
                 }
                 adapter.notifyDataSetChanged();
+
+                if(requestList.size() == 0){
+                    textviewNotifi.setVisibility(View.VISIBLE);
+                    listviewResignation.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    textviewNotifi.setVisibility(View.INVISIBLE);
+                    listviewResignation.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -125,5 +136,6 @@ public class ListResignationFragment extends Fragment {
     private void mapping() {
         btnBackResignation = (ImageView) view.findViewById(R.id.btnBackResignation);
         listviewResignation = (ListView) view.findViewById(R.id.listviewResignation);
+        textviewNotifi = (TextView) view.findViewById(R.id.textviewNotifi);
     }
 }

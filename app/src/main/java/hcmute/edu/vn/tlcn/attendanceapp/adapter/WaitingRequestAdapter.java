@@ -20,15 +20,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import hcmute.edu.vn.tlcn.attendanceapp.ListSendedRequestActivity;
 import hcmute.edu.vn.tlcn.attendanceapp.R;
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
 
 public class WaitingRequestAdapter extends BaseAdapter {
     private ArrayList<DayOffRequest> arrWaitingReq;
-    private Context context;
+    private ListSendedRequestActivity context;
     private int layout ;
 
-    public WaitingRequestAdapter(ArrayList<DayOffRequest> arrWaitingReq, Context context, int layout) {
+    public WaitingRequestAdapter(ArrayList<DayOffRequest> arrWaitingReq, ListSendedRequestActivity context, int layout) {
         this.arrWaitingReq = arrWaitingReq;
         this.context = context;
         this.layout = layout;
@@ -77,38 +78,7 @@ public class WaitingRequestAdapter extends BaseAdapter {
         holder.btnCancelSentReq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
-
-                dayOffReportRef.orderByChild("status").startAt("waiting").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for(DataSnapshot dataSnapshot: snapshot.getChildren()){
-                            DayOffRequest dayOff = dataSnapshot.getValue(DayOffRequest.class);
-                            String phone = dayOff.getUserPhone();
-                            String day = dayOff.getDateOff();
-
-                            if(phone.equals(waitingReq.getUserPhone())
-                                    && day.equals(waitingReq.getDateOff())){
-                                String reqId = dataSnapshot.getKey();
-                                dayOffReportRef.child(reqId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        arrWaitingReq.remove(position);
-                                        notifyDataSetChanged();
-                                        Toast.makeText(context, "Cancel request day: "+day+" successfully !", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                break;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
+                context.cancelWaitingRequest(waitingReq);
             }
         });
 

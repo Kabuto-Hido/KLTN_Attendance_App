@@ -34,6 +34,18 @@
                 android:layout_marginBottom="2dp"/>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/textviewNotifi"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/layout2"
+            android:text="No Resignations"
+            android:gravity="center"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:visibility="invisible" />
+
         <ListView
             android:id="@+id/listviewResignation"
             android:layout_marginTop="20dp"

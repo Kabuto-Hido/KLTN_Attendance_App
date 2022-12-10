@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.EmployeeAdapter;
+import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -85,6 +88,7 @@ public class Manage_Emp_Fragment extends Fragment {
     }
 
     View view;
+    TextView textviewNoti;
     ImageView btnBackPageMngEmp;
     ListView listviewEmp;
     EmployeeAdapter employeeAdapter;
@@ -130,6 +134,7 @@ public class Manage_Emp_Fragment extends Fragment {
         btnBackPageMngEmp = (ImageView) view.findViewById(R.id.btnBackPageMngEmp);
         listviewEmp = (ListView) view.findViewById(R.id.listviewEmp);
         btnAddEmp = (FloatingActionButton) view.findViewById(R.id.btnAddEmp);
+        textviewNoti = (TextView) view.findViewById(R.id.textviewNoti);
     }
 
     private void getListEmp(){
@@ -144,6 +149,15 @@ public class Manage_Emp_Fragment extends Fragment {
                     empList.add(user);
                 }
                 employeeAdapter.notifyDataSetChanged();
+
+                if(empList.size() == 0){
+                    textviewNoti.setVisibility(View.VISIBLE);
+                    listviewEmp.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    textviewNoti.setVisibility(View.INVISIBLE);
+                    listviewEmp.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -215,11 +229,90 @@ public class Manage_Emp_Fragment extends Fragment {
                             @Override
                             public void onSuccess(Void unused) {
                                 FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+                                DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
+                                dayOffReportRef.orderByChild("userPhone")
+                                        .startAt(user.getPhone())
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                                                    String reqId = dataSnapshot.getKey();
+                                                    dayOffReportRef.child(reqId).removeValue();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+
+                                DatabaseReference recordRef = database.getReference("record");
+                                recordRef.child(user.getPhone()).removeValue();
+
+                                DatabaseReference statisticRef = database.getReference("statistic");
+                                statisticRef.child(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for(DataSnapshot yearSnapshot: snapshot.getChildren()){
+                                            String year = yearSnapshot.getKey();
+                                            for(DataSnapshot monthSnapshot: yearSnapshot.getChildren()){
+                                                String month = monthSnapshot.getKey();
+                                                Statistic statistic = monthSnapshot.getValue(Statistic.class);
+
+                                                if (year != null) {
+                                                    if (month != null) {
+                                                        statisticRef.child(year).child(month).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                                int totalOnTime;
+                                                                int totalLate;
+                                                                int totalAbsentWithPer;
+                                                                int totalAbsentWithoutPer;
+
+                                                                Statistic monthStatistic = snapshot.getValue(Statistic.class);
+                                                                if(monthStatistic!=null) {
+                                                                    totalOnTime = monthStatistic.getOnTime() - statistic.getOnTime();
+                                                                    monthStatistic.setOnTime(totalOnTime);
+
+                                                                    totalLate = monthStatistic.getLate() - statistic.getLate();
+                                                                    monthStatistic.setLate(totalLate);
+
+                                                                    totalAbsentWithPer = monthStatistic.getAbsentWithPer() - statistic.getAbsentWithPer();
+                                                                    monthStatistic.setAbsentWithPer(totalAbsentWithPer);
+
+                                                                    totalAbsentWithoutPer = monthStatistic.getAbsentWithoutPer() - statistic.getAbsentWithoutPer();
+                                                                    monthStatistic.setAbsentWithoutPer(totalAbsentWithoutPer);
+
+                                                                    statisticRef.child(year).child(month).setValue(monthStatistic);
+                                                                    statisticRef.child(user.getPhone()).removeValue();
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+
                                 DatabaseReference ref = database.getReference("users");
                                 ref.child(user.getPhone()).removeValue()
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void unused) {
+
                                                 getListEmp();
                                                 dialog.dismiss();
                                                 Toast.makeText(getActivity(),"Delete successful!!",Toast.LENGTH_SHORT).show();
