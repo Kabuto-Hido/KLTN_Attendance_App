@@ -77,8 +77,6 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                     DatabaseReference myRef = database.getReference("users");
                     myRef.child(getPhone).child("password").setValue(newHashPass);
 
-                    System.out.println("c");
-
                     Toast.makeText(ForgetPasswordActivity.this, "Change password successful.", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                     logout();
@@ -91,7 +89,6 @@ public class ForgetPasswordActivity extends AppCompatActivity {
     private void logout() {
         User_singeton user_singeton = User_singeton.getInstance();
         user_singeton.setUser(null);
-        user_singeton = null;
 
         sharedPreferences = getSharedPreferences("isVerifyOtp", Context.MODE_MULTI_PROCESS);
         SharedPreferences.Editor editor = sharedPreferences.edit();

@@ -9,17 +9,27 @@ public class Statistic implements Serializable {
     public int absentWithoutPer;
     public String statisticMonth;
     public String statisticYear;
+    public String userPhone;
 
-    public Statistic(int onTime, int late, int absentWithPer, int absentWithoutPer, String statisticMonth, String statisticYear) {
+    public Statistic(int onTime, int late, int absentWithPer, int absentWithoutPer, String statisticMonth, String statisticYear, String userPhone) {
         this.onTime = onTime;
         this.late = late;
         this.absentWithPer = absentWithPer;
         this.absentWithoutPer = absentWithoutPer;
         this.statisticMonth = statisticMonth;
         this.statisticYear = statisticYear;
+        this.userPhone = userPhone;
     }
 
     public Statistic() {
+    }
+
+    public String getUserPhone() {
+        return userPhone;
+    }
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 
     public String getStatisticMonth() {

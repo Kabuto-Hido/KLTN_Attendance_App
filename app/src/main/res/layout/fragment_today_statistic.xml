@@ -33,7 +33,7 @@
     </RelativeLayout>
     <TextView
         android:id="@+id/txtDay"
-        android:layout_width="130dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relativeLayout"
         android:layout_centerHorizontal="true"

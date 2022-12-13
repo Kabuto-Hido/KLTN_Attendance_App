@@ -249,7 +249,6 @@ public class ConfirmOTPActivity extends AppCompatActivity {
                             editor.apply();
 
                             if(loginUser == null){
-                                System.out.println("b");
                                 Intent goToForgetPasswordActivity = new Intent(ConfirmOTPActivity.this,ForgetPasswordActivity.class);
                                 goToForgetPasswordActivity.putExtra("forgetPhone",mPhone);
                                 startActivity(goToForgetPasswordActivity);

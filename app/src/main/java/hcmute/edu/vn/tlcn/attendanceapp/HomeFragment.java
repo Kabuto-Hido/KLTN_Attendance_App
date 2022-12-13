@@ -295,7 +295,7 @@ public class HomeFragment extends Fragment {
                     }
 
                     //month statistic
-                    Statistic newStatistic = new Statistic(countOnTime,countLate,0,countAbsentWithoutPer,currentMonth,currentYear);
+                    Statistic newStatistic = new Statistic(countOnTime,countLate,0,countAbsentWithoutPer,currentMonth,currentYear,"");
                     statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
 
                 }
@@ -333,7 +333,7 @@ public class HomeFragment extends Fragment {
                         countAbsentWithoutPer = 1;
                     }
 
-                    Statistic newStatistic = new Statistic(countOnTime,countLate,0,countAbsentWithoutPer,currentMonth,currentYear);
+                    Statistic newStatistic = new Statistic(countOnTime,countLate,0,countAbsentWithoutPer,currentMonth,currentYear,user.getPhone());
                     statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
                 }
                 else{
@@ -416,7 +416,7 @@ public class HomeFragment extends Fragment {
                                     Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
                                     if(monthStatistic == null){
-                                        Statistic newStatistic = new Statistic(0,0,0,count,currentMonth,currentYear);
+                                        Statistic newStatistic = new Statistic(0,0,0,count,currentMonth,currentYear,"");
                                         statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
                                     }
                                     else{
@@ -426,7 +426,7 @@ public class HomeFragment extends Fragment {
                                     }
 
                                     if(empStatistic == null){
-                                        Statistic newStatistic = new Statistic(0,0,0,count,currentMonth,currentYear);
+                                        Statistic newStatistic = new Statistic(0,0,0,count,currentMonth,currentYear,user.getPhone());
                                         statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
                                     }
                                     else{

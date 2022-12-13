@@ -81,7 +81,7 @@ public class SendOTPActivity extends AppCompatActivity {
                 else {
                     finish();
                 }
-                finish();
+//                finish();
             }
         });
 
@@ -141,7 +141,6 @@ public class SendOTPActivity extends AppCompatActivity {
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
                 token = forceResendingToken;
-                System.out.println("a");
                 Intent gotoConfirmActivity = new Intent(SendOTPActivity.this,ConfirmOTPActivity.class);
                 gotoConfirmActivity.putExtra("verificationId",s);
                 gotoConfirmActivity.putExtra("phone",phone);
