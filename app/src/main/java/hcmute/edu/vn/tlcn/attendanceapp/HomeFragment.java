@@ -365,10 +365,12 @@ public class HomeFragment extends Fragment {
 
     private void checkPreviousAttendance(){
         Date today = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat dayFormat = new SimpleDateFormat("dd");
         SimpleDateFormat monthYearFormat = new SimpleDateFormat("yyyy-MM");
         String dayCurr = dayFormat.format(today.getTime());
         String YMCurr = monthYearFormat.format(today.getTime());
+        Calendar calendar = Calendar.getInstance();
 
         int n = Integer.parseInt(dayCurr);
         for(int i = 1; i < n; i++){
@@ -380,84 +382,91 @@ public class HomeFragment extends Fragment {
             else {
                 dateAttend = YMCurr + "-" + (i);
             }
+            Date getDate = null;
+            try {
+                getDate = dateFormat.parse(dateAttend);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            calendar.setTime(getDate);
+            
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference recordRef = database.getReference("record");
-            recordRef.child(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    //check-in
-                    DataSnapshot dataSnapshot = snapshot.child(dateAttend).child("checkIn");
-                    Record checkInRecord = dataSnapshot.getValue(Record.class);
-                    DataSnapshot dataSnapshot2 = snapshot.child(dateAttend).child("absent");
-                    Record absentRecord = dataSnapshot2.getValue(Record.class);
-                    DataSnapshot dataSnapshot3 = snapshot.child(dateAttend).child("checkOut");
-                    Record checkOutRecord = dataSnapshot3.getValue(Record.class);
+            if(calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                recordRef.child(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        //check-in
+                        DataSnapshot dataSnapshot = snapshot.child(dateAttend).child("checkIn");
+                        Record checkInRecord = dataSnapshot.getValue(Record.class);
+                        DataSnapshot dataSnapshot2 = snapshot.child(dateAttend).child("absent");
+                        Record absentRecord = dataSnapshot2.getValue(Record.class);
+                        DataSnapshot dataSnapshot3 = snapshot.child(dateAttend).child("checkOut");
+                        Record checkOutRecord = dataSnapshot3.getValue(Record.class);
 
-                    if(checkInRecord == null){
-                        if(absentRecord == null) {
-                            Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent");
-                            recordRef.child(user.getPhone()).child(dateAttend).child("absent").setValue(absent);
+                        if (checkInRecord == null) {
+                            if (absentRecord == null) {
+                                Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent");
+                                recordRef.child(user.getPhone()).child(dateAttend).child("absent").setValue(absent);
 
-                            count += 1;
+                                count += 1;
 
-                            //updateStatistic
-                            FirebaseDatabase database = FirebaseDatabase.getInstance();
-                            DatabaseReference statisticRef = database.getReference("statistic");
-                            statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    String currentYear =dateAttend.substring(0,4);
-                                    String currentMonth = dateAttend.substring(5,7);
-                                    DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
-                                    Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
-                                    int countAbsentWithoutPer;
+                                //updateStatistic
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference statisticRef = database.getReference("statistic");
+                                statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        String currentYear = dateAttend.substring(0, 4);
+                                        String currentMonth = dateAttend.substring(5, 7);
+                                        DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
+                                        Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
+                                        int countAbsentWithoutPer;
 
-                                    DataSnapshot dataSnapshot2 = snapshot.child(user.getPhone()).child(currentYear).child(currentMonth);
-                                    Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
+                                        DataSnapshot dataSnapshot2 = snapshot.child(user.getPhone()).child(currentYear).child(currentMonth);
+                                        Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
-                                    if(monthStatistic == null){
-                                        Statistic newStatistic = new Statistic(0,0,0,count,currentMonth,currentYear,"");
-                                        statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
+                                        if (monthStatistic == null) {
+                                            Statistic newStatistic = new Statistic(0, 0, 0, count, currentMonth, currentYear, "");
+                                            statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
+                                        } else {
+                                            countAbsentWithoutPer = monthStatistic.getAbsentWithoutPer();
+                                            countAbsentWithoutPer += count;
+                                            statisticRef.child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
+                                        }
+
+                                        if (empStatistic == null) {
+                                            Statistic newStatistic = new Statistic(0, 0, 0, count, currentMonth, currentYear, user.getPhone());
+                                            statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
+                                        } else {
+                                            countAbsentWithoutPer = empStatistic.getAbsentWithoutPer();
+                                            countAbsentWithoutPer += count;
+                                            statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
+                                        }
                                     }
-                                    else{
-                                        countAbsentWithoutPer = monthStatistic.getAbsentWithoutPer();
-                                        countAbsentWithoutPer += count;
-                                        statisticRef.child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
                                     }
+                                });
 
-                                    if(empStatistic == null){
-                                        Statistic newStatistic = new Statistic(0,0,0,count,currentMonth,currentYear,user.getPhone());
-                                        statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
-                                    }
-                                    else{
-                                        countAbsentWithoutPer = empStatistic.getAbsentWithoutPer();
-                                        countAbsentWithoutPer += count;
-                                        statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
-                                    }
-                                }
+                            }
+                        } else {
+                            if (checkOutRecord == null) {
+                                Record checkOut = new Record(user.getPhone(), dateAttend, "17:00", "", "checkOut");
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
-
+                                recordRef.child(user.getPhone()).child(dateAttend).child("checkOut").setValue(checkOut);
+                            }
                         }
                     }
-                    else {
-                        if(checkOutRecord == null){
-                            Record checkOut = new Record(user.getPhone(),dateAttend,"17:00","","checkOut");
 
-                            recordRef.child(user.getPhone()).child(dateAttend).child("checkOut").setValue(checkOut);
-                        }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
+                });
+            }
         }
     }
 

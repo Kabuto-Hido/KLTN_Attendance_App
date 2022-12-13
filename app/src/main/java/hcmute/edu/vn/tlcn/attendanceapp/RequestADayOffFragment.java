@@ -121,10 +121,10 @@ public class RequestADayOffFragment extends Fragment {
             }
         });
 
+        calendar = Calendar.getInstance();
         edtDayToOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calendar = Calendar.getInstance();
                 int date = calendar.get(Calendar.DATE);
                 int month = calendar.get(Calendar.MONTH);
                 int year = calendar.get(Calendar.YEAR);
@@ -171,6 +171,12 @@ public class RequestADayOffFragment extends Fragment {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String selectedDate = format.format(calendar.getTime());
             edtDayToOff.setText(selectedDate);
+
+            if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+                btnSendRequestDayOff.setEnabled(false);
+                Toast.makeText(getActivity(), "The day you choose is Sunday!!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             btnSendRequestDayOff.setEnabled(true);
             database = FirebaseDatabase.getInstance();
