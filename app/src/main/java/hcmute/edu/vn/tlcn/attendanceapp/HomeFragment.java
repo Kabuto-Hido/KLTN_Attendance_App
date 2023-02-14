@@ -2,26 +2,30 @@ package hcmute.edu.vn.tlcn.attendanceapp;
 
 import static android.Manifest.permission.CAMERA;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,8 +41,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -52,24 +60,16 @@ import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.squareup.picasso.Picasso;
 
-import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
-import org.tensorflow.lite.support.common.ops.NormalizeOp;
-import org.tensorflow.lite.support.image.ImageProcessor;
-import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.support.image.ops.ResizeOp;
-import org.tensorflow.lite.support.image.ops.ResizeWithCropOrPadOp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -77,12 +77,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
+import hcmute.edu.vn.tlcn.attendanceapp.pattern.IBaseGpsListener;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 /**
@@ -90,7 +92,7 @@ import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements IBaseGpsListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -163,6 +165,7 @@ public class HomeFragment extends Fragment {
     SimpleDateFormat monthFormat;
     SimpleDateFormat yearFormat;
     int count;
+    String currentLocation = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -170,6 +173,7 @@ public class HomeFragment extends Fragment {
         view =  inflater.inflate(R.layout.fragment_home, container, false);
 
         mapping();
+
         currentTime = Calendar.getInstance().getTime();
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         dayFormat = new SimpleDateFormat("dd");
@@ -193,8 +197,11 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 type = "checkIn";
 
+                getLocation();
+
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(currentTime);
+                //check in - sunday
                 if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
                     AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                     dialog.setMessage("Today is sunday are you sure you want to take attendance ? ");
@@ -211,7 +218,6 @@ public class HomeFragment extends Fragment {
                             btnTimeIn.setVisibility(View.INVISIBLE);
                             notifiDone.setText("Have a nice weekend!!");
                             notifiDone.setVisibility(View.VISIBLE);
-                            return;
                         }
                     });
                     dialog.show();
@@ -224,17 +230,17 @@ public class HomeFragment extends Fragment {
                         notifiDone.setTextColor(Color.parseColor("#ff0000"));
                         notifiDone.setVisibility(View.VISIBLE);
 
-                        currentTime = Calendar.getInstance().getTime();
-                        String absentDate = dateFormat.format(currentTime);
-
-                        FirebaseDatabase database = FirebaseDatabase.getInstance();
-                        DatabaseReference recordRef = database.getReference("record")
-                                .child(user.getPhone()).child(absentDate).child("absent");
-
-                        Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent");
-                        recordRef.setValue(absentRecord);
-                        updateStatistic(absent2);
-                        Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
+//                        currentTime = Calendar.getInstance().getTime();
+//                        String absentDate = dateFormat.format(currentTime);
+//
+//                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//                        DatabaseReference recordRef = database.getReference("record")
+//                                .child(user.getPhone()).child(absentDate).child("absent");
+//
+//                        Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent","location");
+//                        recordRef.setValue(absentRecord);
+//                        updateStatistic(absent2);
+                        //Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
                     } else {
                         takeAttendance();
                     }
@@ -390,7 +396,7 @@ public class HomeFragment extends Fragment {
                 e.printStackTrace();
             }
             calendar.setTime(getDate);
-            
+
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference recordRef = database.getReference("record");
             if(calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
@@ -407,7 +413,7 @@ public class HomeFragment extends Fragment {
 
                         if (checkInRecord == null) {
                             if (absentRecord == null) {
-                                Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent");
+                                Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent","");
                                 recordRef.child(user.getPhone()).child(dateAttend).child("absent").setValue(absent);
 
                                 count += 1;
@@ -455,7 +461,7 @@ public class HomeFragment extends Fragment {
                             }
                         } else {
                             if (checkOutRecord == null) {
-                                Record checkOut = new Record(user.getPhone(), dateAttend, "17:00", "", "checkOut");
+                                Record checkOut = new Record(user.getPhone(), dateAttend, "17:00", "", "checkOut","");
 
                                 recordRef.child(user.getPhone()).child(dateAttend).child("checkOut").setValue(checkOut);
                             }
@@ -644,10 +650,10 @@ public class HomeFragment extends Fragment {
             public void onSuccess(List<Face> faces) {
                 for (Face face :faces){
                     RectF bounds = new RectF(face.getBoundingBox());
+                    //cut face from image
                     Bitmap cropped_face = getCropBitmapByCPU(bitmap, bounds);
 
                     Bitmap scaled = getResizedBitmap(cropped_face, inputSize, inputSize);
-                    //Bitmap cropped = Bitmap.createBitmap(bitmap,bounds.left,bounds.top,bounds.width(),bounds.height());
                     get_embaddings(scaled,name);
                 }
             }
@@ -757,7 +763,8 @@ public class HomeFragment extends Fragment {
                 String checkInDate = dateFormat.format(currentTime);
                 String checkInTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getPhone(),checkInDate,checkInTime,status,type);
+
+                Record record = new Record(user.getPhone(),checkInDate,checkInTime,status,type,"");
 
                 recordRef.child(checkInDate).child(type).setValue(record);
                 updateStatistic(status);
@@ -773,7 +780,7 @@ public class HomeFragment extends Fragment {
                 String checkOutDate = dateFormat.format(currentTime);
                 String checkOutTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getPhone(),checkOutDate,checkOutTime,"",type);
+                Record record = new Record(user.getPhone(),checkOutDate,checkOutTime,"",type,"");
 
                 recordRef.child(checkOutDate).child(type).setValue(record);
 
@@ -787,6 +794,25 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private void getLocation(){
+        if(ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+            if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0, this);
+
+            }else{
+                Toast.makeText(getActivity(),"Enable GPS!!",Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+        }
+        else{
+            RequestPermissions();
+        }
+
+    }
+
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
     public boolean CheckPermissions() {
         int result = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), CAMERA);
@@ -794,7 +820,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void RequestPermissions() {
-        ActivityCompat.requestPermissions(getActivity(), new String[]{CAMERA}, REQUEST_AUDIO_PERMISSION_CODE);
+        ActivityCompat.requestPermissions(getActivity(), new String[]{CAMERA,
+                Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_AUDIO_PERMISSION_CODE);
     }
 
     @Override
@@ -803,12 +830,51 @@ public class HomeFragment extends Fragment {
         if (requestCode == REQUEST_AUDIO_PERMISSION_CODE) {
             if (grantResults.length > 0) {
                 boolean permissionToCamera = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                if (permissionToCamera) {
+                boolean permissionToLocation = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                if (permissionToCamera && permissionToLocation) {
+                    getLocation();
                     Toast.makeText(getActivity().getApplicationContext(), "Permission Granted", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), "Permission Denied", Toast.LENGTH_LONG).show();
                 }
             }
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Geocoder geocoder = new Geocoder(getActivity(),Locale.getDefault());
+        try {
+            List<Address> addressList= geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+            if(addressList!=null){
+                currentLocation = addressList.get(0).getAddressLine(0);
+                Toast.makeText(getActivity(),"add: "+currentLocation,Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(getActivity(),"not found",Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onGpsStatusChanged(int event) {
+
     }
 }

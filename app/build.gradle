@@ -56,6 +56,7 @@ dependencies {
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.tiedmud:Custom-Calendar-View:1.2'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
     //face api
     implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-debug-SNAPSHOT'
     implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'

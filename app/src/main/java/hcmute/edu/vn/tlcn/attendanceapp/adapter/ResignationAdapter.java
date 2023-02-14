@@ -129,7 +129,7 @@ public class ResignationAdapter extends BaseAdapter {
                                         DataSnapshot dataSnapshot = snapshot.child(phone).child(day).child("checkIn");
                                         Record checkInRecord = dataSnapshot.getValue(Record.class);
                                         if (checkInRecord == null) {
-                                            Record absentRecord = new Record(phone, day, "", "absent with permission", "absent");
+                                            Record absentRecord = new Record(phone, day, "", "absent with permission", "absent","");
                                             recordRef.child(phone).child(day).child("absent").setValue(absentRecord);
 
                                             String currentMonth = day.substring(5,7);

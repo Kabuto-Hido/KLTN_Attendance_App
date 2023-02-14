@@ -8,13 +8,15 @@ public class Record implements Serializable {
     public String time;
     public String status; //on time - late - none
     public String type; //checkIn - checkOut
+    private String location;
 
-    public Record(String userPhone, String day, String time, String status, String type) {
+    public Record(String userPhone, String day, String time, String status, String type, String location) {
         this.userPhone = userPhone;
         this.day = day;
         this.time = time;
         this.status = status;
         this.type = type;
+        this.location = location;
     }
 
     public String getType() {
@@ -58,5 +60,13 @@ public class Record implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

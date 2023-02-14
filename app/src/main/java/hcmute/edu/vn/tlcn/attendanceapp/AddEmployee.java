@@ -362,13 +362,15 @@ public class AddEmployee extends Fragment {
             return false;
         }
 
-        if(phoneNumber.length()!=10){
-            Toast.makeText(getActivity(), "Invalid phone !", Toast.LENGTH_SHORT).show();
+        if(phoneNumber.length()!=10 || !phoneNumber.matches(getString(R.string.regexPhone))){
+            edtPhonenum.setError("Invalid phone !");
+            //Toast.makeText(getActivity(), "Invalid phone !", Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if(password.length() < 6){
-            Toast.makeText(getActivity(), "Password too weak !", Toast.LENGTH_SHORT).show();
+            edtPassword1.setError("Password too weak !");
+            //Toast.makeText(getActivity(), "Password too weak !", Toast.LENGTH_SHORT).show();
             return false;
         }
 
