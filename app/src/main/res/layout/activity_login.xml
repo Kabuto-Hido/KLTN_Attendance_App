@@ -28,19 +28,19 @@
         android:layout_below="@+id/loginImage" />
 
     <EditText
-        android:id="@+id/edittextPhone"
+        android:id="@+id/edittextEmpCode"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:layout_below="@+id/loginLabel"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="80dp"
         android:layout_marginTop="20dp"
-        android:autofillHints="phone"
+        android:autofillHints="postalAddress"
         android:background="@drawable/custom_login_input"
-        android:drawableStart="@drawable/ic_phone"
+        android:drawableStart="@drawable/ic_emp_code"
         android:drawablePadding="10dp"
-        android:hint="Phone Number"
-        android:inputType="phone"
+        android:hint="Employee number"
+        android:inputType="text"
         android:paddingStart="10dp"
         android:paddingEnd="10dp" />
 
@@ -53,7 +53,7 @@
         android:layout_marginStart="80dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:layout_below="@+id/edittextPhone">
+        android:layout_below="@+id/edittextEmpCode">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edittextPassword"
             android:layout_width="match_parent"

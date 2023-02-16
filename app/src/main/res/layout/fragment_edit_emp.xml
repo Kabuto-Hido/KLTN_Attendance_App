@@ -7,7 +7,7 @@
     tools:context=".EditEmpFragment">
 
     <TextView
-        android:id="@+id/labelNameEmp"
+        android:id="@+id/labelCodeEmp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -15,14 +15,14 @@
         android:paddingTop="15sp"
         android:text="EMPLOYEE'S NAME"
         android:textColor="#2196F3"
-        android:textSize="30sp"
+        android:textSize="25sp"
         android:textStyle="bold" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgAvatarProfile"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_below="@+id/labelNameEmp"
+        android:layout_below="@+id/labelCodeEmp"
         android:layout_marginStart="20sp"
         android:layout_marginTop="20dp"
         android:src="@drawable/person_white"

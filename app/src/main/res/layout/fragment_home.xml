@@ -15,15 +15,27 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="#2196F3"
-            android:padding="6dp">
+            android:padding="6dp"
+            android:orientation="horizontal">
 
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="Welcome,"
+                android:textStyle="bold"
+                android:layout_marginStart="30dp"
+                android:textColor="@color/white"
+                android:textSize="25sp"/>
+
+            <TextView
+                android:id="@+id/txtUuid"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:text="Welcome"
+                android:text="uuid"
                 android:textStyle="bold"
-                android:layout_marginStart="30dp"
+                android:layout_marginStart="10dp"
                 android:textColor="@color/white"
                 android:textSize="25sp"/>
         </LinearLayout>

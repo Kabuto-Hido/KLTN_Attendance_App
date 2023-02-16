@@ -3,6 +3,7 @@ package hcmute.edu.vn.tlcn.attendanceapp.model;
 import java.io.Serializable;
 
 public class User implements Serializable {
+    public String uuid;
     public String fullName;
     public String phone;
     private String password;
@@ -12,8 +13,8 @@ public class User implements Serializable {
     public String avatar;
     public Integer role;
 
-    public User(String fullName, String phone, String password, String birthday,
-                String description, Boolean sex, String avatar, Integer role) {
+    public User(String uuid, String fullName, String phone, String password, String birthday, String description, Boolean sex, String avatar, Integer role) {
+        this.uuid = uuid;
         this.fullName = fullName;
         this.phone = phone;
         this.password = password;
@@ -25,6 +26,14 @@ public class User implements Serializable {
     }
 
     public User() {
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public String getFullName() {

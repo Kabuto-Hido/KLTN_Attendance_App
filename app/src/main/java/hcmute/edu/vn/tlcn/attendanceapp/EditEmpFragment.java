@@ -107,7 +107,7 @@ public class EditEmpFragment extends Fragment {
     }
 
     View view;
-    TextView labelNameEmp, btnCancelEdit;
+    TextView labelCodeEmp, btnCancelEdit;
     CircleImageView imgAvatarProfile;
     EditText edtPhonenum, edtName, edtBirthday1;
     RadioButton radioMale, radioFemale;
@@ -308,7 +308,7 @@ public class EditEmpFragment extends Fragment {
             }
         });
 
-        labelNameEmp.setText(editUser.getFullName());
+        labelCodeEmp.setText(editUser.getUuid());
         edtName.setText(editUser.getFullName());
         edtBirthday1.setText(editUser.getBirthday());
         String getPhone = editUser.getPhone();
@@ -325,7 +325,7 @@ public class EditEmpFragment extends Fragment {
     }
 
     private void mapping() {
-        labelNameEmp = (TextView) view.findViewById(R.id.labelNameEmp);
+        labelCodeEmp = (TextView) view.findViewById(R.id.labelCodeEmp);
         btnCancelEdit = (TextView) view.findViewById(R.id.btnCancelEdit);
         imgAvatarProfile = (CircleImageView) view.findViewById(R.id.imgAvatarProfile);
         edtPhonenum = (EditText) view.findViewById(R.id.edtPhonenum);

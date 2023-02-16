@@ -23,7 +23,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -41,12 +40,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -84,7 +79,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
-import hcmute.edu.vn.tlcn.attendanceapp.pattern.IBaseGpsListener;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 /**
@@ -92,7 +86,7 @@ import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment implements IBaseGpsListener {
+public class HomeFragment extends Fragment{
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -107,15 +101,6 @@ public class HomeFragment extends Fragment implements IBaseGpsListener {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -135,7 +120,7 @@ public class HomeFragment extends Fragment implements IBaseGpsListener {
     }
 
     View view;
-    TextView txtNameUser, txtTimeCheckIn, txtTimeCheckOut, txtDayNow, notifiDone;
+    TextView txtNameUser, txtTimeCheckIn, txtTimeCheckOut, txtDayNow, notifiDone, txtUuid;
     CircleImageView avatarUser;
     DigitalClock digitalClock;
     Button btnTimeIn, btnTimeOut;
@@ -166,6 +151,7 @@ public class HomeFragment extends Fragment implements IBaseGpsListener {
     SimpleDateFormat yearFormat;
     int count;
     String currentLocation = "";
+    private LocationListener locationListener=null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -518,6 +504,7 @@ public class HomeFragment extends Fragment implements IBaseGpsListener {
             getActivity().finish();
         }
 
+        txtUuid.setText(user.getUuid());
         txtNameUser.setText(user.getFullName());
 
         Date today = new Date();
@@ -594,6 +581,7 @@ public class HomeFragment extends Fragment implements IBaseGpsListener {
         btnTimeIn = (Button) view.findViewById(R.id.btnTimeIn);
         btnTimeOut = (Button) view.findViewById(R.id.btnTimeOut);
         notifiDone = (TextView) view.findViewById(R.id.notifiDone);
+        txtUuid = (TextView) view.findViewById(R.id.txtUuid);
     }
 
     @Override
@@ -800,7 +788,8 @@ public class HomeFragment extends Fragment implements IBaseGpsListener {
             LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
             if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0, this);
+                locationListener = new MyLocationListener();
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10, locationListener);
 
             }else{
                 Toast.makeText(getActivity(),"Enable GPS!!",Toast.LENGTH_SHORT).show();
@@ -841,40 +830,37 @@ public class HomeFragment extends Fragment implements IBaseGpsListener {
         }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        Geocoder geocoder = new Geocoder(getActivity(),Locale.getDefault());
-        try {
-            List<Address> addressList= geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-            if(addressList!=null){
-                currentLocation = addressList.get(0).getAddressLine(0);
-                Toast.makeText(getActivity(),"add: "+currentLocation,Toast.LENGTH_SHORT).show();
+    private class MyLocationListener implements LocationListener{
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+            Log.v("location",String.valueOf(location.getLongitude()));
+            Geocoder geocoder = new Geocoder(getActivity(),Locale.getDefault());
+            List<Address> addressList;
+            try {
+                addressList = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                if(addressList != null){
+                    currentLocation = addressList.get(0).getAddressLine(0);
+                    txtNameUser.setText(currentLocation);
+                    Toast.makeText(getActivity(),"add: "+currentLocation,Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    Toast.makeText(getActivity(),"not found",Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            else{
-                Toast.makeText(getActivity(),"not found",Toast.LENGTH_SHORT).show();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+
+        @Override
+        public void onProviderEnabled(@NonNull String provider) {
+            LocationListener.super.onProviderEnabled(provider);
+        }
+
+        @Override
+        public void onProviderDisabled(@NonNull String provider) {
+            LocationListener.super.onProviderDisabled(provider);
         }
     }
 
-    @Override
-    public void onProviderDisabled(String provider) {
 
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onGpsStatusChanged(int event) {
-
-    }
 }

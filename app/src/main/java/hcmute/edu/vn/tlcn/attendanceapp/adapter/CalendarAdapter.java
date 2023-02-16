@@ -54,6 +54,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarViewHolder> {
             case "absent with permission":
                 holder.cellDayText.setBackgroundColor(Color.parseColor("#00ffff"));
                 break;
+            case "not yet":
+                holder.cellDayText.setBackgroundColor(Color.parseColor("#ffffff"));
+                break;
         }
 
         int dayValue = Integer.parseInt(day.get(position));

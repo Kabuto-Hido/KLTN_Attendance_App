@@ -1,13 +1,14 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,20 +16,40 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.itextpdf.kernel.geom.PageSize;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.property.HorizontalAlignment;
+import com.itextpdf.layout.property.TextAlignment;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.MonthlyEmpReportAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
+import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -84,7 +105,8 @@ public class MonthlyEmpReportFragment extends Fragment {
     ListView listviewEmpReport;
     MonthlyEmpReportAdapter adapter;
     ArrayList<Statistic> arrStatistic;
-    ArrayList<String> arrPhone;
+    ArrayList<User> arrUser;
+    FloatingActionButton btnExportPDF;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -95,8 +117,8 @@ public class MonthlyEmpReportFragment extends Fragment {
         mapping();
 
         arrStatistic = new ArrayList<>();
-        arrPhone = new ArrayList<>();
-        adapter = new MonthlyEmpReportAdapter(arrPhone,arrStatistic,getActivity(),R.layout.emp_report_row);
+        arrUser = new ArrayList<>();
+        adapter = new MonthlyEmpReportAdapter(arrUser,arrStatistic,getActivity(),R.layout.emp_report_row);
         listviewEmpReport.setAdapter(adapter);
 
         btnBackMonthlyEmpReport.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +126,21 @@ public class MonthlyEmpReportFragment extends Fragment {
             public void onClick(View v) {
                 MenuStatisticFragment menuStatisticFragment = new MenuStatisticFragment();
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,menuStatisticFragment).commit();
+            }
+        });
+
+        btnExportPDF.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(checkPermission()){
+                    try {
+                        generatePDF();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    requestPermission();
+                }
             }
         });
 
@@ -153,7 +190,6 @@ public class MonthlyEmpReportFragment extends Fragment {
     }
 
     private void putDataToView(String yearCurrent, String monthCurrent) {
-
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference userRef = database.getReference("users");
         userRef.addValueEventListener(new ValueEventListener() {
@@ -161,10 +197,12 @@ public class MonthlyEmpReportFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     arrStatistic.clear();
-                    arrPhone.clear();
+                    arrUser.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String phone = dataSnapshot.getKey();
-                        arrPhone.add(phone);
+
+                        User getUser = dataSnapshot.getValue(User.class);
+                        arrUser.add(getUser);
 
                         DatabaseReference statisticRef = database.getReference("statistic").child(phone);
                         statisticRef.addValueEventListener(new ValueEventListener() {
@@ -207,10 +245,88 @@ public class MonthlyEmpReportFragment extends Fragment {
         });
     }
 
+    private void generatePDF() throws FileNotFoundException{
+        String M_Y = txtMonth.getText().toString();
+        String y = M_Y.substring(3,7);
+        String m = M_Y.substring(0,2);
+
+        String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+        File file = new File(filePath,"Employees_Report_"+m+"_"+y+".pdf");
+
+        PdfWriter pdfWriter = new PdfWriter(file);
+        PdfDocument pdfDocument = new PdfDocument(pdfWriter);
+        Document document = new Document(pdfDocument);
+
+        pdfDocument.setDefaultPageSize(PageSize.A4);
+
+        Paragraph title = new Paragraph(m+"/"+y+" EMPLOYEE TIMESHEET")
+                .setBold().setFontSize(20).setTextAlignment(TextAlignment.CENTER);
+
+        float columnWidth[] = {80f, 150f,80f,80f,80f,80f};
+        Table table = new Table(columnWidth);
+        table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+
+        table.addCell(new Cell().add(new Paragraph("Emp No").setBold()));
+        table.addCell(new Cell().add(new Paragraph("Emp Name").setBold()));
+        table.addCell(new Cell().add(new Paragraph("On Time").setBold()));
+        table.addCell(new Cell().add(new Paragraph("Late").setBold()));
+        table.addCell(new Cell().add(new Paragraph("Absent With Per").setBold()));
+        table.addCell(new Cell().add(new Paragraph("Absent Without Per").setBold()));
+
+        Collections.reverse(arrStatistic);
+        for(Statistic s : arrStatistic) {
+            for(User u: arrUser){
+                if(s.getUserPhone().equals(u.getPhone())){
+                    table.addCell(new Cell().add(new Paragraph(u.getUuid())));
+                    table.addCell(new Cell().add(new Paragraph(u.getFullName())));
+                }
+            }
+            table.addCell(new Cell().add(new Paragraph(String.valueOf(s.getOnTime()))));
+            table.addCell(new Cell().add(new Paragraph(String.valueOf(s.getLate()))));
+            table.addCell(new Cell().add(new Paragraph(String.valueOf(s.getAbsentWithPer()))));
+            table.addCell(new Cell().add(new Paragraph(String.valueOf(s.getAbsentWithoutPer()))));
+        }
+
+        document.add(title);
+        document.add(table);
+        document.close();
+        Toast.makeText(getActivity(), "PDF created!!", Toast.LENGTH_SHORT).show();
+
+
+    }
+
+    private static final int PERMISSION_REQUEST_CODE = 200;
+    private boolean checkPermission() {
+        int permission1 = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), WRITE_EXTERNAL_STORAGE);
+        int permission2 = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), READ_EXTERNAL_STORAGE);
+        return permission1 == PackageManager.PERMISSION_GRANTED && permission2 == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(getActivity(), new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0) {
+                boolean writeStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                boolean readStorage = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+
+                if (writeStorage && readStorage) {
+                    Toast.makeText(getActivity(), "Permission Granted..", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Permission Denied.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
     private void mapping() {
         btnBackMonthlyEmpReport = (ImageView) view.findViewById(R.id.btnBackMonthlyEmpReport);
         txtMonth = (TextView) view.findViewById(R.id.txtMonth);
         txtnotifi = (TextView) view.findViewById(R.id.txtnotifi);
         listviewEmpReport = (ListView) view.findViewById(R.id.listviewEmpReport);
+        btnExportPDF = (FloatingActionButton) view.findViewById(R.id.btnExportPDF);
     }
 }

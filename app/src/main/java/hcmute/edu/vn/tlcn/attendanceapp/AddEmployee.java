@@ -15,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -212,6 +213,7 @@ public class AddEmployee extends Fragment {
                 String birthday = edtBirthday1.getText().toString();
                 String password = edtPassword1.getText().toString();
                 boolean sex = !checkFemale.isChecked();
+                String code = "ATD";
 
                 ProgressDialog progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setTitle("Checking...");
@@ -222,7 +224,7 @@ public class AddEmployee extends Fragment {
                     //hash password
                     String hashPass = BCrypt.withDefaults().hashToString(12, password.toCharArray());
 
-                    User user = new User(fullName, phoneNumber, hashPass, birthday, "", sex, "", 1);
+                    User user = new User("",fullName, phoneNumber, hashPass, birthday, "", sex, "", 1);
 
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference ref = storage.getReference();
@@ -251,15 +253,34 @@ public class AddEmployee extends Fragment {
                                                 progressDialog.dismiss();
                                             }
                                             else{
-                                                user.setAvatar("images/" + user.getPhone() + "_avatar");
-                                                userRef.child(user.getPhone()).setValue(user);
+                                                userRef.orderByKey().limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                            User latestUser = dataSnapshot.getValue(User.class);
+                                                            if(latestUser != null) {
+                                                                String getNum = latestUser.getUuid().substring(3, 8);
+                                                                user.setUuid("ATD" + increaseOneUnit(getNum));
+                                                            }
+                                                            user.setAvatar("images/" + user.getPhone() + "_avatar");
+                                                            userRef.child(user.getPhone()).setValue(user);
 
-                                                progressDialog.dismiss();
-                                                Toast.makeText(getContext(), "New employee added", Toast.LENGTH_SHORT).show();
+                                                            progressDialog.dismiss();
+                                                            Toast.makeText(getContext(), "New employee added", Toast.LENGTH_SHORT).show();
 
-                                                //return list emp
-                                                Manage_Emp_Fragment manage_emp_fragment = new Manage_Emp_Fragment();
-                                                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, manage_emp_fragment).commit();
+                                                            //return list emp
+                                                            Manage_Emp_Fragment manage_emp_fragment = new Manage_Emp_Fragment();
+                                                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, manage_emp_fragment).commit();
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                    }
+                                                });
+
+
 
                                             }
                                         }
@@ -379,6 +400,18 @@ public class AddEmployee extends Fragment {
             return false;
         }
         return true;
+    }
+
+    private String increaseOneUnit(String num){
+        int n = Integer.parseInt(num) + 1;
+        StringBuilder kq = new StringBuilder(String.valueOf(n));
+        int len = kq.length();
+        if(len!= 5){
+            for(int i =0;i< (5-len);i++){
+                kq.insert(0, 0);
+            }
+        }
+        return String.valueOf(kq);
     }
 
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;

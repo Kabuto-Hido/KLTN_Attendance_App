@@ -62,7 +62,7 @@ public class EmployeeAdapter extends BaseAdapter {
 
     private class ViewHolder{
         CircleImageView empAvatar;
-        TextView empName;
+        TextView empName, empCode;
         ImageView btnMore;
     }
 
@@ -76,6 +76,7 @@ public class EmployeeAdapter extends BaseAdapter {
 
             holder.empAvatar = (CircleImageView) convertView.findViewById(R.id.empAvatar);
             holder.empName = (TextView) convertView.findViewById(R.id.empName);
+            holder.empCode = (TextView) convertView.findViewById(R.id.empCode);
             holder.btnMore = (ImageView) convertView.findViewById(R.id.btnMore);
 
             convertView.setTag(holder);
@@ -104,6 +105,7 @@ public class EmployeeAdapter extends BaseAdapter {
         else{
             holder.empAvatar.setImageResource(R.drawable.man_placeholder);
         }
+        holder.empCode.setText(user.getUuid());
         holder.empName.setText(user.getFullName());
 
         holder.btnMore.setOnClickListener(new View.OnClickListener() {

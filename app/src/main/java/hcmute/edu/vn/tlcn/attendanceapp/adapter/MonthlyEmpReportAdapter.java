@@ -30,14 +30,14 @@ import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
 public class MonthlyEmpReportAdapter extends BaseAdapter {
-    private ArrayList<String> userPhoneArrayList;
+    private ArrayList<User> userArrayList;
     private ArrayList<Statistic> statisticArrayList;
     private Context context;
     private int layout ;
 
-    public MonthlyEmpReportAdapter(ArrayList<String> userPhoneArrayList,
+    public MonthlyEmpReportAdapter(ArrayList<User> userArrayList,
                                    ArrayList<Statistic> statisticArrayList, Context context, int layout) {
-        this.userPhoneArrayList = userPhoneArrayList;
+        this.userArrayList = userArrayList;
         this.statisticArrayList = statisticArrayList;
         this.context = context;
         this.layout = layout;
@@ -84,7 +84,7 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
         }
 
         Statistic statistic = statisticArrayList.get(position);
-        String userPhone = userPhoneArrayList.get(position);
+        User user = userArrayList.get(position);
 
         holder.totalOnTime.setText(String.valueOf(statistic.getOnTime()));
         holder.totalLate.setText(String.valueOf(statistic.getLate()));
@@ -94,7 +94,7 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
 
-        myRef.child(userPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child(statistic.getUserPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
