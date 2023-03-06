@@ -10,8 +10,10 @@ public class Statistic implements Serializable {
     public String statisticMonth;
     public String statisticYear;
     public String userPhone;
+    public int hourWorked;
 
-    public Statistic(int onTime, int late, int absentWithPer, int absentWithoutPer, String statisticMonth, String statisticYear, String userPhone) {
+    public Statistic(int onTime, int late, int absentWithPer, int absentWithoutPer,
+                     String statisticMonth, String statisticYear, String userPhone, int hourWorked) {
         this.onTime = onTime;
         this.late = late;
         this.absentWithPer = absentWithPer;
@@ -19,6 +21,7 @@ public class Statistic implements Serializable {
         this.statisticMonth = statisticMonth;
         this.statisticYear = statisticYear;
         this.userPhone = userPhone;
+        this.hourWorked = hourWorked;
     }
 
     public Statistic() {
@@ -78,5 +81,13 @@ public class Statistic implements Serializable {
 
     public void setAbsentWithoutPer(int absentWithoutPer) {
         this.absentWithoutPer = absentWithoutPer;
+    }
+
+    public int getHourWorked() {
+        return hourWorked;
+    }
+
+    public void setHourWorked(int hourWorked) {
+        this.hourWorked = hourWorked;
     }
 }
