@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="20dp"
+    android:padding="20dp"
+    android:id="@+id/layoutDialogContainer">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/layoutDialog"
+        android:background="@drawable/dialog_background">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textTitle"
+            android:padding="10dp"
+            android:text="Ngay bao nhieu"
+            android:textAlignment="center"
+            android:background="@drawable/date_information_background"
+            android:textColor="@color/colorWhite"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkinString"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="18dp"
+            android:text="@string/checkin_time"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/checkoutString"
+            app:layout_constraintTop_toBottomOf="@id/textTitle"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkinTime"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:text="HH:MM:SS"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/checkoutString"
+            app:layout_constraintTop_toBottomOf="@id/textTitle"
+            app:layout_constraintLeft_toRightOf="@id/checkinString"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkoutString"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="18dp"
+            android:text="@string/checkout_time"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/workTimeString"
+            app:layout_constraintTop_toBottomOf="@id/checkinString"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkoutTime"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="18dp"
+            android:text="HH:MM:SS "
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@id/workTime"
+            app:layout_constraintTop_toBottomOf="@id/checkinTime"
+            app:layout_constraintLeft_toRightOf="@id/checkoutString"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/workTimeString"
+            android:layout_marginStart="60dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="18dp"
+            android:text="Worked time: "
+            android:layout_marginBottom="40dp"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkoutString"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/workTime"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="18dp"
+            android:text="HH:MM:SS "
+            android:layout_marginBottom="40dp"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/checkoutTime"
+            app:layout_constraintLeft_toRightOf="@id/workTimeString"
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:id="@+id/buttonOkay"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="70dp"
+        android:text="OK"
+        android:backgroundTint="@color/colorSuccess"
+        app:layout_constraintBottom_toBottomOf="@id/layoutDialog"
+        app:layout_constraintTop_toBottomOf="@id/layoutDialog"
+        android:textSize="14sp"
+        android:textColor="@color/colorWhite"
+        app:cornerRadius="20sp"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
