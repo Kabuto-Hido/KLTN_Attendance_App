@@ -262,7 +262,7 @@ public class MonthlyEmpReportFragment extends Fragment {
         Paragraph title = new Paragraph(m+"/"+y+" EMPLOYEE TIMESHEET")
                 .setBold().setFontSize(20).setTextAlignment(TextAlignment.CENTER);
 
-        float columnWidth[] = {80f, 150f,80f,80f,80f,80f};
+        float columnWidth[] = {80f, 150f,80f,80f,80f,80f,80f};
         Table table = new Table(columnWidth);
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
 
@@ -272,6 +272,7 @@ public class MonthlyEmpReportFragment extends Fragment {
         table.addCell(new Cell().add(new Paragraph("Late").setBold()));
         table.addCell(new Cell().add(new Paragraph("Absent With Per").setBold()));
         table.addCell(new Cell().add(new Paragraph("Absent Without Per").setBold()));
+        table.addCell(new Cell().add(new Paragraph("Worked Time").setBold()));
 
         Collections.reverse(arrStatistic);
         for(Statistic s : arrStatistic) {
@@ -285,6 +286,7 @@ public class MonthlyEmpReportFragment extends Fragment {
             table.addCell(new Cell().add(new Paragraph(String.valueOf(s.getLate()))));
             table.addCell(new Cell().add(new Paragraph(String.valueOf(s.getAbsentWithPer()))));
             table.addCell(new Cell().add(new Paragraph(String.valueOf(s.getAbsentWithoutPer()))));
+            table.addCell(new Cell().add(new Paragraph(s.getHourWorked())));
         }
 
         document.add(title);

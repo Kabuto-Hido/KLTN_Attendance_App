@@ -15,6 +15,17 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/txtEmployeeCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:text="Code"
+            android:textColor="@color/black"
+            android:layout_marginTop="30dp"
+            android:layout_marginStart="40dp"/>
+
+        <TextView
             android:id="@+id/txtEmployeeName"
             android:layout_width="150dp"
             android:layout_height="65dp"
@@ -22,132 +33,82 @@
             android:textColor="@color/black"
             android:lines="2"
             android:maxLines="2"
-            android:layout_marginStart="40dp"
             android:textStyle="bold"
             android:textSize="22sp"
             android:text="name"
             android:layout_marginTop="10dp"
-            android:scrollbars="vertical"/>
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/empImg"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:src="@drawable/person_white"
-            android:layout_marginTop="10dp"
             android:layout_alignParentEnd ="true"
-            android:layout_marginEnd="50dp"/>
+            android:layout_marginEnd="40dp"
+            android:scrollbars="vertical"/>
 
         <TextView
             android:id="@+id/labelAttendance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Attendance"
-            android:layout_below="@+id/txtEmployeeName"
+            android:text="Attendance: "
+            android:textColor="#00FF00"
+            android:layout_below="@+id/txtEmployeeCode"
             android:layout_marginStart="40dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="25dp"
             android:textSize="20sp"/>
 
         <TextView
-            android:id="@+id/labelOnTime"
+            android:id="@+id/totalAttend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginTop="5dp"
-            android:text="On time: "
             android:textColor="#00FF00"
-            android:layout_below="@+id/labelAttendance"
-            android:layout_marginStart="50dp"/>
-
-        <TextView
-            android:id="@+id/totalOnTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginTop="5dp"
+            android:textSize="20sp"
             android:text="0"
-            android:textColor="#00FF00"
-            android:layout_toEndOf="@+id/labelOnTime"
-            android:layout_below="@+id/labelAttendance"
-            android:layout_marginStart="10dp"/>
-
-        <TextView
-            android:id="@+id/labelLate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginTop="5dp"
-            android:text="Late: "
-            android:textColor="#ffff33"
-            android:layout_below="@+id/labelOnTime"
-            android:layout_marginStart="50dp"/>
-
-        <TextView
-            android:id="@+id/totalLate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:layout_marginTop="5dp"
-            android:text="0"
-            android:textColor="#ffff33"
-            android:layout_toEndOf="@+id/labelLate"
-            android:layout_below="@+id/labelOnTime"
-            android:layout_marginStart="10dp"/>
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="25dp"
+            android:layout_below="@+id/txtEmployeeCode"
+            android:layout_toEndOf="@+id/labelAttendance"/>
 
         <TextView
             android:id="@+id/labelAbsent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Absent"
-            android:layout_below="@+id/empImg"
+            android:text="Absent: "
+            android:layout_below="@+id/txtEmployeeName"
             android:layout_alignParentEnd ="true"
-            android:layout_marginEnd="100dp"
+            android:textColor="#FF3131"
+            android:layout_marginEnd="80dp"
             android:layout_marginTop="10dp"
             android:textSize="20sp"/>
 
         <TextView
-            android:id="@+id/labelWithPer"
+            android:id="@+id/totalAbsent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Permission: "
-            android:textSize="18sp"
-            android:textColor="#00ffff"
-            android:layout_below="@+id/labelAbsent"
-            android:layout_toStartOf="@+id/totalAbsentWithPer"/>
-
-        <TextView
-            android:id="@+id/totalAbsentWithPer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:textSize="18sp"
-            android:layout_below="@+id/labelAbsent"
-            android:layout_alignParentEnd ="true"
-            android:layout_marginStart="5dp"
-            android:textColor="#00ffff"
-            android:layout_marginEnd="40dp"/>
-
-        <TextView
-            android:id="@+id/labelWithoutPer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No permission: "
-            android:textSize="18sp"
             android:textColor="#FF3131"
-            android:layout_below="@+id/labelWithPer"
-            android:layout_toStartOf="@+id/totalAbsentWithoutPer"/>
+            android:textSize="20sp"
+            android:layout_alignParentEnd ="true"
+            android:text="0"
+            android:layout_marginEnd="60dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/txtEmployeeName"/>
 
-        <TextView
-            android:id="@+id/totalAbsentWithoutPer"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"
-            android:textSize="18sp"
-            android:layout_below="@+id/labelWithPer"
-            android:layout_alignParentEnd ="true"
-            android:layout_marginStart="5dp"
-            android:textColor="#FF3131"
-            android:layout_marginEnd="15dp"/>
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/labelAttendance"
+            android:layout_marginTop="20dp">
+            <TextView
+                android:id="@+id/labelWorkedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Worked Time: "
+                android:textColor="@color/black"
+                android:textSize="25dp" />
+            <TextView
+                android:id="@+id/totalWorkedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HH:mm "
+                android:textColor="@color/black"
+                android:textSize="25dp" />
+        </LinearLayout>
 
     </RelativeLayout>
 

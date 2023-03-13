@@ -1,7 +1,9 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +22,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.concurrent.TimeUnit;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.CalendarAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
@@ -86,6 +92,7 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
     User_singeton user_singeton = User_singeton.getInstance();
     User user;
     CalendarAdapter calendarAdapter;
+    SimpleDateFormat timeFormat;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,6 +100,7 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
         view = inflater.inflate(R.layout.fragment_attendance_calendar, container, false);
 
         mapping();
+        timeFormat = new SimpleDateFormat("HH:mm");
         user = user_singeton.getUser();
         selectedDate = LocalDate.now();
         setMonthView();
@@ -232,8 +240,96 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
 
     @Override
     public void onItemClick(int pos, String dayText) {
-        if(dayText.equals("")){
-            Toast.makeText(getActivity(), dayText+" "+ monthYearFromDate(selectedDate), Toast.LENGTH_SHORT).show();
+        if(!dayText.equals("")){
+            DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM");
+            String yearMonth = selectedDate.format(dateFormat);
+            System.out.println(yearMonth);
+            String dateSelect;
+            if(dayText.length()==1){
+                dateSelect = yearMonth + "-0" + dayText;
+            }
+            else {
+                dateSelect = yearMonth + "-" + dayText;
+            }
+
+            Dialog dialog = new Dialog(getActivity(),R.style.DialogStyle);
+            dialog.setContentView(R.layout.layout_date_info_dialog);
+
+            Button buttonOkay = (Button) dialog.findViewById(R.id.buttonOkay);
+            TextView textTitle = (TextView) dialog.findViewById(R.id.textTitle);
+            TextView checkinTime = (TextView) dialog.findViewById(R.id.checkinTime);
+            TextView checkoutTime = (TextView) dialog.findViewById(R.id.checkoutTime);
+            TextView workTime = (TextView) dialog.findViewById(R.id.workTime);
+            buttonOkay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference recordRef = database.getReference("record");
+            recordRef.child(user.getPhone()).addValueEventListener(new ValueEventListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    DataSnapshot dataSnapshot1 = snapshot.child(dateSelect).child("checkIn");
+                    Record checkInRecord = dataSnapshot1.getValue(Record.class);
+
+                    DataSnapshot dataSnapshot2 = snapshot.child(dateSelect).child("checkOut");
+                    Record checkOutRecord = dataSnapshot2.getValue(Record.class);
+
+                    textTitle.setText(dayText+" "+ monthYearFromDate(selectedDate));
+                    if (checkInRecord != null && checkOutRecord != null) {
+                        String timeIn = checkInRecord.getTime();
+                        String timeOut = checkOutRecord.getTime();
+                        checkinTime.setText(timeIn);
+                        checkoutTime.setText(timeOut);
+
+                        try {
+                            Date in = timeFormat.parse(timeIn);
+                            Date out = timeFormat.parse(timeOut);
+
+                            long diff = out.getTime() - in.getTime();
+                            long diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+                            long diffHours = TimeUnit.MILLISECONDS.toHours(diff);
+                            long addMinutes = diffMinutes - (diffHours*60);
+
+                            if(addMinutes<10){
+                                workTime.setText(diffHours + "h 0"+addMinutes + "m");
+                            }
+                            else {
+                                workTime.setText(diffHours + "h " + addMinutes + "m");
+                            }
+                            dialog.show();
+                        }catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    else if(checkInRecord != null){
+                        Toast.makeText(getActivity(),"Please check out to see details",Toast.LENGTH_SHORT).show();
+                        HomeFragment homeFragment = new HomeFragment();
+                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, homeFragment).commit();
+
+                    }
+                    else{
+                        Toast.makeText(getActivity(), dayText+" "+ monthYearFromDate(selectedDate), Toast.LENGTH_SHORT).show();
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+
+
+            //Toast.makeText(getActivity(), dayText+" "+ monthYearFromDate(selectedDate), Toast.LENGTH_SHORT).show();
         }
     }
 }

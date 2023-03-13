@@ -149,7 +149,7 @@ public class ResignationAdapter extends BaseAdapter {
 
                                                     int countAbsentWithPer;
                                                     if(monthStatistic == null){
-                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,"",0);
+                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,"","00:00");
                                                         statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
 
 
@@ -164,7 +164,7 @@ public class ResignationAdapter extends BaseAdapter {
                                                     }
 
                                                     if(empStatistic == null){
-                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,phone,0);
+                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,phone,"00:00");
                                                         statisticRef.child(phone).child(currentYear).child(currentMonth).setValue(newStatistic);
                                                     }
                                                     else{

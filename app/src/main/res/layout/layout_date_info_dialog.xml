@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="20dp"
-    android:padding="20dp"
-    android:id="@+id/layoutDialogContainer">
+    android:id="@+id/layoutDialogContainer"
+    android:background="@drawable/dialog_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -121,12 +120,11 @@
         android:layout_marginStart="70dp"
         android:layout_marginEnd="70dp"
         android:text="OK"
-        android:backgroundTint="@color/colorSuccess"
+        android:backgroundTint="#2196F3"
         app:layout_constraintBottom_toBottomOf="@id/layoutDialog"
         app:layout_constraintTop_toBottomOf="@id/layoutDialog"
         android:textSize="14sp"
         android:textColor="@color/colorWhite"
-        app:cornerRadius="20sp"
-        />
+        app:cornerRadius="20sp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

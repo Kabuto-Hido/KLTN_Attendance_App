@@ -59,8 +59,8 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
     }
 
     private class ViewHolder{
-        CircleImageView empImg;
-        TextView txtEmployeeName, totalOnTime, totalLate, totalAbsentWithPer, totalAbsentWithoutPer;
+        TextView txtEmployeeCode, txtEmployeeName, totalAttend,
+                totalAbsent, totalWorkedTime;
     }
 
     @Override
@@ -71,12 +71,11 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(layout,null);
 
-            holder.empImg = (CircleImageView) convertView.findViewById(R.id.empImg);
             holder.txtEmployeeName = (TextView) convertView.findViewById(R.id.txtEmployeeName);
-            holder.totalOnTime = (TextView) convertView.findViewById(R.id.totalOnTime);
-            holder.totalLate = (TextView) convertView.findViewById(R.id.totalLate);
-            holder.totalAbsentWithPer = (TextView) convertView.findViewById(R.id.totalAbsentWithPer);
-            holder.totalAbsentWithoutPer = (TextView) convertView.findViewById(R.id.totalAbsentWithoutPer);
+            holder.txtEmployeeCode = (TextView) convertView.findViewById(R.id.txtEmployeeCode);
+            holder.totalAttend = (TextView) convertView.findViewById(R.id.totalAttend);
+            holder.totalAbsent = (TextView) convertView.findViewById(R.id.totalAbsent);
+            holder.totalWorkedTime = (TextView) convertView.findViewById(R.id.totalWorkedTime);
             convertView.setTag(holder);
         }
         else{
@@ -86,10 +85,11 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
         Statistic statistic = statisticArrayList.get(position);
         User user = userArrayList.get(position);
 
-        holder.totalOnTime.setText(String.valueOf(statistic.getOnTime()));
-        holder.totalLate.setText(String.valueOf(statistic.getLate()));
-        holder.totalAbsentWithPer.setText(String.valueOf(statistic.getAbsentWithPer()));
-        holder.totalAbsentWithoutPer.setText(String.valueOf(statistic.getAbsentWithoutPer()));
+        holder.totalWorkedTime.setText(String.valueOf(statistic.getHourWorked()));
+        int attend = statistic.getOnTime() + statistic.getLate();
+        int absent = statistic.getAbsentWithPer() + statistic.getAbsentWithoutPer();
+        holder.totalAttend.setText(String.valueOf(attend));
+        holder.totalAbsent.setText(String.valueOf(absent));
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
@@ -100,20 +100,7 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
                 if(snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
                     holder.txtEmployeeName.setText(user.getFullName());
-
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageReference = storage.getReference(user.getAvatar());
-                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Picasso.get().load(uri).fit().centerCrop().into(holder.empImg);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("TAG", "onFailure: " + e.getMessage());
-                        }
-                    });
+                    holder.txtEmployeeCode.setText(user.getUuid());
                 }
             }
 
