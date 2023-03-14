@@ -85,7 +85,7 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
         Statistic statistic = statisticArrayList.get(position);
         User user = userArrayList.get(position);
 
-        holder.totalWorkedTime.setText(String.valueOf(statistic.getHourWorked()));
+        holder.totalWorkedTime.setText(printWorkedHour(statistic.getHourWorked()));
         int attend = statistic.getOnTime() + statistic.getLate();
         int absent = statistic.getAbsentWithPer() + statistic.getAbsentWithoutPer();
         holder.totalAttend.setText(String.valueOf(attend));
@@ -111,5 +111,10 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+
+    public String printWorkedHour(String time){
+        String[] cutStr1 = time.split(":");
+        return cutStr1[0] + "h " + cutStr1[1]+ "m";
     }
 }

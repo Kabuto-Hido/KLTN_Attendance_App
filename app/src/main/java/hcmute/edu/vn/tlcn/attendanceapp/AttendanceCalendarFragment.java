@@ -2,6 +2,8 @@ package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -252,8 +254,9 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
                 dateSelect = yearMonth + "-" + dayText;
             }
 
-            Dialog dialog = new Dialog(getActivity(),R.style.DialogStyle);
+            Dialog dialog = new Dialog(getActivity(),R.style.AlertDialogTheme);
             dialog.setContentView(R.layout.layout_date_info_dialog);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
             Button buttonOkay = (Button) dialog.findViewById(R.id.buttonOkay);
             TextView textTitle = (TextView) dialog.findViewById(R.id.textTitle);

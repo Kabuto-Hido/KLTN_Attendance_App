@@ -200,7 +200,6 @@ public class MonthlyEmpReportFragment extends Fragment {
                     arrUser.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String phone = dataSnapshot.getKey();
-
                         User getUser = dataSnapshot.getValue(User.class);
                         arrUser.add(getUser);
 
@@ -210,10 +209,11 @@ public class MonthlyEmpReportFragment extends Fragment {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 DataSnapshot dataSnapshot1 = snapshot.child(yearCurrent).child(monthCurrent);
-                                Statistic statistic = dataSnapshot1.getValue(Statistic.class);
-                                if(statistic != null){
+                                if(dataSnapshot1.exists()){
+                                    Statistic statistic = dataSnapshot1.getValue(Statistic.class);
                                     arrStatistic.add(statistic);
                                 }
+
                                 adapter.notifyDataSetChanged();
 
                                 if(arrStatistic.size() == 0){
