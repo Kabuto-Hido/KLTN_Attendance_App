@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,9 +89,10 @@ public class Manage_Emp_Fragment extends Fragment {
     }
 
     View view;
-    TextView textviewNoti;
+    TextView textviewNoti, label1;
     ImageView btnBackPageMngEmp;
     ListView listviewEmp;
+    SearchView searchEmp;
     EmployeeAdapter employeeAdapter;
     ArrayList<User> empList = new ArrayList<>();
     FloatingActionButton btnAddEmp;
@@ -125,6 +127,40 @@ public class Manage_Emp_Fragment extends Fragment {
             }
         });
 
+        searchEmp.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                label1.setVisibility(View.GONE);
+            }
+        });
+        searchEmp.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                label1.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+
+        searchEmp.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String keyword) {
+                ArrayList<User> result = new ArrayList<>();
+                for(User u : empList){
+                    if(u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())){
+                        result.add(u);
+                    }
+                }
+                ((EmployeeAdapter)listviewEmp.getAdapter()).update(result);
+                return false;
+            }
+        });
+
         getListEmp();
 
         return view;
@@ -135,6 +171,8 @@ public class Manage_Emp_Fragment extends Fragment {
         listviewEmp = (ListView) view.findViewById(R.id.listviewEmp);
         btnAddEmp = (FloatingActionButton) view.findViewById(R.id.btnAddEmp);
         textviewNoti = (TextView) view.findViewById(R.id.textviewNoti);
+        label1 = (TextView) view.findViewById(R.id.label1);
+        searchEmp = (SearchView) view.findViewById(R.id.searchEmp);
     }
 
     private void getListEmp(){

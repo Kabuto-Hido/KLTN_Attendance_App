@@ -22,6 +22,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -43,6 +44,12 @@ public class EmployeeAdapter extends BaseAdapter {
         this.layout = layout;
         this.lstEmp = lstEmp;
         this.fragment = fragment;
+    }
+
+    public void update(ArrayList<User> result){
+        lstEmp = new ArrayList<>();
+        lstEmp.addAll(result);
+        notifyDataSetChanged();
     }
 
     @Override

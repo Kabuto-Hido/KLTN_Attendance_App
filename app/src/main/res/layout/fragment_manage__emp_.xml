@@ -12,6 +12,7 @@
 
         <LinearLayout
             android:id="@+id/layout1"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="#2196F3"
@@ -22,7 +23,8 @@
                 android:layout_height="match_parent"
                 android:src="@drawable/baseline_arrow_back_white_24"/>
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/label1"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Manage Employees"
                 android:gravity="center_vertical"
@@ -30,6 +32,19 @@
                 android:layout_marginStart="30dp"
                 android:textColor="@color/white"
                 android:textSize="25sp"/>
+            <SearchView
+                android:id="@+id/searchEmp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconifiedByDefault="false"
+                android:theme="@style/SearchViewStyle"
+                android:contextClickable="true"
+                android:queryHint="Type here for search"
+                android:closeIcon="@drawable/ic_close"
+                android:searchHintIcon="@drawable/ic_search"
+                android:layout_marginStart="50dp"
+                android:searchIcon="@drawable/ic_search"/>
+
         </LinearLayout>
 
         <TextView
