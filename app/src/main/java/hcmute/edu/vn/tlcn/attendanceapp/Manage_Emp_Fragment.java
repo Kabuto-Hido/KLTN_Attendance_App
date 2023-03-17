@@ -36,6 +36,7 @@ import java.util.ArrayList;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.EmployeeAdapter;
+import hcmute.edu.vn.tlcn.attendanceapp.adapter.MonthlyEmpReportAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
@@ -95,6 +96,7 @@ public class Manage_Emp_Fragment extends Fragment {
     SearchView searchEmp;
     EmployeeAdapter employeeAdapter;
     ArrayList<User> empList = new ArrayList<>();
+    ArrayList<User> result;
     FloatingActionButton btnAddEmp;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -149,7 +151,7 @@ public class Manage_Emp_Fragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String keyword) {
-                ArrayList<User> result = new ArrayList<>();
+                result = new ArrayList<>();
                 for(User u : empList){
                     if(u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
                             u.getFullName().toLowerCase().contains(keyword.toLowerCase())){
@@ -176,6 +178,10 @@ public class Manage_Emp_Fragment extends Fragment {
     }
 
     private void getListEmp(){
+        if(result != null){
+            result.clear();
+            ((EmployeeAdapter)listviewEmp.getAdapter()).update(result);
+        }
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("users");
         ref.orderByChild("role").equalTo(1).addListenerForSingleValueEvent(new ValueEventListener() {

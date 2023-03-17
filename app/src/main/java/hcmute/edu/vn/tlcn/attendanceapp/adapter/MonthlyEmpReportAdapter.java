@@ -30,17 +30,22 @@ import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
 public class MonthlyEmpReportAdapter extends BaseAdapter {
-    private ArrayList<User> userArrayList;
+    //private ArrayList<User> userArrayList;
     private ArrayList<Statistic> statisticArrayList;
     private Context context;
     private int layout ;
 
-    public MonthlyEmpReportAdapter(ArrayList<User> userArrayList,
-                                   ArrayList<Statistic> statisticArrayList, Context context, int layout) {
-        this.userArrayList = userArrayList;
+    public MonthlyEmpReportAdapter(ArrayList<Statistic> statisticArrayList, Context context, int layout) {
+        //this.userArrayList = userArrayList;
         this.statisticArrayList = statisticArrayList;
         this.context = context;
         this.layout = layout;
+    }
+
+    public void update(ArrayList<Statistic> result){
+        statisticArrayList = new ArrayList<>();
+        statisticArrayList.addAll(result);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -83,7 +88,7 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
         }
 
         Statistic statistic = statisticArrayList.get(position);
-        User user = userArrayList.get(position);
+        //User user = userArrayList.get(position);
 
         holder.totalWorkedTime.setText(printWorkedHour(statistic.getHourWorked()));
         int attend = statistic.getOnTime() + statistic.getLate();

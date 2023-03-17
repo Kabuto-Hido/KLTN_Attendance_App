@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -26,8 +27,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import hcmute.edu.vn.tlcn.attendanceapp.adapter.MonthlyEmpReportAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.TodayStatisticAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
+import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -78,12 +82,16 @@ public class TodayStatisticFragment extends Fragment {
 
     View view;
     ImageView btnBackTodayStatistic;
-    TextView txtTotalCheckin, txtTotalAbsent, txtTotalEmp, txtTb, txtDay;
+    TextView txtTotalCheckin, txtTotalAbsent,
+            txtTotalEmp, txtTb, txtDay, layoutToday;
     ListView lstStat;
+    SearchView searchTodayReport;
     private int countCheckIn;
     private int countAbsent;
     private int countEmp;
     ArrayList<Record> recordArrayList;
+    ArrayList<Record> result;
+    ArrayList<User> arrUser;
     TodayStatisticAdapter todayStatisticAdapter;
 
     @Override
@@ -93,6 +101,7 @@ public class TodayStatisticFragment extends Fragment {
 
         mapping();
         recordArrayList = new ArrayList<>();
+        arrUser = new ArrayList<>();
         todayStatisticAdapter = new TodayStatisticAdapter(recordArrayList,getActivity(),R.layout.row_stat_day);
         lstStat.setAdapter(todayStatisticAdapter);
 
@@ -127,6 +136,45 @@ public class TodayStatisticFragment extends Fragment {
             }
         });
 
+        searchTodayReport.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutToday.setVisibility(View.GONE);
+            }
+        });
+
+        searchTodayReport.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                layoutToday.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+
+        searchTodayReport.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String keyword) {
+                result = new ArrayList<>();
+                for(User u : arrUser){
+                    if(u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())){
+                        for(Record r : recordArrayList){
+                            if(r.getUserPhone().equals(u.getPhone())){
+                                result.add(r);
+                            }
+                        }
+                    }
+                }
+                ((TodayStatisticAdapter)lstStat.getAdapter()).update(result);
+                return false;
+            }
+        });
+
         Date currentTime = Calendar.getInstance().getTime();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String currentDate = dateFormat.format(currentTime);
@@ -137,6 +185,10 @@ public class TodayStatisticFragment extends Fragment {
     }
 
     private void putDataToView(String currentDate){
+        if(result != null){
+            result.clear();
+            ((TodayStatisticAdapter)lstStat.getAdapter()).update(result);
+        }
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("users");
         ref.addValueEventListener(new ValueEventListener() {
@@ -147,11 +199,14 @@ public class TodayStatisticFragment extends Fragment {
                 countAbsent = 0;
                 if(snapshot.exists()) {
                     recordArrayList.clear();
+                    arrUser.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         countEmp++;
-                        txtTotalEmp.setText(String.valueOf(countEmp));
+                        String phone = dataSnapshot.getKey();
+                        User getUser = dataSnapshot.getValue(User.class);
+                        arrUser.add(getUser);
 
-                        DatabaseReference recordRef = database.getReference("record").child(dataSnapshot.getKey());
+                        DatabaseReference recordRef = database.getReference("record").child(phone);
                         recordRef.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -170,8 +225,7 @@ public class TodayStatisticFragment extends Fragment {
                                     recordArrayList.add(absentRecord);
                                 }
                                 todayStatisticAdapter.notifyDataSetChanged();
-                                txtTotalCheckin.setText(String.valueOf(countCheckIn));
-                                txtTotalAbsent.setText(String.valueOf(countAbsent));
+
 
                                 if(recordArrayList.size() == 0){
                                     txtTb.setVisibility(View.VISIBLE);
@@ -190,8 +244,9 @@ public class TodayStatisticFragment extends Fragment {
                         });
 
                     }
-
-
+                    txtTotalEmp.setText(String.valueOf(countEmp));
+                    txtTotalCheckin.setText(String.valueOf(countCheckIn));
+                    txtTotalAbsent.setText(String.valueOf(countAbsent));
                 }
             }
 
@@ -209,5 +264,7 @@ public class TodayStatisticFragment extends Fragment {
         lstStat = (ListView) view.findViewById(R.id.lstStat);
         txtTb = (TextView) view.findViewById(R.id.txtTb);
         txtDay = (TextView) view.findViewById(R.id.txtDay);
+        layoutToday = (TextView) view.findViewById(R.id.layoutToday);
+        searchTodayReport = (SearchView) view.findViewById(R.id.searchTodayReport);
     }
 }

@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.MonthlyEmpReportAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
@@ -101,12 +103,14 @@ public class MonthlyEmpReportFragment extends Fragment {
 
     View view;
     ImageView btnBackMonthlyEmpReport;
-    TextView txtMonth, txtnotifi;
+    TextView txtMonth, txtnotifi, labelMonthly;
     ListView listviewEmpReport;
     MonthlyEmpReportAdapter adapter;
     ArrayList<Statistic> arrStatistic;
+    ArrayList<Statistic> result;
     ArrayList<User> arrUser;
     FloatingActionButton btnExportPDF;
+    SearchView searchMonthEmpReport;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -118,7 +122,7 @@ public class MonthlyEmpReportFragment extends Fragment {
 
         arrStatistic = new ArrayList<>();
         arrUser = new ArrayList<>();
-        adapter = new MonthlyEmpReportAdapter(arrUser,arrStatistic,getActivity(),R.layout.emp_report_row);
+        adapter = new MonthlyEmpReportAdapter(arrStatistic,getActivity(),R.layout.emp_report_row);
         listviewEmpReport.setAdapter(adapter);
 
         btnBackMonthlyEmpReport.setOnClickListener(new View.OnClickListener() {
@@ -141,6 +145,46 @@ public class MonthlyEmpReportFragment extends Fragment {
                 }else{
                     requestPermission();
                 }
+            }
+        });
+
+        searchMonthEmpReport.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                labelMonthly.setVisibility(View.GONE);
+            }
+        });
+
+        searchMonthEmpReport.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                labelMonthly.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+
+        searchMonthEmpReport.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String keyword) {
+                result = new ArrayList<>();
+                for(User u : arrUser){
+                    if(u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())){
+                        for(Statistic s : arrStatistic){
+                            if(s.getUserPhone().equals(u.getPhone())){
+                                result.add(s);
+                            }
+                        }
+                    }
+                }
+                ((MonthlyEmpReportAdapter)listviewEmpReport.getAdapter()).update(result);
+
+                return false;
             }
         });
 
@@ -190,6 +234,10 @@ public class MonthlyEmpReportFragment extends Fragment {
     }
 
     private void putDataToView(String yearCurrent, String monthCurrent) {
+        if(result != null){
+            result.clear();
+            ((MonthlyEmpReportAdapter)listviewEmpReport.getAdapter()).update(result);
+        }
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference userRef = database.getReference("users");
         userRef.addValueEventListener(new ValueEventListener() {
@@ -262,7 +310,7 @@ public class MonthlyEmpReportFragment extends Fragment {
         Paragraph title = new Paragraph(m+"/"+y+" EMPLOYEE TIMESHEET")
                 .setBold().setFontSize(20).setTextAlignment(TextAlignment.CENTER);
 
-        float columnWidth[] = {80f, 150f,80f,80f,80f,80f,80f};
+        float[] columnWidth = {80f, 150f,80f,80f,80f,80f,80f};
         Table table = new Table(columnWidth);
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
 
@@ -328,7 +376,9 @@ public class MonthlyEmpReportFragment extends Fragment {
         btnBackMonthlyEmpReport = (ImageView) view.findViewById(R.id.btnBackMonthlyEmpReport);
         txtMonth = (TextView) view.findViewById(R.id.txtMonth);
         txtnotifi = (TextView) view.findViewById(R.id.txtnotifi);
+        labelMonthly = (TextView) view.findViewById(R.id.labelMonthly);
         listviewEmpReport = (ListView) view.findViewById(R.id.listviewEmpReport);
         btnExportPDF = (FloatingActionButton) view.findViewById(R.id.btnExportPDF);
+        searchMonthEmpReport = (SearchView) view.findViewById(R.id.searchMonthEmpReport);
     }
 }

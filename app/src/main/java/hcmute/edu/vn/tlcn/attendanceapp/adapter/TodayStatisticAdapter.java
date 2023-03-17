@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.R;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
 public class TodayStatisticAdapter extends BaseAdapter {
@@ -39,6 +40,12 @@ public class TodayStatisticAdapter extends BaseAdapter {
         this.recordArrayList = recordArrayList;
         this.context = context;
         this.layout = layout;
+    }
+
+    public void update(ArrayList<Record> result){
+        recordArrayList = new ArrayList<>();
+        recordArrayList.addAll(result);
+        notifyDataSetChanged();
     }
 
     @Override
