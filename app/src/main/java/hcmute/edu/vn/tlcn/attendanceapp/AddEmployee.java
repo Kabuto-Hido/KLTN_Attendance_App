@@ -54,6 +54,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -224,7 +226,7 @@ public class AddEmployee extends Fragment {
                     //hash password
                     String hashPass = BCrypt.withDefaults().hashToString(12, password.toCharArray());
 
-                    User user = new User("",fullName, phoneNumber, hashPass, birthday, "", sex, "", 1);
+                    User user = new User("",fullName, phoneNumber, hashPass, birthday, "", sex, "", 1,"");
 
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference ref = storage.getReference();
@@ -385,13 +387,11 @@ public class AddEmployee extends Fragment {
 
         if(phoneNumber.length()!=10 || !phoneNumber.matches(getString(R.string.regexPhone))){
             edtPhonenum.setError("Invalid phone !");
-            //Toast.makeText(getActivity(), "Invalid phone !", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        if(password.length() < 6){
-            edtPassword1.setError("Password too weak !");
-            //Toast.makeText(getActivity(), "Password too weak !", Toast.LENGTH_SHORT).show();
+        if(!isValidPassword(password)){
+            edtPassword1.setError("Password must contain at least 8 characters, one digit, one upper case alphabet and one lower case alphabet!");
             return false;
         }
 
@@ -400,6 +400,18 @@ public class AddEmployee extends Fragment {
             return false;
         }
         return true;
+    }
+
+    public boolean isValidPassword(String password) {
+        //password must containing at least 8 characters and at most 20 characters,
+        // containing at least one digit, one upper case alphabet and one lower case alphabet1
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,20}$";
+        Pattern p = Pattern.compile(regex);
+        if (password == null) {
+            return false;
+        }
+        Matcher m = p.matcher(password);
+        return m.matches();
     }
 
     private String increaseOneUnit(String num){

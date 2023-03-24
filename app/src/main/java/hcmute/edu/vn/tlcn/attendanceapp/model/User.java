@@ -12,8 +12,10 @@ public class User implements Serializable {
     public Boolean sex;
     public String avatar;
     public Integer role;
+    public String qrcode;
 
-    public User(String uuid, String fullName, String phone, String password, String birthday, String description, Boolean sex, String avatar, Integer role) {
+    public User(String uuid, String fullName, String phone, String password, String birthday,
+                String description, Boolean sex, String avatar, Integer role, String qrcode) {
         this.uuid = uuid;
         this.fullName = fullName;
         this.phone = phone;
@@ -23,6 +25,7 @@ public class User implements Serializable {
         this.sex = sex;
         this.avatar = avatar;
         this.role = role;
+        this.qrcode = qrcode;
     }
 
     public User() {
@@ -98,5 +101,13 @@ public class User implements Serializable {
 
     public void setRole(Integer role) {
         this.role = role;
+    }
+
+    public String getQrcode() {
+        return qrcode;
+    }
+
+    public void setQrcode(String qrcode) {
+        this.qrcode = qrcode;
     }
 }

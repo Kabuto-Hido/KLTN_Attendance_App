@@ -3,6 +3,7 @@ package hcmute.edu.vn.tlcn.attendanceapp;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,11 +15,26 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
+
+import java.io.ByteArrayOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
@@ -87,54 +103,28 @@ public class LoginActivity extends AppCompatActivity {
                                 BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(),hashPass);
 
                                 if(result.verified){
-                                User_singeton user_singeton = User_singeton.getInstance();
-                                user_singeton.setUser(loginUser);
-                                progressDialog.dismiss();
-                                Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
-                                if(loginUser.getRole() == 1) {
-                                    startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                    generateQR(loginUser);
+                                    myRef.child(loginUser.getPhone()).setValue(loginUser);
+                                    User_singeton user_singeton = User_singeton.getInstance();
+                                    user_singeton.setUser(loginUser);
+
+
+                                    progressDialog.dismiss();
+                                    Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
+                                    if(loginUser.getRole() == 1) {
+                                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                                    }
+                                    else{
+                                        startActivity(new Intent(LoginActivity.this,AdminMainActivity.class));
+                                    }
+                                    finish();
                                 }
                                 else{
-                                    startActivity(new Intent(LoginActivity.this,AdminMainActivity.class));
+                                    progressDialog.dismiss();
+                                    Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
                                 }
-                                finish();
-                            }
-                            else{
-                                progressDialog.dismiss();
-                                Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
-                            }
                                 Log.d("tag",loginUser.getPhone());
                             }
-//
-//
-//                            DataSnapshot dataSnapshot = snapshot.child(phone);
-//                            if(!dataSnapshot.exists()) {
-//                                progressDialog.dismiss();
-//                                Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
-//                            }
-//
-//                            User user = dataSnapshot.getValue(User.class);
-//                            assert user != null;
-//                            String hashPass = user.getPassword();
-//                            BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(),hashPass);
-//
-//                            if(result.verified){
-//                                User_singeton user_singeton = User_singeton.getInstance();
-//                                user_singeton.setUser(user);
-//                                progressDialog.dismiss();
-//                                Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
-//                                if(user.getRole() == 1) {
-//                                    startActivity(new Intent(LoginActivity.this,MainActivity.class));
-//                                }
-//                                else{
-//                                    startActivity(new Intent(LoginActivity.this,AdminMainActivity.class));
-//                                }
-//                                finish();
-//                            }
-//                            else{
-//                                progressDialog.dismiss();
-//                                Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
-//                            }
                         }
 
                         @Override
@@ -145,6 +135,42 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void generateQR(User user){
+        MultiFormatWriter writer = new MultiFormatWriter();
+        try {
+            String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
+            BitMatrix matrix = writer.encode(user.getUuid() + "_" + user.getPassword() + "_" + timeStamp,
+                    BarcodeFormat.QR_CODE, 800, 800);
+
+            BarcodeEncoder encoder = new BarcodeEncoder();
+            Bitmap bitmap = encoder.createBitmap(matrix);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG,100,stream);
+            byte[] byteArray = stream.toByteArray();
+
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference ref = storage.getReference();
+
+            String url = "images/" + user.getUuid() + "_qrcode" ;
+
+            UploadTask uploadTask = ref.child(url).putBytes(byteArray);
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    user.setQrcode(url);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        }catch (WriterException e){
+            e.printStackTrace();
+        }
     }
 
 }
