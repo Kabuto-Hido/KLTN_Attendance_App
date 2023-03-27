@@ -72,7 +72,7 @@ public class AdminSettingsFragment extends Fragment {
 
     View view;
     TextView txtEmployee, txtAdminProfile, txtAdminChangePassword,
-            txtAdminLogOut, txtListResignations, txtQuantityResignation;
+            txtAdminLogOut, txtListResignations, txtQuantityResignation, txtAdminQRCode;
     User_singeton user_singeton;
     SharedPreferences sharedPreferences;
     @Override
@@ -141,6 +141,14 @@ public class AdminSettingsFragment extends Fragment {
             }
         });
 
+        txtAdminQRCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                QRCodeFragment qrCodeFragment = new QRCodeFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,qrCodeFragment).commit();
+
+            }
+        });
         return view;
     }
 
@@ -172,5 +180,6 @@ public class AdminSettingsFragment extends Fragment {
         txtAdminLogOut = (TextView) view.findViewById(R.id.txtAdminLogOut);
         txtListResignations = (TextView) view.findViewById(R.id.txtListResignations);
         txtQuantityResignation = (TextView) view.findViewById(R.id.txtQuantityResignation);
+        txtAdminQRCode = (TextView) view.findViewById(R.id.txtAdminQRCode);
     }
 }

@@ -76,7 +76,7 @@ public class SettingsFragment extends Fragment {
     }
 
     View view;
-    TextView txtProfile, txtChangePassword, txtLogOut, txtDay_off;
+    TextView txtProfile, txtChangePassword, txtLogOut, txtDay_off, txtQRCode;
     User_singeton user_singeton;
     User user;
     SharedPreferences sharedPreferences;
@@ -137,6 +137,15 @@ public class SettingsFragment extends Fragment {
                 getActivity().finish();            }
         });
 
+        txtQRCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                QRCodeFragment qrCodeFragment = new QRCodeFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,qrCodeFragment).commit();
+
+            }
+        });
+
         return view;
     }
 
@@ -145,5 +154,6 @@ public class SettingsFragment extends Fragment {
         txtChangePassword = (TextView) view.findViewById(R.id.txtChangePassword);
         txtLogOut = (TextView) view.findViewById(R.id.txtLogOut);
         txtDay_off = (TextView) view.findViewById(R.id.txtDay_off);
+        txtQRCode = (TextView) view.findViewById(R.id.txtQRCode);
     }
 }
