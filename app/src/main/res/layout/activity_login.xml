@@ -97,4 +97,17 @@
         android:textStyle="bold"
         app:cornerRadius="30sp" />
 
+    <TextView
+        android:id="@+id/txtLoginWithQRCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnLogin"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="40dp"
+        android:text="Login By QR Code"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/colorBlue"
+        android:textSize="18sp" />
+
+
 </RelativeLayout>

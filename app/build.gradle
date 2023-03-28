@@ -25,6 +25,7 @@ android {
 
     buildFeatures {
         mlModelBinding true
+        viewBinding true
     }
 
     aaptOptions {
@@ -60,9 +61,17 @@ dependencies {
     implementation 'com.itextpdf:itext7-core:7.1.8'
     //qr code
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation 'com.google.mlkit:barcode-scanning:17.1.0'
     //face api
     implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-debug-SNAPSHOT'
     implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
     implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0'
     implementation 'com.google.mlkit:face-detection:16.0.0'
+    //cameraX
+    implementation "androidx.camera:camera-core:1.1.0-beta02"
+    implementation "androidx.camera:camera-camera2:1.1.0-beta02"
+    implementation "androidx.camera:camera-lifecycle:1.1.0-beta02"
+    implementation "androidx.camera:camera-video:1.1.0-beta02"
+    implementation "androidx.camera:camera-view:1.1.0-beta02"
+    implementation "androidx.camera:camera-extensions:1.1.0-beta02"
 }

@@ -1,10 +1,15 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,19 +37,17 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.io.ByteArrayOutputStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 public class LoginActivity extends AppCompatActivity {
 
     EditText edittextEmpCode,edittextPassword;
-    TextView txtForgotPassword;
+    TextView txtForgotPassword, txtLoginWithQRCode;
     Button btnLogin;
 
     ProgressDialog progressDialog;
@@ -58,12 +61,22 @@ public class LoginActivity extends AppCompatActivity {
         edittextPassword = (EditText) findViewById(R.id.edittextPassword);
         txtForgotPassword = (TextView) findViewById(R.id.txtForgotPassword);
         btnLogin = (Button) findViewById(R.id.btnLogin);
+        txtLoginWithQRCode = (TextView) findViewById(R.id.txtLoginWithQRCode);
+
+        checkInternetIsConnected();
 
         txtForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this,SendOTPActivity.class));
                 finish();
+            }
+        });
+
+        txtLoginWithQRCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, QRScannerActivity.class));
             }
         });
 
@@ -173,4 +186,35 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    public void checkInternetIsConnected(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if(networkInfo != null){
+            if(!networkInfo.isConnected()){
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                builder.setMessage("Please connect to the internet to proceed futher")
+                        .setCancelable(false)
+                        .setPositiveButton("Connect", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(Settings.ACTION_WIFI_IP_SETTINGS));
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startActivity(new Intent(LoginActivity.this, BeginActivity.class));
+                                finish();
+                            }
+                        });
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkInternetIsConnected();
+    }
 }
