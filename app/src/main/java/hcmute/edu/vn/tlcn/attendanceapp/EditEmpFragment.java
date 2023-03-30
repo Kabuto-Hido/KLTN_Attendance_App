@@ -13,13 +13,6 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,15 +25,16 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -57,7 +51,6 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
-import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -162,11 +155,11 @@ public class EditEmpFragment extends Fragment {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        calendar.set(year,month,dayOfMonth);
+                        calendar.set(year, month, dayOfMonth);
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                         edtBirthday1.setText(format.format(calendar.getTime()));
                     }
-                },year,month,date);
+                }, year, month, date);
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
@@ -188,17 +181,17 @@ public class EditEmpFragment extends Fragment {
                         Intent intent = new Intent();
                         intent.setType("image/*");
                         intent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(Intent.createChooser(intent,"Select image..."), PICK_IMAGE_REQUEST);
+                        startActivityForResult(Intent.createChooser(intent, "Select image..."), PICK_IMAGE_REQUEST);
                     }
                 });
 
                 camera.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(CheckPermissions()) {
+                        if (CheckPermissions()) {
                             Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                             startActivityForResult(takePicture, 0);
-                        }else {
+                        } else {
                             RequestPermissions();
                         }
                     }
@@ -218,13 +211,13 @@ public class EditEmpFragment extends Fragment {
                 progressDialog.setMessage("Please wait");
                 progressDialog.show();
 
-                if(fullName.equals("") || birthday.equals("")) {
+                if (fullName.equals("") || birthday.equals("")) {
                     Toast.makeText(getActivity(), "Invalid input !", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                     return;
                 }
 
-                if(!isRecognizeFace){
+                if (!isRecognizeFace) {
                     Toast.makeText(getActivity(), "Please take a photo with your face !", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                     return;
@@ -238,26 +231,22 @@ public class EditEmpFragment extends Fragment {
                 StorageReference ref = storage.getReference();
 
                 UploadTask uploadTask;
-                if(imgAvatarProfile.isSelected()){
-                    if(filePath == null){
+                if (imgAvatarProfile.isSelected()) {
+                    if (filePath == null) {
                         Bitmap bitmap = ((BitmapDrawable) imgAvatarProfile.getDrawable()).getBitmap();
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] imageInByte = stream.toByteArray();
 
                         uploadTask = ref.child("images/" + editUser.getPhone() + "_avatar").putBytes(imageInByte);
-                    }
-
-                    else if(isCamera){
+                    } else if (isCamera) {
                         uploadTask = ref.child("images/" + editUser.getPhone() + "_avatar").putBytes(byteArray);
-                    }
-                    else {
+                    } else {
                         uploadTask = ref.child("images/" + editUser.getPhone() + "_avatar").putFile(filePath);
                     }
 
 
-                }
-                else{
+                } else {
                     Bitmap bitmap = ((BitmapDrawable) imgAvatarProfile.getDrawable()).getBitmap();
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -315,10 +304,9 @@ public class EditEmpFragment extends Fragment {
         String phone = "+84" + getPhone.substring(1);
         edtPhonenum.setText(phone);
         edtPhonenum.setBackgroundColor(Color.parseColor("#D9D9D9"));
-        if(editUser.getSex()){
+        if (editUser.getSex()) {
             radioMale.setChecked(true);
-        }
-        else{
+        } else {
             radioFemale.setChecked(true);
         }
 
@@ -337,6 +325,7 @@ public class EditEmpFragment extends Fragment {
     }
 
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
+
     public boolean CheckPermissions() {
         int result = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), CAMERA);
         return result == PackageManager.PERMISSION_GRANTED;
@@ -364,44 +353,43 @@ public class EditEmpFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK
                 && data != null && data.getData() != null) {
             isCamera = false;
             filePath = data.getData();
             imgAvatarProfile.setImageURI(filePath);
 
             BitmapDrawable drawable = (BitmapDrawable) imgAvatarProfile.getDrawable();
-            Bitmap bitmapOrigin = Bitmap.createBitmap( drawable.getBitmap());
+            Bitmap bitmapOrigin = Bitmap.createBitmap(drawable.getBitmap());
             //check face
             face_detector(bitmapOrigin);
 
             dialog.dismiss();
-        }
-        else if(requestCode == 0 && resultCode == getActivity().RESULT_OK
-                && data != null){
+        } else if (requestCode == 0 && resultCode == getActivity().RESULT_OK
+                && data != null) {
             isCamera = true;
             Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            selectedImage.compress(Bitmap.CompressFormat.PNG,100,stream);
+            selectedImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byteArray = stream.toByteArray();
 
             //detect face
             face_detector(selectedImage);
 
-            Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
             imgAvatarProfile.setImageBitmap(bitmap);
             dialog.dismiss();
         }
     }
 
-    public void face_detector(Bitmap bitmap){
-        InputImage image = InputImage.fromBitmap(bitmap,0);
+    public void face_detector(Bitmap bitmap) {
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
         FaceDetector detector = FaceDetection.getClient();
         detector.process(image)
                 .addOnSuccessListener(new OnSuccessListener<List<Face>>() {
                     @Override
                     public void onSuccess(List<Face> faces) {
-                        if(faces.size() != 0){
+                        if (faces.size() != 0) {
                             isRecognizeFace = true;
                         }
                     }
@@ -409,7 +397,7 @@ public class EditEmpFragment extends Fragment {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

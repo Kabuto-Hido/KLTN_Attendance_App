@@ -3,7 +3,6 @@ package hcmute.edu.vn.tlcn.attendanceapp;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.UUID;
 
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
@@ -85,7 +83,8 @@ public class RequestADayOffFragment extends Fragment {
     EditText edtDayToOff, edtReason;
     Button btnSendRequestDayOff;
     TextView btnCancelRequest;
-    User_singeton user_singeton = User_singeton.getInstance();;
+    User_singeton user_singeton = User_singeton.getInstance();
+    ;
     User user;
     Calendar calendar;
     FirebaseDatabase database;
@@ -109,7 +108,7 @@ public class RequestADayOffFragment extends Fragment {
         btnSeeListReq.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(),ListSendedRequestActivity.class));
+                startActivity(new Intent(getActivity(), ListSendedRequestActivity.class));
             }
         });
 
@@ -128,7 +127,7 @@ public class RequestADayOffFragment extends Fragment {
                 int date = calendar.get(Calendar.DATE);
                 int month = calendar.get(Calendar.MONTH);
                 int year = calendar.get(Calendar.YEAR);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), datePickerListener,year,month,date);
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), datePickerListener, year, month, date);
                 datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
                 datePickerDialog.show();
             }
@@ -140,13 +139,13 @@ public class RequestADayOffFragment extends Fragment {
                 String reason = edtReason.getText().toString();
                 String dateDayOff = edtDayToOff.getText().toString();
 
-                if(dateDayOff.equals("")){
+                if (dateDayOff.equals("")) {
                     Toast.makeText(getActivity(), "Please choose a day you want to work off !", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 final String reqId = UUID.randomUUID().toString();
 
-                DayOffRequest dayOffRequest = new DayOffRequest(user.getPhone(),reason,"waiting",dateDayOff);
+                DayOffRequest dayOffRequest = new DayOffRequest(user.getPhone(), reason, "waiting", dateDayOff);
 
                 database = FirebaseDatabase.getInstance();
                 DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
@@ -167,12 +166,12 @@ public class RequestADayOffFragment extends Fragment {
     private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-            calendar.set(year,month,dayOfMonth);
+            calendar.set(year, month, dayOfMonth);
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String selectedDate = format.format(calendar.getTime());
             edtDayToOff.setText(selectedDate);
 
-            if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
                 btnSendRequestDayOff.setEnabled(false);
                 Toast.makeText(getActivity(), "The day you choose is Sunday!!", Toast.LENGTH_SHORT).show();
                 return;
@@ -185,16 +184,15 @@ public class RequestADayOffFragment extends Fragment {
             dayOffRef.orderByChild("userPhone").startAt(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         DayOffRequest dayOff = dataSnapshot.getValue(DayOffRequest.class);
                         String day = dayOff.getDateOff();
 
-                        if(day.equals(selectedDate)){
+                        if (day.equals(selectedDate)) {
                             btnSendRequestDayOff.setEnabled(false);
-                            Toast.makeText(getActivity(), "You have already sent request for "+day, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "You have already sent request for " + day, Toast.LENGTH_SHORT).show();
                             break;
-                        }
-                        else{
+                        } else {
                             database = FirebaseDatabase.getInstance();
                             DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
                             recordRef.addValueEventListener(new ValueEventListener() {
@@ -207,13 +205,11 @@ public class RequestADayOffFragment extends Fragment {
                                     if (checkInRecord != null) {
                                         btnSendRequestDayOff.setEnabled(false);
                                         Toast.makeText(getActivity(), "You have already check in!!", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else if (absentRecord != null) {
+                                    } else if (absentRecord != null) {
                                         btnSendRequestDayOff.setEnabled(false);
-                                        if(absentRecord.getStatus().equals("absent with permission")){
-                                            Toast.makeText(getActivity(), "You have already sent request for "+absentRecord.getDay(), Toast.LENGTH_SHORT).show();
-                                        }
-                                        else {
+                                        if (absentRecord.getStatus().equals("absent with permission")) {
+                                            Toast.makeText(getActivity(), "You have already sent request for " + absentRecord.getDay(), Toast.LENGTH_SHORT).show();
+                                        } else {
                                             Toast.makeText(getActivity(), "You have already absent!!", Toast.LENGTH_SHORT).show();
                                         }
                                     }

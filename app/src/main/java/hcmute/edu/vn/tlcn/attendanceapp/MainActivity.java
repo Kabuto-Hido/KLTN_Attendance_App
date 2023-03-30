@@ -1,38 +1,28 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
 
-import hcmute.edu.vn.tlcn.attendanceapp.model.User;
-import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
+import hcmute.edu.vn.tlcn.attendanceapp.Utility.InternetCheckService;
 
 public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
-
+    InternetCheckService internetCheckService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        internetCheckService = new InternetCheckService();
 
         SettingsFragment settingsFragment = new SettingsFragment();
         HomeFragment homeFragment = new HomeFragment();
@@ -59,5 +49,23 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.navHome);
     }
 
+    @Override
+    protected void onStart() {
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
+        super.onStart();
+    }
 
+    @Override
+    protected void onStop() {
+        unregisterReceiver(internetCheckService);
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
+    }
 }

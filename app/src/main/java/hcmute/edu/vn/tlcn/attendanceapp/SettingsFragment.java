@@ -4,27 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import androidx.fragment.app.Fragment;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -91,8 +77,7 @@ public class SettingsFragment extends Fragment {
         user_singeton = User_singeton.getInstance();
         user = user_singeton.getUser();
 
-        if(user == null)
-        {
+        if (user == null) {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
         }
@@ -101,7 +86,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ProfileInformationFragment profileInformationFragment = new ProfileInformationFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,profileInformationFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, profileInformationFragment).commit();
             }
         });
 
@@ -109,7 +94,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 RequestADayOffFragment aDayOffFragment = new RequestADayOffFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,aDayOffFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, aDayOffFragment).commit();
             }
         });
 
@@ -117,7 +102,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ChangePasswordFragment changePasswordFragment = new ChangePasswordFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,changePasswordFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, changePasswordFragment).commit();
             }
         });
 
@@ -134,14 +119,15 @@ public class SettingsFragment extends Fragment {
                 editor.apply();
 
                 startActivity(new Intent(getActivity(), LoginActivity.class));
-                getActivity().finish();            }
+                getActivity().finish();
+            }
         });
 
         txtQRCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 QRCodeFragment qrCodeFragment = new QRCodeFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment,qrCodeFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, qrCodeFragment).commit();
 
             }
         });

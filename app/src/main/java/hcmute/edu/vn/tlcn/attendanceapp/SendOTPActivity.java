@@ -1,8 +1,5 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +9,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -59,10 +59,9 @@ public class SendOTPActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("isVerifyOtp", Context.MODE_MULTI_PROCESS);
 
-        if(user == null){
+        if (user == null) {
             edittext_phone_SendOtp.setFocusable(true);
-        }
-        else{
+        } else {
             edittext_phone_SendOtp.setText(user.getPhone());
             edittext_phone_SendOtp.setFocusable(false);
         }
@@ -71,14 +70,13 @@ public class SendOTPActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean("otp",false);
+                editor.putBoolean("otp", false);
                 editor.apply();
 
-                if(user == null){
-                    startActivity(new Intent(SendOTPActivity.this,LoginActivity.class));
+                if (user == null) {
+                    startActivity(new Intent(SendOTPActivity.this, LoginActivity.class));
                     finish();
-                }
-                else {
+                } else {
                     finish();
                 }
 //                finish();
@@ -89,7 +87,7 @@ public class SendOTPActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String getPhone = edittext_phone_SendOtp.getText().toString().trim();
-                if(getPhone.length()<10){
+                if (getPhone.length() < 10) {
                     edittext_phone_SendOtp.setError("The phone number must have 10 digits");
                     return;
                 }
@@ -100,13 +98,12 @@ public class SendOTPActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         DataSnapshot dataSnapshot = snapshot.child(getPhone);
-                        if(!dataSnapshot.exists()) {
+                        if (!dataSnapshot.exists()) {
                             Toast.makeText(SendOTPActivity.this, "This phone number doesn't exist!", Toast.LENGTH_SHORT).show();
-                        }
-                        else{
+                        } else {
                             phone = "+84" + getPhone.substring(1);
 
-                            PhoneAuthOptions options =  PhoneAuthOptions.newBuilder(firebaseAuth)
+                            PhoneAuthOptions options = PhoneAuthOptions.newBuilder(firebaseAuth)
                                     .setPhoneNumber(phone)       // Phone number to verify
                                     .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
                                     .setActivity(SendOTPActivity.this)                 // Activity (for callback binding)
@@ -141,9 +138,9 @@ public class SendOTPActivity extends AppCompatActivity {
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
                 token = forceResendingToken;
-                Intent gotoConfirmActivity = new Intent(SendOTPActivity.this,ConfirmOTPActivity.class);
-                gotoConfirmActivity.putExtra("verificationId",s);
-                gotoConfirmActivity.putExtra("phone",phone);
+                Intent gotoConfirmActivity = new Intent(SendOTPActivity.this, ConfirmOTPActivity.class);
+                gotoConfirmActivity.putExtra("verificationId", s);
+                gotoConfirmActivity.putExtra("phone", phone);
                 startActivity(gotoConfirmActivity);
                 finish();
             }

@@ -1,11 +1,11 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -14,10 +14,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import hcmute.edu.vn.tlcn.attendanceapp.Utility.InternetCheckService;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 public class ForgetPasswordActivity extends AppCompatActivity {
@@ -26,6 +32,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
     Button btnConfirmResetPass;
     SharedPreferences sharedPreferences;
     String mPhone, getPhone;
+    InternetCheckService internetCheckService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,18 +41,19 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
         mapping();
 
+        internetCheckService = new InternetCheckService();
+
         mPhone = getIntent().getStringExtra("forgetPhone");
-        getPhone = "0"+ mPhone.substring(3);
+        getPhone = "0" + mPhone.substring(3);
 
         txtShowNewPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(txtShowNewPassword.getText().toString().equals("SHOW")) {
+                if (txtShowNewPassword.getText().toString().equals("SHOW")) {
                     edtNewResetPassword.setInputType(1);
                     edtConfirmResetNewPassword.setInputType(1);
                     txtShowNewPassword.setText("HIDE");
-                }
-                else{
+                } else {
                     edtNewResetPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
                     edtConfirmResetNewPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
                     txtShowNewPassword.setText("SHOW");
@@ -63,15 +71,13 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                 String newPass = edtNewResetPassword.getText().toString();
                 String confirmNewPass = edtConfirmResetNewPassword.getText().toString();
 
-                if(newPass.length() < 6) {
+                if (isValidPassword(newPass)) {
                     progressDialog.dismiss();
-                    Toast.makeText(ForgetPasswordActivity.this, "This password too weak !", Toast.LENGTH_SHORT).show();
-                }
-                else if(!newPass.equals(confirmNewPass)){
+                    edtNewResetPassword.setError("Password must contain at least 8 characters, one digit, one upper case alphabet and one lower case alphabet!");
+                } else if (!newPass.equals(confirmNewPass)) {
                     progressDialog.dismiss();
-                    Toast.makeText(ForgetPasswordActivity.this, "The confirm password does not match!!", Toast.LENGTH_SHORT).show();
-                }
-                else{
+                    edtConfirmResetNewPassword.setError("The confirm password does not match!!");
+                } else {
                     String newHashPass = BCrypt.withDefaults().hashToString(12, newPass.toCharArray());
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference("users");
@@ -84,6 +90,38 @@ public class ForgetPasswordActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(internetCheckService);
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
+    }
+
+    public boolean isValidPassword(String password) {
+        //password must containing at least 8 characters and at most 20 characters,
+        // containing at least one digit, one upper case alphabet and one lower case alphabet1
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,20}$";
+        Pattern p = Pattern.compile(regex);
+        if (password == null) {
+            return false;
+        }
+        Matcher m = p.matcher(password);
+        return m.matches();
     }
 
     private void logout() {

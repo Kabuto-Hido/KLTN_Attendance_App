@@ -88,7 +88,7 @@ import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment{
+public class HomeFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -138,8 +138,8 @@ public class HomeFragment extends Fragment{
     Bitmap bitmapOrigin;
     int[] intValues;
     int inputSize = 112;
-    int OUTPUT_SIZE =192;
-    float [][] embeedings;
+    int OUTPUT_SIZE = 192;
+    float[][] embeedings;
     private static final float IMAGE_MEAN = 128.0f;
     private static final float IMAGE_STD = 128.0f;
 
@@ -153,12 +153,12 @@ public class HomeFragment extends Fragment{
     SimpleDateFormat yearFormat;
     int count;
     String currentLocation = "";
-    private LocationListener locationListener=null;
+    private LocationListener locationListener = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view =  inflater.inflate(R.layout.fragment_home, container, false);
+        view = inflater.inflate(R.layout.fragment_home, container, false);
 
         mapping();
 
@@ -171,9 +171,9 @@ public class HomeFragment extends Fragment{
 
         try {
             tflite = new Interpreter(loadModelFile(getActivity()));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            Log.v("tflite",e.getMessage());
+            Log.v("tflite", e.getMessage());
         }
         user = user_singeton.getUser();
         checkPreviousAttendance();
@@ -190,7 +190,7 @@ public class HomeFragment extends Fragment{
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(currentTime);
                 //check in - sunday
-                if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                     dialog.setMessage("Today is sunday are you sure you want to take attendance ? ");
                     dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -209,8 +209,7 @@ public class HomeFragment extends Fragment{
                         }
                     });
                     dialog.show();
-                }
-                else {
+                } else {
                     checkIsTimeCheckIn();
                     if (absent) {
                         btnTimeIn.setVisibility(View.INVISIBLE);
@@ -241,10 +240,10 @@ public class HomeFragment extends Fragment{
             @Override
             public void onClick(View v) {
                 type = "checkOut";
-                if(CheckPermissions()) {
+                if (CheckPermissions()) {
                     Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(takePicture, 0);
-                }else {
+                } else {
                     RequestPermissions();
                 }
 
@@ -255,7 +254,7 @@ public class HomeFragment extends Fragment{
         return view;
     }
 
-    private void updateStatistic(String status){
+    private void updateStatistic(String status) {
         String currentMonth = monthFormat.format(currentTime);
         String currentYear = yearFormat.format(currentTime);
 
@@ -274,75 +273,65 @@ public class HomeFragment extends Fragment{
                 int countLate;
                 int countAbsentWithoutPer;
                 //month statistic
-                if(monthStatistic == null){
+                if (monthStatistic == null) {
                     countOnTime = 0;
                     countLate = 0;
                     countAbsentWithoutPer = 0;
-                    if(status.equals("on time")){
+                    if (status.equals("on time")) {
                         countOnTime = 1;
-                    }
-                    else if(status.equals("late")){
+                    } else if (status.equals("late")) {
                         countLate = 1;
-                    }
-                    else if(status.equals(absent2)){
+                    } else if (status.equals(absent2)) {
                         countAbsentWithoutPer = 1;
                     }
 
                     //month statistic
-                    Statistic newStatistic = new Statistic(countOnTime,countLate,0,countAbsentWithoutPer,currentMonth,currentYear,"","00:00");
+                    Statistic newStatistic = new Statistic(countOnTime, countLate, 0, countAbsentWithoutPer, currentMonth, currentYear, "", "00:00");
                     statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
 
-                }
-                else{
+                } else {
                     countOnTime = monthStatistic.getOnTime();
                     countLate = monthStatistic.getLate();
                     countAbsentWithoutPer = monthStatistic.getAbsentWithoutPer();
-                    if(status.equals("on time")){
+                    if (status.equals("on time")) {
                         countOnTime++;
                         monthStatistic.setOnTime(countOnTime);
-                    }
-                    else if(status.equals("late")){
+                    } else if (status.equals("late")) {
                         countLate++;
                         monthStatistic.setLate(countLate);
-                    }
-                    else if(status.equals(absent2)){
+                    } else if (status.equals(absent2)) {
                         countAbsentWithoutPer++;
                         monthStatistic.setAbsentWithoutPer(countAbsentWithoutPer);
                     }
                     statisticRef.child(currentYear).child(currentMonth).setValue(monthStatistic);
                 }
                 //emp statistic
-                if(empStatistic == null){
+                if (empStatistic == null) {
                     countOnTime = 0;
                     countLate = 0;
                     countAbsentWithoutPer = 0;
-                    if(status.equals("on time")){
+                    if (status.equals("on time")) {
                         countOnTime = 1;
-                    }
-                    else if(status.equals("late")){
+                    } else if (status.equals("late")) {
                         countLate = 1;
-                    }
-                    else if(status.equals(absent2)){
+                    } else if (status.equals(absent2)) {
                         countAbsentWithoutPer = 1;
                     }
 
-                    Statistic newStatistic = new Statistic(countOnTime,countLate,0,countAbsentWithoutPer,currentMonth,currentYear,user.getPhone(),"00:00");
+                    Statistic newStatistic = new Statistic(countOnTime, countLate, 0, countAbsentWithoutPer, currentMonth, currentYear, user.getPhone(), "00:00");
                     statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
-                }
-                else{
+                } else {
                     countOnTime = empStatistic.getOnTime();
                     countLate = empStatistic.getLate();
                     countAbsentWithoutPer = empStatistic.getAbsentWithoutPer();
-                    if(status.equals("on time")){
-                        countOnTime+= 1;
+                    if (status.equals("on time")) {
+                        countOnTime += 1;
                         empStatistic.setOnTime(countOnTime);
-                    }
-                    else if(status.equals("late")){
-                        countLate+= 1;
+                    } else if (status.equals("late")) {
+                        countLate += 1;
                         empStatistic.setLate(countLate);
-                    }
-                    else if(status.equals(absent2)){
-                        countAbsentWithoutPer+= 1;
+                    } else if (status.equals(absent2)) {
+                        countAbsentWithoutPer += 1;
                         empStatistic.setAbsentWithoutPer(countAbsentWithoutPer);
                     }
                     statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(empStatistic);
@@ -356,7 +345,7 @@ public class HomeFragment extends Fragment{
         });
     }
 
-    private void checkPreviousAttendance(){
+    private void checkPreviousAttendance() {
         Date today = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         SimpleDateFormat dayFormat = new SimpleDateFormat("dd");
@@ -368,13 +357,12 @@ public class HomeFragment extends Fragment{
         List<String> hoursList = new ArrayList<>();
 
         int n = Integer.parseInt(dayCurr);
-        for(int i = 1; i < n; i++){
+        for (int i = 1; i < n; i++) {
             count = 0;
             String dateAttend;
-            if(String.valueOf(i).length()==1){
+            if (String.valueOf(i).length() == 1) {
                 dateAttend = YMCurr + "-0" + (i);
-            }
-            else {
+            } else {
                 dateAttend = YMCurr + "-" + (i);
             }
             Date getDate = null;
@@ -387,7 +375,7 @@ public class HomeFragment extends Fragment{
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference recordRef = database.getReference("record");
-            if(calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+            if (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
                 recordRef.child(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -401,7 +389,7 @@ public class HomeFragment extends Fragment{
 
                         if (checkInRecord == null) {
                             if (absentRecord == null) {
-                                Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent","");
+                                Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent", "");
                                 recordRef.child(user.getPhone()).child(dateAttend).child("absent").setValue(absent);
 
                                 count += 1;
@@ -422,7 +410,7 @@ public class HomeFragment extends Fragment{
                                         Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
                                         if (monthStatistic == null) {
-                                            Statistic newStatistic = new Statistic(0, 0, 0, count, currentMonth, currentYear, "","00:00");
+                                            Statistic newStatistic = new Statistic(0, 0, 0, count, currentMonth, currentYear, "", "00:00");
                                             statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
                                         } else {
                                             countAbsentWithoutPer = monthStatistic.getAbsentWithoutPer();
@@ -431,7 +419,7 @@ public class HomeFragment extends Fragment{
                                         }
 
                                         if (empStatistic == null) {
-                                            Statistic newStatistic = new Statistic(0, 0, 0, count, currentMonth, currentYear, user.getPhone(),"00:00");
+                                            Statistic newStatistic = new Statistic(0, 0, 0, count, currentMonth, currentYear, user.getPhone(), "00:00");
                                             statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
                                         } else {
                                             countAbsentWithoutPer = empStatistic.getAbsentWithoutPer();
@@ -449,7 +437,7 @@ public class HomeFragment extends Fragment{
                             }
                         } else {
                             if (checkOutRecord == null) {
-                                Record checkOut = new Record(user.getPhone(), dateAttend, "17:00", "", "checkOut","");
+                                Record checkOut = new Record(user.getPhone(), dateAttend, "17:00", "", "checkOut", "");
                                 recordRef.child(user.getPhone()).child(dateAttend).child("checkOut").setValue(checkOut);
 
                                 try {
@@ -457,11 +445,11 @@ public class HomeFragment extends Fragment{
                                     Date timeIn = timeFormat.parse(checkInRecord.getTime());
 
                                     long diff = timeOut.getTime() - timeIn.getTime();
-                                    if(diff>0) {
+                                    if (diff > 0) {
                                         //long diffHours = diff / (60 * 60 * 1000) % 24;
                                         long diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
                                         long diffHours = TimeUnit.MILLISECONDS.toHours(diff);
-                                        long addMinutes = diffMinutes - (diffHours*60);
+                                        long addMinutes = diffMinutes - (diffHours * 60);
 
                                         String diffDate = diffHours + ":" + addMinutes;
 
@@ -479,8 +467,8 @@ public class HomeFragment extends Fragment{
                                                 String currentMonth = dateAttend.substring(5, 7);
 
                                                 String hoursGet = "00:00";
-                                                for(int i=0;i<hoursList.size();i++){
-                                                    hoursGet = calTime(hoursGet,hoursList.get(i));
+                                                for (int i = 0; i < hoursList.size(); i++) {
+                                                    hoursGet = calTime(hoursGet, hoursList.get(i));
                                                     //hoursGet += hoursList.get(i);
                                                 }
                                                 System.out.println(hoursGet);
@@ -492,13 +480,13 @@ public class HomeFragment extends Fragment{
                                                 Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
                                                 String totalHourWorked = monthStatistic.getHourWorked();
-                                                totalHourWorked = calTime(totalHourWorked,hoursGet);
+                                                totalHourWorked = calTime(totalHourWorked, hoursGet);
                                                 //totalHourWorked += hoursGet;
 
                                                 statisticRef.child(currentYear).child(currentMonth).child("hourWorked").setValue(totalHourWorked);
 
                                                 String hourWorked = empStatistic.getHourWorked();
-                                                hourWorked = calTime(hourWorked,hoursGet);
+                                                hourWorked = calTime(hourWorked, hoursGet);
                                                 //hourWorked += hoursGet;
                                                 statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).child("hourWorked").setValue(hourWorked);
 
@@ -529,7 +517,7 @@ public class HomeFragment extends Fragment{
         }
     }
 
-    private void checkIsTimeCheckIn(){
+    private void checkIsTimeCheckIn() {
         try {
             Date nine = timeFormat.parse("09:00");
             Date haftNine = timeFormat.parse("09:30");
@@ -554,7 +542,7 @@ public class HomeFragment extends Fragment{
         }
     }
 
-    private void takeAttendance(){
+    private void takeAttendance() {
         if (CheckPermissions()) {
             Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
             startActivityForResult(takePicture, 0);
@@ -565,7 +553,7 @@ public class HomeFragment extends Fragment{
 
     private void putDataToView() {
 
-        if(user == null) {
+        if (user == null) {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
         }
@@ -617,10 +605,9 @@ public class HomeFragment extends Fragment{
                 DataSnapshot dataSnapshot3 = snapshot.child(currentDate).child("absent");
                 Record absentRecord = dataSnapshot3.getValue(Record.class);
                 if (absentRecord != null) {
-                    if(absentRecord.getStatus().equals(absent1)){
+                    if (absentRecord.getStatus().equals(absent1)) {
                         notifiDone.setText("You have the day off!!");
-                    }
-                    else{
+                    } else {
                         notifiDone.setText("You are absent today!!");
                     }
                     btnTimeIn.setVisibility(View.INVISIBLE);
@@ -653,19 +640,19 @@ public class HomeFragment extends Fragment{
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 0 && resultCode == getActivity().RESULT_OK
-                && data != null){
+        if (requestCode == 0 && resultCode == getActivity().RESULT_OK
+                && data != null) {
             Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            selectedImage.compress(Bitmap.CompressFormat.PNG,100,stream);
+            selectedImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
-            if(bitmapOrigin == null){
+            if (bitmapOrigin == null) {
                 BitmapDrawable drawable = (BitmapDrawable) avatarUser.getDrawable();
-                bitmapOrigin = Bitmap.createBitmap( drawable.getBitmap());
-                face_detector(bitmapOrigin,"origin");
+                bitmapOrigin = Bitmap.createBitmap(drawable.getBitmap());
+                face_detector(bitmapOrigin, "origin");
             }
 
-            face_detector(selectedImage,"checkin");
+            face_detector(selectedImage, "checkin");
 
 
 //            byte[] byteArray = stream.toByteArray();
@@ -677,11 +664,11 @@ public class HomeFragment extends Fragment{
         }
     }
 
-    private float cal_distance(float[] ori_embedding, float[] checkIn_embedding ){
+    private float cal_distance(float[] ori_embedding, float[] checkIn_embedding) {
         float distance = 0;
-        for(int i=0; i < ori_embedding.length;i++){
+        for (int i = 0; i < ori_embedding.length; i++) {
             float diff = checkIn_embedding[i] - ori_embedding[i];
-            distance += diff*diff;
+            distance += diff * diff;
         }
         return (float) Math.sqrt(distance);
     }
@@ -692,30 +679,30 @@ public class HomeFragment extends Fragment{
         FileChannel fileChannel = inputStream.getChannel();
         long startOffSet = fileDescriptor.getStartOffset();
         long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY,startOffSet,declaredLength);
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffSet, declaredLength);
     }
 
-    public void face_detector(Bitmap bitmap, String name){
-        InputImage image = InputImage.fromBitmap(bitmap,0);
+    public void face_detector(Bitmap bitmap, String name) {
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
         FaceDetector detector = FaceDetection.getClient();
         detector.process(image)
                 .addOnSuccessListener(new OnSuccessListener<List<Face>>() {
-            @Override
-            public void onSuccess(List<Face> faces) {
-                for (Face face :faces){
-                    RectF bounds = new RectF(face.getBoundingBox());
-                    //cut face from image
-                    Bitmap cropped_face = getCropBitmapByCPU(bitmap, bounds);
+                    @Override
+                    public void onSuccess(List<Face> faces) {
+                        for (Face face : faces) {
+                            RectF bounds = new RectF(face.getBoundingBox());
+                            //cut face from image
+                            Bitmap cropped_face = getCropBitmapByCPU(bitmap, bounds);
 
-                    Bitmap scaled = getResizedBitmap(cropped_face, inputSize, inputSize);
-                    get_embaddings(scaled,name);
-                }
-            }
-        })
+                            Bitmap scaled = getResizedBitmap(cropped_face, inputSize, inputSize);
+                            get_embaddings(scaled, name);
+                        }
+                    }
+                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -760,7 +747,7 @@ public class HomeFragment extends Fragment{
         return resizedBitmap;
     }
 
-    public void get_embaddings(Bitmap bitmap, String name){
+    public void get_embaddings(Bitmap bitmap, String name) {
 
         ByteBuffer imgData = ByteBuffer.allocateDirect(inputSize * inputSize * 3 * 4);
         imgData.order(ByteOrder.nativeOrder());
@@ -770,7 +757,7 @@ public class HomeFragment extends Fragment{
         for (int i = 0; i < inputSize; ++i) {
             for (int j = 0; j < inputSize; ++j) {
                 int pixelValue = intValues[i * inputSize + j];
-                 // Float model
+                // Float model
                 imgData.putFloat((((pixelValue >> 16) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
                 imgData.putFloat((((pixelValue >> 8) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
                 imgData.putFloat(((pixelValue & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
@@ -790,27 +777,27 @@ public class HomeFragment extends Fragment{
 
         tflite.runForMultipleInputsOutputs(inputArray, outputMap);
 
-        if(name.equals("checkin")){
+        if (name.equals("checkin")) {
             checkIn_embedding = embeedings;
-            System.out.println("checkIn_embedding "+ Arrays.toString(checkIn_embedding[0]));
-        }else{
+            System.out.println("checkIn_embedding " + Arrays.toString(checkIn_embedding[0]));
+        } else {
             ori_embedding = embeedings;
-            System.out.println("ori_embedding "+ Arrays.toString(ori_embedding[0]));
+            System.out.println("ori_embedding " + Arrays.toString(ori_embedding[0]));
         }
 
-        if(checkIn_embedding != null && ori_embedding != null){
-            recordToDatabase(checkIn_embedding,ori_embedding);
+        if (checkIn_embedding != null && ori_embedding != null) {
+            recordToDatabase(checkIn_embedding, ori_embedding);
             checkIn_embedding = null;
         }
     }
 
     private void recordToDatabase(float[][] checkIn_embedding, float[][] ori_embedding) {
-        float dis = cal_distance(ori_embedding[0],checkIn_embedding[0]);
-        System.out.println("Distance: "+dis);
-        if(dis < 1.0f){
+        float dis = cal_distance(ori_embedding[0], checkIn_embedding[0]);
+        System.out.println("Distance: " + dis);
+        if (dis < 1.0f) {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
-            if(type.equals("checkIn")) {
+            if (type.equals("checkIn")) {
                 Toast.makeText(getActivity(), "Check In Successfully", Toast.LENGTH_SHORT).show();
 
                 currentTime = Calendar.getInstance().getTime();
@@ -818,7 +805,7 @@ public class HomeFragment extends Fragment{
                 String checkInTime = timeFormat.format(currentTime);
 
 
-                Record record = new Record(user.getPhone(),checkInDate,checkInTime,status,type,"");
+                Record record = new Record(user.getPhone(), checkInDate, checkInTime, status, type, "");
 
                 recordRef.child(checkInDate).child(type).setValue(record);
                 updateStatistic(status);
@@ -826,31 +813,30 @@ public class HomeFragment extends Fragment{
                 txtTimeCheckIn.setText(digitalClock.getText());
                 btnTimeIn.setVisibility(View.INVISIBLE);
                 btnTimeOut.setVisibility(View.VISIBLE);
-            }
-            else{
+            } else {
                 Toast.makeText(getActivity(), "Check Out Successfully", Toast.LENGTH_SHORT).show();
 
                 currentTime = Calendar.getInstance().getTime();
                 String checkOutDate = dateFormat.format(currentTime);
                 String checkOutTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getPhone(),checkOutDate,checkOutTime,"",type,"");
+                Record record = new Record(user.getPhone(), checkOutDate, checkOutTime, "", type, "");
 
                 recordRef.child(checkOutDate).child(type).setValue(record);
 
-                recordTimeWorked(checkOutDate,checkOutTime);
+                recordTimeWorked(checkOutDate, checkOutTime);
 
                 txtTimeCheckOut.setText(digitalClock.getText());
                 notifiDone.setVisibility(View.VISIBLE);
                 btnTimeOut.setVisibility(View.INVISIBLE);
             }
-        }else {
+        } else {
             bitmapOrigin = null;
-            Toast.makeText(getActivity(),"Can't recognize face",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Can't recognize face", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void recordTimeWorked(String day,String timeCheckOut) {
+    private void recordTimeWorked(String day, String timeCheckOut) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
         recordRef.child(day).child("checkIn").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -863,15 +849,15 @@ public class HomeFragment extends Fragment{
                     Date timeIn = timeFormat.parse(timeCheckIn);
 
                     long diff = timeOut.getTime() - timeIn.getTime();
-                    if(diff>0) {
+                    if (diff > 0) {
                         long diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
                         long diffHours = TimeUnit.MILLISECONDS.toHours(diff);
-                        long addMinutes = diffMinutes - (diffHours*60);
+                        long addMinutes = diffMinutes - (diffHours * 60);
                         //long diffHours = diff / (60 * 60 * 1000) % 24;
                         System.out.println(addMinutes);
                         System.out.println(diffHours);
 
-                        String diffDate = diffHours + ":"+addMinutes;
+                        String diffDate = diffHours + ":" + addMinutes;
 
                         String currentYear = day.substring(0, 4);
                         String currentMonth = day.substring(5, 7);
@@ -887,12 +873,12 @@ public class HomeFragment extends Fragment{
                                 Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
                                 String totalHourWorked = monthStatistic.getHourWorked();
-                                totalHourWorked = calTime(diffDate,totalHourWorked);
+                                totalHourWorked = calTime(diffDate, totalHourWorked);
                                 statisticRef.child(currentYear).child(currentMonth).child("hourWorked").setValue(totalHourWorked);
 
                                 String hourWorked = empStatistic.getHourWorked();
                                 System.out.println(hourWorked);
-                                hourWorked = calTime(diffDate,hourWorked);
+                                hourWorked = calTime(diffDate, hourWorked);
 
                                 System.out.println(hourWorked);
                                 statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).child("hourWorked").setValue(hourWorked);
@@ -920,43 +906,43 @@ public class HomeFragment extends Fragment{
 
     }
 
-    private String calTime(String time1, String time2){
+    private String calTime(String time1, String time2) {
         String[] cutStr1 = time1.split(":");
         String[] cutStr2 = time2.split(":");
         int totalHours = Integer.parseInt(cutStr1[0]) + Integer.parseInt(cutStr2[0]);
         int totalMinutes = Integer.parseInt(cutStr1[1]) + Integer.parseInt(cutStr2[1]);
 
         if (totalMinutes >= 60) {
-            totalHours ++;
+            totalHours++;
             totalMinutes = totalMinutes % 60;
         }
-        if(totalMinutes < 10){
+        if (totalMinutes < 10) {
             return totalHours + ":0" + totalMinutes;
         }
         return totalHours + ":" + totalMinutes;
     }
 
-    private void getLocation(){
-        if(ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+    private void getLocation() {
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-            if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 locationListener = new MyLocationListener();
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
 
-            }else{
-                Toast.makeText(getActivity(),"Enable GPS!!",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getActivity(), "Enable GPS!!", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
             }
-        }
-        else{
+        } else {
             RequestPermissions();
         }
 
     }
 
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
+
     public boolean CheckPermissions() {
         int result = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), CAMERA);
         return result == PackageManager.PERMISSION_GRANTED;
@@ -984,21 +970,20 @@ public class HomeFragment extends Fragment{
         }
     }
 
-    private class MyLocationListener implements LocationListener{
+    private class MyLocationListener implements LocationListener {
         @Override
         public void onLocationChanged(@NonNull Location location) {
-            Log.v("location",String.valueOf(location.getLongitude()));
-            Geocoder geocoder = new Geocoder(getActivity(),Locale.getDefault());
+            Log.v("location", String.valueOf(location.getLongitude()));
+            Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
             List<Address> addressList;
             try {
-                addressList = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                if(addressList != null){
+                addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                if (addressList != null) {
                     currentLocation = addressList.get(0).getAddressLine(0);
                     txtNameUser.setText(currentLocation);
-                    Toast.makeText(getActivity(),"add: "+currentLocation,Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(getActivity(),"not found",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "add: " + currentLocation, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "not found", Toast.LENGTH_SHORT).show();
                 }
             } catch (IOException e) {
                 e.printStackTrace();

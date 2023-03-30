@@ -17,16 +17,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
-import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-
-import java.util.concurrent.TimeUnit;
 
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
@@ -36,9 +32,9 @@ public class ConfirmOTPActivity extends AppCompatActivity {
     PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
     PhoneAuthProvider.ForceResendingToken token;
     Button btn_confirmOtp;
-    TextView nofi3,btn_resendCode;
-    EditText editTextInput1,editTextInput2,editTextInput3,
-            editTextInput4,editTextInput5,editTextInput6;
+    TextView nofi3, btn_resendCode;
+    EditText editTextInput1, editTextInput2, editTextInput3,
+            editTextInput4, editTextInput5, editTextInput6;
 
     String mPhone, mVerificationId;
     SharedPreferences sharedPreferences;
@@ -60,7 +56,7 @@ public class ConfirmOTPActivity extends AppCompatActivity {
         mPhone = getIntent().getStringExtra("phone");
         mVerificationId = getIntent().getStringExtra("verificationId");
 
-        nofi3.setText("We have sent you an SMS with the code to "+mPhone);
+        nofi3.setText("We have sent you an SMS with the code to " + mPhone);
 
 //        btn_resendCode.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -113,7 +109,7 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(editTextInput1.getText().toString().length()==1) {
+                if (editTextInput1.getText().toString().length() == 1) {
                     editTextInput2.requestFocus();
                 }
             }
@@ -132,7 +128,7 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(editTextInput2.getText().toString().length()==1) {
+                if (editTextInput2.getText().toString().length() == 1) {
                     editTextInput3.requestFocus();
                 }
             }
@@ -151,7 +147,7 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(editTextInput3.getText().toString().length()==1) {
+                if (editTextInput3.getText().toString().length() == 1) {
                     editTextInput4.requestFocus();
                 }
             }
@@ -170,7 +166,7 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(editTextInput4.getText().toString().length()==1){
+                if (editTextInput4.getText().toString().length() == 1) {
                     editTextInput5.requestFocus();
                 }
             }
@@ -189,7 +185,7 @@ public class ConfirmOTPActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(editTextInput5.getText().toString().length()==1){
+                if (editTextInput5.getText().toString().length() == 1) {
                     editTextInput6.requestFocus();
                 }
             }
@@ -198,43 +194,43 @@ public class ConfirmOTPActivity extends AppCompatActivity {
         btn_confirmOtp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(editTextInput1.getText().toString().isEmpty()){
+                if (editTextInput1.getText().toString().isEmpty()) {
                     editTextInput1.setError("Required");
                     return;
                 }
-                if(editTextInput2.getText().toString().isEmpty()){
+                if (editTextInput2.getText().toString().isEmpty()) {
                     editTextInput2.setError("Required");
                     return;
                 }
-                if(editTextInput3.getText().toString().isEmpty()){
+                if (editTextInput3.getText().toString().isEmpty()) {
                     editTextInput3.setError("Required");
                     return;
                 }
-                if(editTextInput4.getText().toString().isEmpty()){
+                if (editTextInput4.getText().toString().isEmpty()) {
                     editTextInput4.setError("Required");
                     return;
                 }
-                if(editTextInput5.getText().toString().isEmpty()){
+                if (editTextInput5.getText().toString().isEmpty()) {
                     editTextInput5.setError("Required");
                     return;
                 }
-                if(editTextInput6.getText().toString().isEmpty()){
+                if (editTextInput6.getText().toString().isEmpty()) {
                     editTextInput6.setError("Required");
                     return;
                 }
 
-                String code=
-                        editTextInput1.getText().toString()+
-                                editTextInput2.getText().toString()+
-                                editTextInput3.getText().toString()+
-                                editTextInput4.getText().toString()+
-                                editTextInput5.getText().toString()+
+                String code =
+                        editTextInput1.getText().toString() +
+                                editTextInput2.getText().toString() +
+                                editTextInput3.getText().toString() +
+                                editTextInput4.getText().toString() +
+                                editTextInput5.getText().toString() +
                                 editTextInput6.getText().toString();
                 PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
                 signInWithPhoneAuthCredential(credential);
             }
         });
-        
+
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
@@ -245,16 +241,15 @@ public class ConfirmOTPActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = task.getResult().getUser();
                             SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putBoolean("otp",true);
+                            editor.putBoolean("otp", true);
                             editor.apply();
 
-                            if(loginUser == null){
-                                Intent goToForgetPasswordActivity = new Intent(ConfirmOTPActivity.this,ForgetPasswordActivity.class);
-                                goToForgetPasswordActivity.putExtra("forgetPhone",mPhone);
+                            if (loginUser == null) {
+                                Intent goToForgetPasswordActivity = new Intent(ConfirmOTPActivity.this, ForgetPasswordActivity.class);
+                                goToForgetPasswordActivity.putExtra("forgetPhone", mPhone);
                                 startActivity(goToForgetPasswordActivity);
                                 finish();
-                            }
-                            else {
+                            } else {
                                 finish();
                             }
                         } else {

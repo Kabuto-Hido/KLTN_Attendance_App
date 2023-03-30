@@ -21,10 +21,10 @@ public class BeginActivity extends AppCompatActivity {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                startActivity(new Intent(BeginActivity.this,LoginActivity.class));
+                startActivity(new Intent(BeginActivity.this, LoginActivity.class));
                 finish();
             }
-        },1000);
+        }, 1000);
 
 
     }

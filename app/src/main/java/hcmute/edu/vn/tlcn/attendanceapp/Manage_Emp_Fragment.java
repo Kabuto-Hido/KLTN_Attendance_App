@@ -4,11 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +14,11 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.SuccessContinuation;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,8 +32,6 @@ import java.util.ArrayList;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.EmployeeAdapter;
-import hcmute.edu.vn.tlcn.attendanceapp.adapter.MonthlyEmpReportAdapter;
-import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
@@ -98,19 +92,20 @@ public class Manage_Emp_Fragment extends Fragment {
     ArrayList<User> empList = new ArrayList<>();
     ArrayList<User> result;
     FloatingActionButton btnAddEmp;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view =  inflater.inflate(R.layout.fragment_manage__emp_, container, false);
+        view = inflater.inflate(R.layout.fragment_manage__emp_, container, false);
 
-        if(User_singeton.getInstance().getUser() == null) {
+        if (User_singeton.getInstance().getUser() == null) {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
         }
 
         mapping();
 
-        employeeAdapter = new EmployeeAdapter(getActivity(),R.layout.emp_row,empList,Manage_Emp_Fragment.this);
+        employeeAdapter = new EmployeeAdapter(getActivity(), R.layout.emp_row, empList, Manage_Emp_Fragment.this);
         listviewEmp.setAdapter(employeeAdapter);
 
         btnBackPageMngEmp.setOnClickListener(new View.OnClickListener() {
@@ -152,13 +147,13 @@ public class Manage_Emp_Fragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String keyword) {
                 result = new ArrayList<>();
-                for(User u : empList){
-                    if(u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
-                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())){
+                for (User u : empList) {
+                    if (u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())) {
                         result.add(u);
                     }
                 }
-                ((EmployeeAdapter)listviewEmp.getAdapter()).update(result);
+                ((EmployeeAdapter) listviewEmp.getAdapter()).update(result);
                 return false;
             }
         });
@@ -168,7 +163,7 @@ public class Manage_Emp_Fragment extends Fragment {
         return view;
     }
 
-    private void mapping(){
+    private void mapping() {
         btnBackPageMngEmp = (ImageView) view.findViewById(R.id.btnBackPageMngEmp);
         listviewEmp = (ListView) view.findViewById(R.id.listviewEmp);
         btnAddEmp = (FloatingActionButton) view.findViewById(R.id.btnAddEmp);
@@ -177,10 +172,10 @@ public class Manage_Emp_Fragment extends Fragment {
         searchEmp = (SearchView) view.findViewById(R.id.searchEmp);
     }
 
-    private void getListEmp(){
-        if(result != null){
+    private void getListEmp() {
+        if (result != null) {
             result.clear();
-            ((EmployeeAdapter)listviewEmp.getAdapter()).update(result);
+            ((EmployeeAdapter) listviewEmp.getAdapter()).update(result);
         }
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("users");
@@ -188,17 +183,16 @@ public class Manage_Emp_Fragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 empList.clear();
-                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
                     empList.add(user);
                 }
                 employeeAdapter.notifyDataSetChanged();
 
-                if(empList.size() == 0){
+                if (empList.size() == 0) {
                     textviewNoti.setVisibility(View.VISIBLE);
                     listviewEmp.setVisibility(View.INVISIBLE);
-                }
-                else{
+                } else {
                     textviewNoti.setVisibility(View.INVISIBLE);
                     listviewEmp.setVisibility(View.VISIBLE);
                 }
@@ -211,9 +205,9 @@ public class Manage_Emp_Fragment extends Fragment {
         });
     }
 
-    public void dialogResetPass(User user){
+    public void dialogResetPass(User user) {
         AlertDialog.Builder dialogResetPass = new AlertDialog.Builder(getActivity());
-        dialogResetPass.setMessage("Do you sure want to reset password for employee have phone "+user.getPhone()+" ?");
+        dialogResetPass.setMessage("Do you sure want to reset password for employee have phone " + user.getPhone() + " ?");
         dialogResetPass.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -227,15 +221,14 @@ public class Manage_Emp_Fragment extends Fragment {
                 userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.hasChild(user.getPhone())) {
+                        if (snapshot.hasChild(user.getPhone())) {
                             userRef.child(user.getPhone()).setValue(user);
-                            Toast.makeText(getActivity(),"New " + user.getPhone()
-                                    +"'s password is 123456",Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "New " + user.getPhone()
+                                    + "'s password is 123456", Toast.LENGTH_SHORT).show();
 
                             dialog.dismiss();
 
-                        }
-                        else{
+                        } else {
                             Toast.makeText(getContext(), "User not exist !", Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
                         }
@@ -260,9 +253,9 @@ public class Manage_Emp_Fragment extends Fragment {
         dialogResetPass.show();
     }
 
-    public void DialogEmpDelete(User user){
+    public void DialogEmpDelete(User user) {
         AlertDialog.Builder dialogDelete = new AlertDialog.Builder(getActivity());
-        dialogDelete.setMessage("Do you want to delete employee have phone "+user.getPhone()+" ?");
+        dialogDelete.setMessage("Do you want to delete employee have phone " + user.getPhone() + " ?");
         dialogDelete.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -280,7 +273,7 @@ public class Manage_Emp_Fragment extends Fragment {
                                         .addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                     String reqId = dataSnapshot.getKey();
                                                     dayOffReportRef.child(reqId).removeValue();
                                                 }
@@ -299,9 +292,9 @@ public class Manage_Emp_Fragment extends Fragment {
                                 statisticRef.child(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        for(DataSnapshot yearSnapshot: snapshot.getChildren()){
+                                        for (DataSnapshot yearSnapshot : snapshot.getChildren()) {
                                             String year = yearSnapshot.getKey();
-                                            for(DataSnapshot monthSnapshot: yearSnapshot.getChildren()){
+                                            for (DataSnapshot monthSnapshot : yearSnapshot.getChildren()) {
                                                 String month = monthSnapshot.getKey();
                                                 Statistic statistic = monthSnapshot.getValue(Statistic.class);
 
@@ -316,7 +309,7 @@ public class Manage_Emp_Fragment extends Fragment {
                                                                 int totalAbsentWithoutPer;
 
                                                                 Statistic monthStatistic = snapshot.getValue(Statistic.class);
-                                                                if(monthStatistic!=null) {
+                                                                if (monthStatistic != null) {
                                                                     totalOnTime = monthStatistic.getOnTime() - statistic.getOnTime();
                                                                     monthStatistic.setOnTime(totalOnTime);
 
@@ -359,15 +352,15 @@ public class Manage_Emp_Fragment extends Fragment {
 
                                                 getListEmp();
                                                 dialog.dismiss();
-                                                Toast.makeText(getActivity(),"Delete successful!!",Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity(), "Delete successful!!", Toast.LENGTH_SHORT).show();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Log.d("deleteEmp",e.getMessage());
+                                                Log.d("deleteEmp", e.getMessage());
                                                 dialog.dismiss();
-                                                Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
                             }
@@ -375,9 +368,9 @@ public class Manage_Emp_Fragment extends Fragment {
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.d("deleteEmp",e.getMessage());
+                                Log.d("deleteEmp", e.getMessage());
                                 dialog.dismiss();
-                                Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
             }

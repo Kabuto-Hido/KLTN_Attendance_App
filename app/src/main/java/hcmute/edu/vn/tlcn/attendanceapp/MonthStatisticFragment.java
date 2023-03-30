@@ -100,7 +100,7 @@ public class MonthStatisticFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 MenuStatisticFragment menuStatisticFragment = new MenuStatisticFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,menuStatisticFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, menuStatisticFragment).commit();
             }
         });
 
@@ -115,20 +115,20 @@ public class MonthStatisticFragment extends Fragment {
                         AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        calendar.set(year,month,dayOfMonth);
+                        calendar.set(year, month, dayOfMonth);
                         SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
                         SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
                         String yearGet = yearFormat.format(calendar.getTime());
                         String monthGet = monthFormat.format(calendar.getTime());
 
-                        txtChooseMonth.setText(monthGet+"/"+yearGet);
-                        putDataToView(yearGet,monthGet);
+                        txtChooseMonth.setText(monthGet + "/" + yearGet);
+                        putDataToView(yearGet, monthGet);
                     }
-                },year,month,date){
+                }, year, month, date) {
                     @Override
                     protected void onCreate(Bundle savedInstanceState) {
                         super.onCreate(savedInstanceState);
-                        getDatePicker().findViewById(getResources().getIdentifier("day","id","android")).setVisibility(View.GONE);
+                        getDatePicker().findViewById(getResources().getIdentifier("day", "id", "android")).setVisibility(View.GONE);
                     }
                 };
                 monthDatePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
@@ -143,14 +143,14 @@ public class MonthStatisticFragment extends Fragment {
         String monthCurrent = monthFormat.format(currentTime);
         String yearCurrent = yearFormat.format(currentTime);
 
-        txtChooseMonth.setText(monthCurrent+"/"+yearCurrent);
-        putDataToView(yearCurrent,monthCurrent);
+        txtChooseMonth.setText(monthCurrent + "/" + yearCurrent);
+        putDataToView(yearCurrent, monthCurrent);
 
         return view;
 
     }
 
-    private void putDataToView(String yearCurrent, String monthCurrent){
+    private void putDataToView(String yearCurrent, String monthCurrent) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference statisticRef = database.getReference("statistic");
         statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -159,18 +159,18 @@ public class MonthStatisticFragment extends Fragment {
                 DataSnapshot dataSnapshot = snapshot.child(yearCurrent).child(monthCurrent);
                 Statistic statistic = dataSnapshot.getValue(Statistic.class);
                 ArrayList<PieEntry> entries = new ArrayList<>();
-                if(statistic!=null){
+                if (statistic != null) {
                     entries.add(new PieEntry(statistic.getOnTime(), "Attendance On Time"));
                     entries.add(new PieEntry(statistic.getLate(), "Attendance Late"));
                     entries.add(new PieEntry(statistic.getAbsentWithPer(), "Absent With Permission"));
                     entries.add(new PieEntry(statistic.getAbsentWithoutPer(), "Absent Without Permission"));
 
                     ArrayList<Integer> colors = new ArrayList<>();
-                    for (int color: ColorTemplate.MATERIAL_COLORS) {
+                    for (int color : ColorTemplate.MATERIAL_COLORS) {
                         colors.add(color);
                     }
 
-                    for (int color: ColorTemplate.VORDIPLOM_COLORS) {
+                    for (int color : ColorTemplate.VORDIPLOM_COLORS) {
                         colors.add(color);
                     }
 
@@ -189,16 +189,16 @@ public class MonthStatisticFragment extends Fragment {
 
                     pieChartMonth.animateY(1400, Easing.EaseInOutQuad);
 
-                    setupPieChart("Attendance Statistic for "+monthCurrent+"/"+yearCurrent);
+                    setupPieChart("Attendance Statistic for " + monthCurrent + "/" + yearCurrent);
 
-                }
-                else{
+                } else {
                     entries.clear();
                     pieChartMonth.clear();
-                    pieChartMonth.setNoDataText("No data available in "+monthCurrent+"/"+yearCurrent);
+                    pieChartMonth.setNoDataText("No data available in " + monthCurrent + "/" + yearCurrent);
                     pieChartMonth.invalidate();
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }

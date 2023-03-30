@@ -4,14 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,8 +18,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
-import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 /**
@@ -75,6 +72,7 @@ public class AdminSettingsFragment extends Fragment {
             txtAdminLogOut, txtListResignations, txtQuantityResignation, txtAdminQRCode;
     User_singeton user_singeton;
     SharedPreferences sharedPreferences;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -82,12 +80,11 @@ public class AdminSettingsFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_admin_settings, container, false);
         user_singeton = User_singeton.getInstance();
 
-        if(user_singeton.getUser() == null)
-        {
+        if (user_singeton.getUser() == null) {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
         }
-        
+
         mapping();
         getData();
 
@@ -95,7 +92,7 @@ public class AdminSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Manage_Emp_Fragment manage_emp_fragment = new Manage_Emp_Fragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,manage_emp_fragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, manage_emp_fragment).commit();
             }
         });
 
@@ -103,7 +100,7 @@ public class AdminSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ProfileInformationFragment profileInformationFragment = new ProfileInformationFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,profileInformationFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, profileInformationFragment).commit();
             }
         });
 
@@ -111,7 +108,7 @@ public class AdminSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ChangePasswordFragment changePasswordFragment = new ChangePasswordFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,changePasswordFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, changePasswordFragment).commit();
             }
         });
 
@@ -136,7 +133,7 @@ public class AdminSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ListResignationFragment listResignationFragment = new ListResignationFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,listResignationFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, listResignationFragment).commit();
 
             }
         });
@@ -145,7 +142,7 @@ public class AdminSettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 QRCodeFragment qrCodeFragment = new QRCodeFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,qrCodeFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, qrCodeFragment).commit();
 
             }
         });
@@ -160,7 +157,7 @@ public class AdminSettingsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long amountWaitingForm = snapshot.getChildrenCount();
-                if(amountWaitingForm != 0L){
+                if (amountWaitingForm != 0L) {
                     txtQuantityResignation.setText(String.valueOf(amountWaitingForm));
                     txtQuantityResignation.setVisibility(View.VISIBLE);
                 }
@@ -173,7 +170,7 @@ public class AdminSettingsFragment extends Fragment {
         });
     }
 
-    private void mapping(){
+    private void mapping() {
         txtEmployee = (TextView) view.findViewById(R.id.txtEmployee);
         txtAdminProfile = (TextView) view.findViewById(R.id.txtAdminProfile);
         txtAdminChangePassword = (TextView) view.findViewById(R.id.txtAdminChangePassword);

@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +42,7 @@ import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
  * Use the {@link AttendanceCalendarFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AttendanceCalendarFragment extends Fragment implements CalendarAdapter.OnItemListener{
+public class AttendanceCalendarFragment extends Fragment implements CalendarAdapter.OnItemListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -130,14 +128,14 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
         monthYearTV.setText(monthYearFromDate(selectedDate));
         LinkedHashMap<String, String> dayInMonth = daysInMonthMap(selectedDate);
 
-        calendarAdapter = new CalendarAdapter(dayInMonth,getContext(),this);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(),7);
+        calendarAdapter = new CalendarAdapter(dayInMonth, getContext(), this);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 7);
         calendarRecyclerView.setLayoutManager(layoutManager);
         calendarRecyclerView.setAdapter(calendarAdapter);
     }
 
-    private LinkedHashMap<String,String> daysInMonthMap(LocalDate date){
-        LinkedHashMap<String,String> daysInMonthMap = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> daysInMonthMap(LocalDate date) {
+        LinkedHashMap<String, String> daysInMonthMap = new LinkedHashMap<>();
         YearMonth yearMonth = YearMonth.from(date);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
@@ -148,16 +146,14 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
         int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
         int maxDayInMonth = daysInMonth + dayOfWeek;
 
-        for(int i = 1; i<=42; i++){
-            if(i <= dayOfWeek){
-                daysInMonthMap.put(String.valueOf(i-dayOfWeek),"");
-            }
-            else if(i <= maxDayInMonth){
+        for (int i = 1; i <= 42; i++) {
+            if (i <= dayOfWeek) {
+                daysInMonthMap.put(String.valueOf(i - dayOfWeek), "");
+            } else if (i <= maxDayInMonth) {
                 String dateReport;
-                if(String.valueOf(i - dayOfWeek).length()==1){
+                if (String.valueOf(i - dayOfWeek).length() == 1) {
                     dateReport = yM + "-0" + (i - dayOfWeek);
-                }
-                else {
+                } else {
                     dateReport = yM + "-" + (i - dayOfWeek);
                 }
 
@@ -165,62 +161,59 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
                 DatabaseReference recordRef = database.getReference("record");
                 int finalI = i;
                 recordRef.child(user.getPhone()).addValueEventListener(new ValueEventListener() {
-                            @SuppressLint("NotifyDataSetChanged")
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                //check-in
-                                DataSnapshot dataSnapshot = snapshot.child(dateReport).child("checkIn");
-                                Record record = dataSnapshot.getValue(Record.class);
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        //check-in
+                        DataSnapshot dataSnapshot = snapshot.child(dateReport).child("checkIn");
+                        Record record = dataSnapshot.getValue(Record.class);
 
-                                String getDate;
-                                String day;
-                                if (record != null) {
-                                    getDate = record.getDay();
-                                    if(getDate.charAt(8) == '0'){
-                                        day = getDate.substring(9,10);
-                                    }else {
-                                        day = getDate.substring(8, 10);
-                                    }
-                                    boolean equals = day.equals(String.valueOf(finalI - dayOfWeek));
-                                    if(equals){
-                                        daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),record.getStatus());
-                                    }
-                                    else{
-                                        daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),"not yet");
-                                    }
-                                }
-                                else{
-                                    DataSnapshot dataSnapshot3 = snapshot.child(dateReport).child("absent");
-                                    Record absentRecord = dataSnapshot3.getValue(Record.class);
-                                    if (absentRecord != null) {
-                                        getDate = absentRecord.getDay();
-                                        if(getDate.charAt(8) == '0'){
-                                            day = getDate.substring(9,10);
-                                        }else {
-                                            day = getDate.substring(8, 10);
-                                        }
-                                        boolean equals = day.equals(String.valueOf(finalI - dayOfWeek));
-                                        if(equals){
-                                            daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),absentRecord.getStatus());
-                                        }
-                                        else{
-                                            daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),"not yet");
-                                        }
-                                    }
-                                    else{
-                                        daysInMonthMap.put(String.valueOf(finalI -dayOfWeek),"not yet");
-                                    }
-
-                                }
-
-                                calendarAdapter.notifyDataSetChanged();
-
+                        String getDate;
+                        String day;
+                        if (record != null) {
+                            getDate = record.getDay();
+                            if (getDate.charAt(8) == '0') {
+                                day = getDate.substring(9, 10);
+                            } else {
+                                day = getDate.substring(8, 10);
                             }
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
+                            boolean equals = day.equals(String.valueOf(finalI - dayOfWeek));
+                            if (equals) {
+                                daysInMonthMap.put(String.valueOf(finalI - dayOfWeek), record.getStatus());
+                            } else {
+                                daysInMonthMap.put(String.valueOf(finalI - dayOfWeek), "not yet");
                             }
-                        });
+                        } else {
+                            DataSnapshot dataSnapshot3 = snapshot.child(dateReport).child("absent");
+                            Record absentRecord = dataSnapshot3.getValue(Record.class);
+                            if (absentRecord != null) {
+                                getDate = absentRecord.getDay();
+                                if (getDate.charAt(8) == '0') {
+                                    day = getDate.substring(9, 10);
+                                } else {
+                                    day = getDate.substring(8, 10);
+                                }
+                                boolean equals = day.equals(String.valueOf(finalI - dayOfWeek));
+                                if (equals) {
+                                    daysInMonthMap.put(String.valueOf(finalI - dayOfWeek), absentRecord.getStatus());
+                                } else {
+                                    daysInMonthMap.put(String.valueOf(finalI - dayOfWeek), "not yet");
+                                }
+                            } else {
+                                daysInMonthMap.put(String.valueOf(finalI - dayOfWeek), "not yet");
+                            }
+
+                        }
+
+                        calendarAdapter.notifyDataSetChanged();
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         }
         return daysInMonthMap;
@@ -234,7 +227,7 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
         btnNextMonth = view.findViewById(R.id.btnNextMonth);
     }
 
-    private String monthYearFromDate(LocalDate date){
+    private String monthYearFromDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM yyyy");
         return date.format(formatter);
     }
@@ -242,19 +235,18 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
 
     @Override
     public void onItemClick(int pos, String dayText) {
-        if(!dayText.equals("")){
+        if (!dayText.equals("")) {
             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM");
             String yearMonth = selectedDate.format(dateFormat);
             System.out.println(yearMonth);
             String dateSelect;
-            if(dayText.length()==1){
+            if (dayText.length() == 1) {
                 dateSelect = yearMonth + "-0" + dayText;
-            }
-            else {
+            } else {
                 dateSelect = yearMonth + "-" + dayText;
             }
 
-            Dialog dialog = new Dialog(getActivity(),R.style.AlertDialogTheme);
+            Dialog dialog = new Dialog(getActivity(), R.style.AlertDialogTheme);
             dialog.setContentView(R.layout.layout_date_info_dialog);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -282,7 +274,7 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
                     DataSnapshot dataSnapshot2 = snapshot.child(dateSelect).child("checkOut");
                     Record checkOutRecord = dataSnapshot2.getValue(Record.class);
 
-                    textTitle.setText(dayText+" "+ monthYearFromDate(selectedDate));
+                    textTitle.setText(dayText + " " + monthYearFromDate(selectedDate));
                     if (checkInRecord != null && checkOutRecord != null) {
                         String timeIn = checkInRecord.getTime();
                         String timeOut = checkOutRecord.getTime();
@@ -296,28 +288,25 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
                             long diff = out.getTime() - in.getTime();
                             long diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diff);
                             long diffHours = TimeUnit.MILLISECONDS.toHours(diff);
-                            long addMinutes = diffMinutes - (diffHours*60);
+                            long addMinutes = diffMinutes - (diffHours * 60);
 
-                            if(addMinutes<10){
-                                workTime.setText(diffHours + "h 0"+addMinutes + "m");
-                            }
-                            else {
+                            if (addMinutes < 10) {
+                                workTime.setText(diffHours + "h 0" + addMinutes + "m");
+                            } else {
                                 workTime.setText(diffHours + "h " + addMinutes + "m");
                             }
                             dialog.show();
-                        }catch (ParseException e) {
+                        } catch (ParseException e) {
                             e.printStackTrace();
                         }
 
-                    }
-                    else if(checkInRecord != null){
-                        Toast.makeText(getActivity(),"Please check out to see details",Toast.LENGTH_SHORT).show();
+                    } else if (checkInRecord != null) {
+                        Toast.makeText(getActivity(), "Please check out to see details", Toast.LENGTH_SHORT).show();
                         HomeFragment homeFragment = new HomeFragment();
                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, homeFragment).commit();
 
-                    }
-                    else{
-                        Toast.makeText(getActivity(), dayText+" "+ monthYearFromDate(selectedDate), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getActivity(), dayText + " " + monthYearFromDate(selectedDate), Toast.LENGTH_SHORT).show();
                     }
 
 
@@ -328,8 +317,6 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
 
                 }
             });
-
-
 
 
             //Toast.makeText(getActivity(), dayText+" "+ monthYearFromDate(selectedDate), Toast.LENGTH_SHORT).show();

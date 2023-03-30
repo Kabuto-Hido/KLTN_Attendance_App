@@ -1,9 +1,8 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +11,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,15 +21,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
+import hcmute.edu.vn.tlcn.attendanceapp.Utility.InternetCheckService;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.RespondedReqAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.WaitingRequestAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
-import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -41,6 +40,7 @@ public class ListSendedRequestActivity extends AppCompatActivity {
     WaitingRequestAdapter waitingRequestAdapter;
     RespondedReqAdapter respondedReqAdapter;
     FirebaseDatabase database;
+    InternetCheckService internetCheckService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +50,11 @@ public class ListSendedRequestActivity extends AppCompatActivity {
 
         mapping();
 
+        internetCheckService = new InternetCheckService();
+
         arrSentReq = new ArrayList<>();
-        waitingRequestAdapter = new WaitingRequestAdapter(arrSentReq,ListSendedRequestActivity.this,R.layout.waiting_req_row);
-        respondedReqAdapter = new RespondedReqAdapter(arrSentReq,ListSendedRequestActivity.this,R.layout.responded_req_row);
+        waitingRequestAdapter = new WaitingRequestAdapter(arrSentReq, ListSendedRequestActivity.this, R.layout.waiting_req_row);
+        respondedReqAdapter = new RespondedReqAdapter(arrSentReq, ListSendedRequestActivity.this, R.layout.responded_req_row);
 
         getWaitingData();
 
@@ -83,19 +85,18 @@ public class ListSendedRequestActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         arrSentReq.clear();
-                        for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             DayOffRequest dayOffRequest = dataSnapshot.getValue(DayOffRequest.class);
                             System.out.println(dayOffRequest.getStatus());
-                            if(dayOffRequest.getStatus().equals("Accept") || dayOffRequest.getStatus().equals("Deny")) {
+                            if (dayOffRequest.getStatus().equals("Accept") || dayOffRequest.getStatus().equals("Deny")) {
                                 arrSentReq.add(dayOffRequest);
                             }
                         }
-                        if(arrSentReq.size() == 0){
+                        if (arrSentReq.size() == 0) {
                             txtNoRequest.setText("No responded");
                             txtNoRequest.setVisibility(View.VISIBLE);
                             lstSentReq.setVisibility(View.INVISIBLE);
-                        }
-                        else{
+                        } else {
                             txtNoRequest.setVisibility(View.INVISIBLE);
                             lstSentReq.setVisibility(View.VISIBLE);
                         }
@@ -105,7 +106,7 @@ public class ListSendedRequestActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Log.v("",error.getMessage());
+                        Log.v("", error.getMessage());
                     }
                 });
                 txtResponded.setBackgroundResource(R.drawable.top_bottom_border);
@@ -117,26 +118,45 @@ public class ListSendedRequestActivity extends AppCompatActivity {
 
     }
 
-    private void getWaitingData(){
+    @Override
+    protected void onStart() {
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(internetCheckService);
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
+    }
+
+    private void getWaitingData() {
         database = FirebaseDatabase.getInstance();
         DatabaseReference waitingRef = database.getReference("dayoffreport");
         waitingRef.orderByChild("userPhone").startAt(user.getPhone()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 arrSentReq.clear();
-                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     DayOffRequest dayOffRequest = dataSnapshot.getValue(DayOffRequest.class);
-                    if(dayOffRequest.getStatus().equals("waiting")) {
+                    if (dayOffRequest.getStatus().equals("waiting")) {
                         arrSentReq.add(dayOffRequest);
                     }
 
                 }
-                if(arrSentReq.size() == 0){
+                if (arrSentReq.size() == 0) {
                     txtNoRequest.setText("No waiting request");
                     txtNoRequest.setVisibility(View.VISIBLE);
                     lstSentReq.setVisibility(View.INVISIBLE);
-                }
-                else{
+                } else {
                     txtNoRequest.setVisibility(View.INVISIBLE);
                     lstSentReq.setVisibility(View.VISIBLE);
                 }
@@ -146,31 +166,31 @@ public class ListSendedRequestActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.v("",error.getMessage());
+                Log.v("", error.getMessage());
             }
         });
     }
 
-    public void cancelWaitingRequest(DayOffRequest waitingReq){
+    public void cancelWaitingRequest(DayOffRequest waitingReq) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
 
         dayOffReportRef.orderByChild("status").startAt("waiting").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     DayOffRequest dayOff = dataSnapshot.getValue(DayOffRequest.class);
                     String phone = dayOff.getUserPhone();
                     String day = dayOff.getDateOff();
 
-                    if(phone.equals(waitingReq.getUserPhone())
-                            && day.equals(waitingReq.getDateOff())){
+                    if (phone.equals(waitingReq.getUserPhone())
+                            && day.equals(waitingReq.getDateOff())) {
                         String reqId = dataSnapshot.getKey();
                         dayOffReportRef.child(reqId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
                                 getWaitingData();
-                                Toast.makeText(ListSendedRequestActivity.this, "Cancel request day: "+day+" successfully !", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ListSendedRequestActivity.this, "Cancel request day: " + day + " successfully !", Toast.LENGTH_SHORT).show();
                             }
                         });
                         break;

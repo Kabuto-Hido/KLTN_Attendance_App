@@ -5,11 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -102,8 +100,7 @@ public class ChangePasswordFragment extends Fragment {
 
                 if (user.getRole() == 0) {
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, adminSettingsFragment).commit();
-                }
-                else{
+                } else {
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, settingsFragment).commit();
 
                 }
@@ -113,13 +110,12 @@ public class ChangePasswordFragment extends Fragment {
         txtShowPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(txtShowPassword.getText().toString().equals("SHOW")) {
+                if (txtShowPassword.getText().toString().equals("SHOW")) {
                     edittextCurrentPassword.setInputType(1);
                     edittextNewPassword.setInputType(1);
                     edittextConfirmNewPassword.setInputType(1);
                     txtShowPassword.setText("HIDE");
-                }
-                else{
+                } else {
                     edittextCurrentPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
                     edittextNewPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
                     edittextConfirmNewPassword.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD | InputType.TYPE_CLASS_TEXT);
@@ -139,23 +135,21 @@ public class ChangePasswordFragment extends Fragment {
                 newPassword = edittextNewPassword.getText().toString();
                 String confirmNewPassword = edittextConfirmNewPassword.getText().toString();
 
-                BCrypt.Result result = BCrypt.verifyer().verify(currentPassword.toCharArray(),user.getPassword());
+                BCrypt.Result result = BCrypt.verifyer().verify(currentPassword.toCharArray(), user.getPassword());
 
-                if(!result.verified){
+                if (!result.verified) {
                     progressDialog.dismiss();
                     Toast.makeText(getActivity(), "Incorrect current password!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(newPassword.length() < 6) {
+                if (newPassword.length() < 6) {
                     progressDialog.dismiss();
                     Toast.makeText(getActivity(), "Password too weak !", Toast.LENGTH_SHORT).show();
-                }
-                else if(!newPassword.equals(confirmNewPassword)){
+                } else if (!newPassword.equals(confirmNewPassword)) {
                     progressDialog.dismiss();
                     Toast.makeText(getActivity(), "The confirm password does not match!!", Toast.LENGTH_SHORT).show();
-                }
-                else{
+                } else {
                     progressDialog.dismiss();
                     startActivity(new Intent(getActivity(), SendOTPActivity.class));
 
@@ -170,8 +164,8 @@ public class ChangePasswordFragment extends Fragment {
     public void onResume() {
         super.onResume();
         sharedPreferences = this.getActivity().getSharedPreferences("isVerifyOtp", Context.MODE_MULTI_PROCESS);
-        boolean otp = sharedPreferences.getBoolean("otp",false);
-        if(otp) {
+        boolean otp = sharedPreferences.getBoolean("otp", false);
+        if (otp) {
             String newHashPass = BCrypt.withDefaults().hashToString(12, newPassword.toCharArray());
 
             user.setPassword(newHashPass);

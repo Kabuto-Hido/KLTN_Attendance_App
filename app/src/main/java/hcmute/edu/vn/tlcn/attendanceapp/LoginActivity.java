@@ -1,15 +1,11 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -41,15 +37,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import hcmute.edu.vn.tlcn.attendanceapp.Utility.InternetCheckService;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText edittextEmpCode,edittextPassword;
+    EditText edittextEmpCode, edittextPassword;
     TextView txtForgotPassword, txtLoginWithQRCode;
     Button btnLogin;
-
+    InternetCheckService internetCheckService;
     ProgressDialog progressDialog;
 
     @Override
@@ -63,12 +60,12 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = (Button) findViewById(R.id.btnLogin);
         txtLoginWithQRCode = (TextView) findViewById(R.id.txtLoginWithQRCode);
 
-        checkInternetIsConnected();
+        internetCheckService = new InternetCheckService();
 
         txtForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this,SendOTPActivity.class));
+                startActivity(new Intent(LoginActivity.this, SendOTPActivity.class));
                 finish();
             }
         });
@@ -92,11 +89,10 @@ public class LoginActivity extends AppCompatActivity {
                 String code = edittextEmpCode.getText().toString();
                 String password = edittextPassword.getText().toString();
 
-                if(code.equals("") || password.equals("") || password.length() < 6)
-                {
+                if (code.equals("") || password.equals("") || password.length() < 6) {
                     progressDialog.dismiss();
                     Toast.makeText(LoginActivity.this, "Invalid input!", Toast.LENGTH_SHORT).show();
-                }else{
+                } else {
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference("users");
 
@@ -104,18 +100,18 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             User_singeton isUser = User_singeton.getInstance();
-                            if(isUser.getUser() != null)
+                            if (isUser.getUser() != null)
                                 return;
-                            if(!snapshot.exists()) {
+                            if (!snapshot.exists()) {
                                 progressDialog.dismiss();
                                 Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
                             }
-                            for(DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 User loginUser = dataSnapshot.getValue(User.class);
                                 String hashPass = loginUser.getPassword();
-                                BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(),hashPass);
+                                BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), hashPass);
 
-                                if(result.verified){
+                                if (result.verified) {
                                     generateQR(loginUser);
                                     myRef.child(loginUser.getPhone()).setValue(loginUser);
                                     User_singeton user_singeton = User_singeton.getInstance();
@@ -124,19 +120,17 @@ public class LoginActivity extends AppCompatActivity {
 
                                     progressDialog.dismiss();
                                     Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
-                                    if(loginUser.getRole() == 1) {
-                                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
-                                    }
-                                    else{
-                                        startActivity(new Intent(LoginActivity.this,AdminMainActivity.class));
+                                    if (loginUser.getRole() == 1) {
+                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    } else {
+                                        startActivity(new Intent(LoginActivity.this, AdminMainActivity.class));
                                     }
                                     finish();
-                                }
-                                else{
+                                } else {
                                     progressDialog.dismiss();
                                     Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
                                 }
-                                Log.d("tag",loginUser.getPhone());
+                                Log.d("tag", loginUser.getPhone());
                             }
                         }
 
@@ -150,7 +144,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void generateQR(User user){
+    private void generateQR(User user) {
         MultiFormatWriter writer = new MultiFormatWriter();
         try {
             String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
@@ -160,13 +154,13 @@ public class LoginActivity extends AppCompatActivity {
             BarcodeEncoder encoder = new BarcodeEncoder();
             Bitmap bitmap = encoder.createBitmap(matrix);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG,100,stream);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference ref = storage.getReference();
 
-            String url = "images/" + user.getUuid() + "_qrcode" ;
+            String url = "images/" + user.getUuid() + "_qrcode";
 
             UploadTask uploadTask = ref.child(url).putBytes(byteArray);
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -181,40 +175,28 @@ public class LoginActivity extends AppCompatActivity {
 
                 }
             });
-        }catch (WriterException e){
+        } catch (WriterException e) {
             e.printStackTrace();
         }
     }
 
-    public void checkInternetIsConnected(){
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+    @Override
+    protected void onStart() {
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
+        super.onStart();
+    }
 
-        if(networkInfo != null){
-            if(!networkInfo.isConnected()){
-                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                builder.setMessage("Please connect to the internet to proceed futher")
-                        .setCancelable(false)
-                        .setPositiveButton("Connect", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startActivity(new Intent(Settings.ACTION_WIFI_IP_SETTINGS));
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startActivity(new Intent(LoginActivity.this, BeginActivity.class));
-                                finish();
-                            }
-                        });
-            }
-        }
+    @Override
+    protected void onStop() {
+        unregisterReceiver(internetCheckService);
+        super.onStop();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkInternetIsConnected();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
     }
 }

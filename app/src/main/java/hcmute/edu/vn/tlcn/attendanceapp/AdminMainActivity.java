@@ -1,6 +1,8 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.annotation.SuppressLint;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -9,17 +11,43 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class AdminMainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener{
+import hcmute.edu.vn.tlcn.attendanceapp.Utility.InternetCheckService;
+
+public class AdminMainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     BottomNavigationView adminBottomNavigationView;
+    InternetCheckService internetCheckService;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
 
+        internetCheckService = new InternetCheckService();
+
         adminBottomNavigationView = (BottomNavigationView) findViewById(R.id.adminBottomNavigationView);
         adminBottomNavigationView.setOnNavigationItemSelectedListener(this);
         adminBottomNavigationView.setSelectedItemId(R.id.navAdminHome);
+    }
+
+    @Override
+    protected void onStart() {
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        unregisterReceiver(internetCheckService);
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(internetCheckService, intentFilter);
     }
 
     AdminSettingsFragment adminSettingsFragment = new AdminSettingsFragment();

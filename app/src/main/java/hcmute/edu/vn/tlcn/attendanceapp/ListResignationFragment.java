@@ -1,11 +1,6 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,7 +22,6 @@ import java.util.ArrayList;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.ResignationAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
-import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,14 +76,15 @@ public class ListResignationFragment extends Fragment {
     ListView listviewResignation;
     ResignationAdapter adapter;
     ArrayList<DayOffRequest> requestList = new ArrayList<>();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_list_resignation, container, false);
-        
+
         mapping();
 
-        adapter = new ResignationAdapter(getActivity(),R.layout.resignation_row,requestList);
+        adapter = new ResignationAdapter(getActivity(), R.layout.resignation_row, requestList);
         listviewResignation.setAdapter(adapter);
 
         btnBackResignation.setOnClickListener(new View.OnClickListener() {
@@ -96,9 +94,9 @@ public class ListResignationFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, adminSettingsFragment).commit();
             }
         });
-        
+
         putDataToView();
-        
+
         return view;
     }
 
@@ -110,17 +108,16 @@ public class ListResignationFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 requestList.clear();
-                for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     DayOffRequest dayOffRequest = dataSnapshot.getValue(DayOffRequest.class);
                     requestList.add(dayOffRequest);
                 }
                 adapter.notifyDataSetChanged();
 
-                if(requestList.size() == 0){
+                if (requestList.size() == 0) {
                     textviewNotifi.setVisibility(View.VISIBLE);
                     listviewResignation.setVisibility(View.INVISIBLE);
-                }
-                else{
+                } else {
                     textviewNotifi.setVisibility(View.INVISIBLE);
                     listviewResignation.setVisibility(View.VISIBLE);
                 }
@@ -128,7 +125,7 @@ public class ListResignationFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.v("",error.getMessage());
+                Log.v("", error.getMessage());
             }
         });
     }

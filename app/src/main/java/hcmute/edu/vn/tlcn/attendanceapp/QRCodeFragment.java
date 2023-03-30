@@ -1,7 +1,5 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
-import static android.Manifest.permission.CAMERA;
-
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -12,13 +10,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,13 +19,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -46,7 +37,6 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -104,7 +94,8 @@ public class QRCodeFragment extends Fragment {
 
     ImageView btnBackQRCode, idIVQRCode;
     Button btn_recreate_QR, btn_save_QR;
-    View view;User_singeton user_singeton;
+    View view;
+    User_singeton user_singeton;
     User user;
 
     @Override
@@ -127,8 +118,7 @@ public class QRCodeFragment extends Fragment {
 
                 if (user.getRole() == 0) {
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, adminSettingsFragment).commit();
-                }
-                else{
+                } else {
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, settingsFragment).commit();
 
                 }
@@ -145,10 +135,9 @@ public class QRCodeFragment extends Fragment {
         btn_save_QR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(CheckPermissions()){
+                if (CheckPermissions()) {
                     saveImg();
-                }
-                else{
+                } else {
                     RequestPermissions();
                 }
             }
@@ -158,7 +147,7 @@ public class QRCodeFragment extends Fragment {
     }
 
     private void putDataToView() {
-        if(user == null) {
+        if (user == null) {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
         }
@@ -185,7 +174,7 @@ public class QRCodeFragment extends Fragment {
         btn_save_QR = (Button) view.findViewById(R.id.btn_save_QR);
     }
 
-    private void generateQR(User user){
+    private void generateQR(User user) {
         MultiFormatWriter writer = new MultiFormatWriter();
         try {
             String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
@@ -195,13 +184,13 @@ public class QRCodeFragment extends Fragment {
             BarcodeEncoder encoder = new BarcodeEncoder();
             Bitmap bitmap = encoder.createBitmap(matrix);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG,100,stream);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
 
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference ref = storage.getReference();
 
-            String url = "images/" + user.getUuid() + "_qrcode" ;
+            String url = "images/" + user.getUuid() + "_qrcode";
 
             UploadTask uploadTask = ref.child(url).putBytes(byteArray);
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -215,12 +204,13 @@ public class QRCodeFragment extends Fragment {
                     Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-        }catch (WriterException e){
+        } catch (WriterException e) {
             e.printStackTrace();
         }
     }
 
     public static final int REQUEST_STORAGE_CODE = 1;
+
     public boolean CheckPermissions() {
         int result = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -248,35 +238,34 @@ public class QRCodeFragment extends Fragment {
         }
     }
 
-    public void saveImg(){
-        String imageName = user.getUuid()+"_"+System.currentTimeMillis();
+    public void saveImg() {
+        String imageName = user.getUuid() + "_" + System.currentTimeMillis();
 
         Uri imageCollection;
         ContentResolver contentResolver = getActivity().getContentResolver();
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             imageCollection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-        }
-        else {
+        } else {
             imageCollection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         }
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, imageName + ".jpg");
         contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/*");
-        Uri imageUri = contentResolver.insert(imageCollection,contentValues);
+        Uri imageUri = contentResolver.insert(imageCollection, contentValues);
 
         try {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) idIVQRCode.getDrawable();
             Bitmap bitmap = bitmapDrawable.getBitmap();
 
             OutputStream outputStream = contentResolver.openOutputStream(Objects.requireNonNull(imageUri));
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
             Objects.requireNonNull(outputStream);
 
             Toast.makeText(getActivity(), "Image Saved Successfully", Toast.LENGTH_SHORT).show();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(getActivity(), "Image Saved Fail", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }

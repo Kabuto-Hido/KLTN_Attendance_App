@@ -10,12 +10,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,8 +46,6 @@ import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -107,6 +102,7 @@ public class AddEmployee extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
     View view;
     CircleImageView imgAvatarProfile;
     EditText edtPhonenum, edtName, edtBirthday1, edtPassword1;
@@ -148,11 +144,11 @@ public class AddEmployee extends Fragment {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        calendar.set(year,month,dayOfMonth);
+                        calendar.set(year, month, dayOfMonth);
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                         edtBirthday1.setText(format.format(calendar.getTime()));
                     }
-                },year,month,date);
+                }, year, month, date);
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
@@ -188,17 +184,17 @@ public class AddEmployee extends Fragment {
                         Intent intent = new Intent();
                         intent.setType("image/*");
                         intent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(Intent.createChooser(intent,"Select image..."), PICK_IMAGE_REQUEST);
+                        startActivityForResult(Intent.createChooser(intent, "Select image..."), PICK_IMAGE_REQUEST);
                     }
                 });
 
                 camera.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(CheckPermissions()) {
+                        if (CheckPermissions()) {
                             Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                             startActivityForResult(takePicture, 0);
-                        }else {
+                        } else {
                             RequestPermissions();
                         }
                     }
@@ -222,22 +218,21 @@ public class AddEmployee extends Fragment {
                 progressDialog.setMessage("Please wait");
                 progressDialog.show();
 
-                if(validate(phoneNumber,fullName,birthday,password,isRecognizeFace)) {
+                if (validate(phoneNumber, fullName, birthday, password, isRecognizeFace)) {
                     //hash password
                     String hashPass = BCrypt.withDefaults().hashToString(12, password.toCharArray());
 
-                    User user = new User("",fullName, phoneNumber, hashPass, birthday, "", sex, "", 1,"");
+                    User user = new User("", fullName, phoneNumber, hashPass, birthday, "", sex, "", 1, "");
 
                     FirebaseStorage storage = FirebaseStorage.getInstance();
                     StorageReference ref = storage.getReference();
-                    if(filePath == null){
-                        filePath = Uri.parse("android.resource://"+ R.class.getPackage().getName()+"/"+R.drawable.man_placeholder);
+                    if (filePath == null) {
+                        filePath = Uri.parse("android.resource://" + R.class.getPackage().getName() + "/" + R.drawable.man_placeholder);
                     }
                     UploadTask uploadTask;
-                    if(isCamera){
+                    if (isCamera) {
                         uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(byteArray);
-                    }
-                    else {
+                    } else {
                         uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putFile(filePath);
                     }
                     uploadTask
@@ -250,17 +245,16 @@ public class AddEmployee extends Fragment {
                                     userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if(snapshot.hasChild(user.getPhone())) {
+                                            if (snapshot.hasChild(user.getPhone())) {
                                                 Toast.makeText(getContext(), "Phone number is already taken !", Toast.LENGTH_SHORT).show();
                                                 progressDialog.dismiss();
-                                            }
-                                            else{
+                                            } else {
                                                 userRef.orderByKey().limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                             User latestUser = dataSnapshot.getValue(User.class);
-                                                            if(latestUser != null) {
+                                                            if (latestUser != null) {
                                                                 String getNum = latestUser.getUuid().substring(3, 8);
                                                                 user.setUuid("ATD" + increaseOneUnit(getNum));
                                                             }
@@ -283,7 +277,6 @@ public class AddEmployee extends Fragment {
                                                 });
 
 
-
                                             }
                                         }
 
@@ -304,8 +297,7 @@ public class AddEmployee extends Fragment {
                             });
 
 
-                }
-                else{
+                } else {
                     progressDialog.dismiss();
                 }
             }
@@ -317,44 +309,43 @@ public class AddEmployee extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK
                 && data != null && data.getData() != null) {
             isCamera = false;
             filePath = data.getData();
             imgAvatarProfile.setImageURI(filePath);
 
             BitmapDrawable drawable = (BitmapDrawable) imgAvatarProfile.getDrawable();
-            Bitmap bitmapOrigin = Bitmap.createBitmap( drawable.getBitmap());
+            Bitmap bitmapOrigin = Bitmap.createBitmap(drawable.getBitmap());
             //check face
             face_detector(bitmapOrigin);
 
             dialog.dismiss();
-        }
-        else if(requestCode == 0 && resultCode == getActivity().RESULT_OK
-                && data != null){
+        } else if (requestCode == 0 && resultCode == getActivity().RESULT_OK
+                && data != null) {
             isCamera = true;
             Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            selectedImage.compress(Bitmap.CompressFormat.PNG,100,stream);
+            selectedImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byteArray = stream.toByteArray();
 
             //check face
             face_detector(selectedImage);
 
-            Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray,0,byteArray.length);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
             imgAvatarProfile.setImageBitmap(bitmap);
             dialog.dismiss();
         }
     }
 
-    public void face_detector(Bitmap bitmap){
-        InputImage image = InputImage.fromBitmap(bitmap,0);
+    public void face_detector(Bitmap bitmap) {
+        InputImage image = InputImage.fromBitmap(bitmap, 0);
         FaceDetector detector = FaceDetection.getClient();
         detector.process(image)
                 .addOnSuccessListener(new OnSuccessListener<List<Face>>() {
                     @Override
                     public void onSuccess(List<Face> faces) {
-                        if(faces.size() != 0){
+                        if (faces.size() != 0) {
                             isRecognizeFace = true;
                         }
                     }
@@ -362,12 +353,12 @@ public class AddEmployee extends Fragment {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getActivity(),e.getMessage(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private void mapping(){
+    private void mapping() {
         imgAvatarProfile = (CircleImageView) view.findViewById(R.id.imgAvatarProfile);
         edtPhonenum = (EditText) view.findViewById(R.id.edtPhonenum);
         edtName = (EditText) view.findViewById(R.id.edtName);
@@ -379,23 +370,23 @@ public class AddEmployee extends Fragment {
         checkFemale = (RadioButton) view.findViewById(R.id.checkFemale);
     }
 
-    private boolean validate(String phoneNumber,String fullName,String birthday,String password, Boolean isFace){
-        if(phoneNumber.equals("") || fullName.equals("") || birthday.equals("") || password.equals("")) {
+    private boolean validate(String phoneNumber, String fullName, String birthday, String password, Boolean isFace) {
+        if (phoneNumber.equals("") || fullName.equals("") || birthday.equals("") || password.equals("")) {
             Toast.makeText(getActivity(), "Invalid input !", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        if(phoneNumber.length()!=10 || !phoneNumber.matches(getString(R.string.regexPhone))){
+        if (phoneNumber.length() != 10 || !phoneNumber.matches(getString(R.string.regexPhone))) {
             edtPhonenum.setError("Invalid phone !");
             return false;
         }
 
-        if(!isValidPassword(password)){
+        if (!isValidPassword(password)) {
             edtPassword1.setError("Password must contain at least 8 characters, one digit, one upper case alphabet and one lower case alphabet!");
             return false;
         }
 
-        if(!isFace){
+        if (!isFace) {
             Toast.makeText(getActivity(), "Please take a photo with your face !", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -414,12 +405,12 @@ public class AddEmployee extends Fragment {
         return m.matches();
     }
 
-    private String increaseOneUnit(String num){
+    private String increaseOneUnit(String num) {
         int n = Integer.parseInt(num) + 1;
         StringBuilder kq = new StringBuilder(String.valueOf(n));
         int len = kq.length();
-        if(len!= 5){
-            for(int i =0;i< (5-len);i++){
+        if (len != 5) {
+            for (int i = 0; i < (5 - len); i++) {
                 kq.insert(0, 0);
             }
         }
@@ -427,6 +418,7 @@ public class AddEmployee extends Fragment {
     }
 
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;
+
     public boolean CheckPermissions() {
         int result = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), CAMERA);
         return result == PackageManager.PERMISSION_GRANTED;

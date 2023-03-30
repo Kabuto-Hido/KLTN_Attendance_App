@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Optional;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.MonthlyEmpReportAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
@@ -122,27 +121,27 @@ public class MonthlyEmpReportFragment extends Fragment {
 
         arrStatistic = new ArrayList<>();
         arrUser = new ArrayList<>();
-        adapter = new MonthlyEmpReportAdapter(arrStatistic,getActivity(),R.layout.emp_report_row);
+        adapter = new MonthlyEmpReportAdapter(arrStatistic, getActivity(), R.layout.emp_report_row);
         listviewEmpReport.setAdapter(adapter);
 
         btnBackMonthlyEmpReport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MenuStatisticFragment menuStatisticFragment = new MenuStatisticFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,menuStatisticFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, menuStatisticFragment).commit();
             }
         });
 
         btnExportPDF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checkPermission()){
+                if (checkPermission()) {
                     try {
                         generatePDF();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                }else{
+                } else {
                     requestPermission();
                 }
             }
@@ -172,17 +171,17 @@ public class MonthlyEmpReportFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String keyword) {
                 result = new ArrayList<>();
-                for(User u : arrUser){
-                    if(u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
-                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())){
-                        for(Statistic s : arrStatistic){
-                            if(s.getUserPhone().equals(u.getPhone())){
+                for (User u : arrUser) {
+                    if (u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())) {
+                        for (Statistic s : arrStatistic) {
+                            if (s.getUserPhone().equals(u.getPhone())) {
                                 result.add(s);
                             }
                         }
                     }
                 }
-                ((MonthlyEmpReportAdapter)listviewEmpReport.getAdapter()).update(result);
+                ((MonthlyEmpReportAdapter) listviewEmpReport.getAdapter()).update(result);
 
                 return false;
             }
@@ -199,20 +198,20 @@ public class MonthlyEmpReportFragment extends Fragment {
                         AlertDialog.THEME_HOLO_LIGHT, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        calendar.set(year,month,dayOfMonth);
+                        calendar.set(year, month, dayOfMonth);
                         SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
                         SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
                         String yearGet = yearFormat.format(calendar.getTime());
                         String monthGet = monthFormat.format(calendar.getTime());
 
-                        txtMonth.setText(monthGet+"/"+yearGet);
-                        putDataToView(yearGet,monthGet);
+                        txtMonth.setText(monthGet + "/" + yearGet);
+                        putDataToView(yearGet, monthGet);
                     }
-                },year,month,date){
+                }, year, month, date) {
                     @Override
                     protected void onCreate(Bundle savedInstanceState) {
                         super.onCreate(savedInstanceState);
-                        getDatePicker().findViewById(getResources().getIdentifier("day","id","android")).setVisibility(View.GONE);
+                        getDatePicker().findViewById(getResources().getIdentifier("day", "id", "android")).setVisibility(View.GONE);
                     }
                 };
                 monthDatePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
@@ -227,23 +226,23 @@ public class MonthlyEmpReportFragment extends Fragment {
         String monthCurrent = monthFormat.format(currentTime);
         String yearCurrent = yearFormat.format(currentTime);
 
-        txtMonth.setText(monthCurrent+"/"+yearCurrent);
-        putDataToView(yearCurrent,monthCurrent);
+        txtMonth.setText(monthCurrent + "/" + yearCurrent);
+        putDataToView(yearCurrent, monthCurrent);
 
         return view;
     }
 
     private void putDataToView(String yearCurrent, String monthCurrent) {
-        if(result != null){
+        if (result != null) {
             result.clear();
-            ((MonthlyEmpReportAdapter)listviewEmpReport.getAdapter()).update(result);
+            ((MonthlyEmpReportAdapter) listviewEmpReport.getAdapter()).update(result);
         }
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference userRef = database.getReference("users");
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
+                if (snapshot.exists()) {
                     arrStatistic.clear();
                     arrUser.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -257,19 +256,18 @@ public class MonthlyEmpReportFragment extends Fragment {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 DataSnapshot dataSnapshot1 = snapshot.child(yearCurrent).child(monthCurrent);
-                                if(dataSnapshot1.exists()){
+                                if (dataSnapshot1.exists()) {
                                     Statistic statistic = dataSnapshot1.getValue(Statistic.class);
                                     arrStatistic.add(statistic);
                                 }
 
                                 adapter.notifyDataSetChanged();
 
-                                if(arrStatistic.size() == 0){
+                                if (arrStatistic.size() == 0) {
                                     txtnotifi.setVisibility(View.VISIBLE);
-                                    txtnotifi.setText("No data in "+monthCurrent+"/"+yearCurrent);
+                                    txtnotifi.setText("No data in " + monthCurrent + "/" + yearCurrent);
                                     listviewEmpReport.setVisibility(View.INVISIBLE);
-                                }
-                                else{
+                                } else {
                                     listviewEmpReport.setVisibility(View.VISIBLE);
                                     txtnotifi.setVisibility(View.INVISIBLE);
                                 }
@@ -293,13 +291,13 @@ public class MonthlyEmpReportFragment extends Fragment {
         });
     }
 
-    private void generatePDF() throws FileNotFoundException{
+    private void generatePDF() throws FileNotFoundException {
         String M_Y = txtMonth.getText().toString();
-        String y = M_Y.substring(3,7);
-        String m = M_Y.substring(0,2);
+        String y = M_Y.substring(3, 7);
+        String m = M_Y.substring(0, 2);
 
         String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
-        File file = new File(filePath,"Employees_Report_"+m+"_"+y+".pdf");
+        File file = new File(filePath, "Employees_Report_" + m + "_" + y + ".pdf");
 
         PdfWriter pdfWriter = new PdfWriter(file);
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
@@ -307,10 +305,10 @@ public class MonthlyEmpReportFragment extends Fragment {
 
         pdfDocument.setDefaultPageSize(PageSize.A4);
 
-        Paragraph title = new Paragraph(m+"/"+y+" EMPLOYEE TIMESHEET")
+        Paragraph title = new Paragraph(m + "/" + y + " EMPLOYEE TIMESHEET")
                 .setBold().setFontSize(20).setTextAlignment(TextAlignment.CENTER);
 
-        float[] columnWidth = {80f, 150f,80f,80f,80f,80f,80f};
+        float[] columnWidth = {80f, 150f, 80f, 80f, 80f, 80f, 80f};
         Table table = new Table(columnWidth);
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
 
@@ -323,9 +321,9 @@ public class MonthlyEmpReportFragment extends Fragment {
         table.addCell(new Cell().add(new Paragraph("Worked Time").setBold()));
 
         Collections.reverse(arrStatistic);
-        for(Statistic s : arrStatistic) {
-            for(User u: arrUser){
-                if(s.getUserPhone().equals(u.getPhone())){
+        for (Statistic s : arrStatistic) {
+            for (User u : arrUser) {
+                if (s.getUserPhone().equals(u.getPhone())) {
                     table.addCell(new Cell().add(new Paragraph(u.getUuid())));
                     table.addCell(new Cell().add(new Paragraph(u.getFullName())));
                 }
@@ -346,6 +344,7 @@ public class MonthlyEmpReportFragment extends Fragment {
     }
 
     private static final int PERMISSION_REQUEST_CODE = 200;
+
     private boolean checkPermission() {
         int permission1 = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), WRITE_EXTERNAL_STORAGE);
         int permission2 = ContextCompat.checkSelfPermission(getActivity().getApplicationContext(), READ_EXTERNAL_STORAGE);

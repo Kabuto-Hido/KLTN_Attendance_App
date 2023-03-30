@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
+    android:background="#EEE3AB"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:tint="#665815"
+        android:src="@drawable/ic_wifi_off"
+        tools:ignore="UseAppTint" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OOPS!"
+        android:textStyle="bold"
+        android:textSize="40sp"
+        android:gravity="center"
+        android:textColor="#665815"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No Internet Connection"
+        android:textSize="25sp"
+        android:gravity="center"
+        android:textColor="#665815"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRetry"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_margin="50dp"
+        android:backgroundTint="#554911"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        app:cornerRadius="50dp"
+        android:textSize="18sp"
+        android:text="retry"/>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

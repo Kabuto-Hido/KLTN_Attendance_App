@@ -2,12 +2,7 @@ package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
@@ -15,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,10 +25,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import hcmute.edu.vn.tlcn.attendanceapp.adapter.MonthlyEmpReportAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.TodayStatisticAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
-import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
 /**
@@ -102,14 +98,14 @@ public class TodayStatisticFragment extends Fragment {
         mapping();
         recordArrayList = new ArrayList<>();
         arrUser = new ArrayList<>();
-        todayStatisticAdapter = new TodayStatisticAdapter(recordArrayList,getActivity(),R.layout.row_stat_day);
+        todayStatisticAdapter = new TodayStatisticAdapter(recordArrayList, getActivity(), R.layout.row_stat_day);
         lstStat.setAdapter(todayStatisticAdapter);
 
         btnBackTodayStatistic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MenuStatisticFragment menuStatisticFragment = new MenuStatisticFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,menuStatisticFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, menuStatisticFragment).commit();
             }
         });
 
@@ -123,14 +119,14 @@ public class TodayStatisticFragment extends Fragment {
                 DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        calendar.set(year,month,dayOfMonth);
+                        calendar.set(year, month, dayOfMonth);
                         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                         String dayGet = format.format(calendar.getTime());
                         txtDay.setText(dayGet);
 
                         putDataToView(dayGet);
                     }
-                },year,month,date);
+                }, year, month, date);
                 datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePickerDialog.show();
             }
@@ -160,17 +156,17 @@ public class TodayStatisticFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String keyword) {
                 result = new ArrayList<>();
-                for(User u : arrUser){
-                    if(u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
-                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())){
-                        for(Record r : recordArrayList){
-                            if(r.getUserPhone().equals(u.getPhone())){
+                for (User u : arrUser) {
+                    if (u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())) {
+                        for (Record r : recordArrayList) {
+                            if (r.getUserPhone().equals(u.getPhone())) {
                                 result.add(r);
                             }
                         }
                     }
                 }
-                ((TodayStatisticAdapter)lstStat.getAdapter()).update(result);
+                ((TodayStatisticAdapter) lstStat.getAdapter()).update(result);
                 return false;
             }
         });
@@ -184,10 +180,10 @@ public class TodayStatisticFragment extends Fragment {
         return view;
     }
 
-    private void putDataToView(String currentDate){
-        if(result != null){
+    private void putDataToView(String currentDate) {
+        if (result != null) {
             result.clear();
-            ((TodayStatisticAdapter)lstStat.getAdapter()).update(result);
+            ((TodayStatisticAdapter) lstStat.getAdapter()).update(result);
         }
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("users");
@@ -197,7 +193,7 @@ public class TodayStatisticFragment extends Fragment {
                 countEmp = 0;
                 countCheckIn = 0;
                 countAbsent = 0;
-                if(snapshot.exists()) {
+                if (snapshot.exists()) {
                     recordArrayList.clear();
                     arrUser.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -219,19 +215,17 @@ public class TodayStatisticFragment extends Fragment {
                                 if (checkInRecord != null) {
                                     countCheckIn++;
                                     recordArrayList.add(checkInRecord);
-                                }
-                                else if(absentRecord != null){
+                                } else if (absentRecord != null) {
                                     countAbsent++;
                                     recordArrayList.add(absentRecord);
                                 }
                                 todayStatisticAdapter.notifyDataSetChanged();
 
 
-                                if(recordArrayList.size() == 0){
+                                if (recordArrayList.size() == 0) {
                                     txtTb.setVisibility(View.VISIBLE);
                                     lstStat.setVisibility(View.INVISIBLE);
-                                }
-                                else{
+                                } else {
                                     lstStat.setVisibility(View.VISIBLE);
                                     txtTb.setVisibility(View.INVISIBLE);
                                 }

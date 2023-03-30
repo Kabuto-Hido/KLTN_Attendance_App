@@ -1,13 +1,12 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +52,7 @@ public class MenuStatisticFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
     TextView txtTodayStatistic, txtMonthStatistic, txtEmpReport;
     View view;
 
@@ -67,7 +67,7 @@ public class MenuStatisticFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 TodayStatisticFragment todayStatisticFragment = new TodayStatisticFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,todayStatisticFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, todayStatisticFragment).commit();
             }
         });
 
@@ -75,7 +75,7 @@ public class MenuStatisticFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 MonthStatisticFragment monthStatisticFragment = new MonthStatisticFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,monthStatisticFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, monthStatisticFragment).commit();
             }
         });
 
@@ -83,7 +83,7 @@ public class MenuStatisticFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 MonthlyEmpReportFragment monthlyEmpReportFragment = new MonthlyEmpReportFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment,monthlyEmpReportFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, monthlyEmpReportFragment).commit();
 
             }
         });
