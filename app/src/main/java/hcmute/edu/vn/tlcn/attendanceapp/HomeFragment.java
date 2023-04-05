@@ -5,6 +5,8 @@ import static android.Manifest.permission.CAMERA;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,13 +19,16 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,8 +45,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -49,11 +57,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
 import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -61,6 +71,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
@@ -75,8 +86,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
@@ -153,7 +166,7 @@ public class HomeFragment extends Fragment {
     SimpleDateFormat yearFormat;
     int count;
     String currentLocation = "";
-    private LocationListener locationListener = null;
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -178,7 +191,13 @@ public class HomeFragment extends Fragment {
         user = user_singeton.getUser();
         checkPreviousAttendance();
 
+        if(currentLocation.equals("")){
+            getLocation();
+        }
+
         putDataToView();
+
+        DialogSaveQrCode();
 
         btnTimeIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,17 +236,17 @@ public class HomeFragment extends Fragment {
                         notifiDone.setTextColor(Color.parseColor("#ff0000"));
                         notifiDone.setVisibility(View.VISIBLE);
 
-//                        currentTime = Calendar.getInstance().getTime();
-//                        String absentDate = dateFormat.format(currentTime);
-//
-//                        FirebaseDatabase database = FirebaseDatabase.getInstance();
-//                        DatabaseReference recordRef = database.getReference("record")
-//                                .child(user.getPhone()).child(absentDate).child("absent");
-//
-//                        Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent","location");
-//                        recordRef.setValue(absentRecord);
-//                        updateStatistic(absent2);
-                        //Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
+                        currentTime = Calendar.getInstance().getTime();
+                        String absentDate = dateFormat.format(currentTime);
+
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference recordRef = database.getReference("record")
+                                .child(user.getPhone()).child(absentDate).child("absent");
+
+                        Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent","location");
+                        recordRef.setValue(absentRecord);
+                        updateStatistic(absent2);
+                        Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
                     } else {
                         takeAttendance();
                     }
@@ -805,7 +824,7 @@ public class HomeFragment extends Fragment {
                 String checkInTime = timeFormat.format(currentTime);
 
 
-                Record record = new Record(user.getPhone(), checkInDate, checkInTime, status, type, "");
+                Record record = new Record(user.getPhone(), checkInDate, checkInTime, status, type, currentLocation);
 
                 recordRef.child(checkInDate).child(type).setValue(record);
                 updateStatistic(status);
@@ -820,7 +839,7 @@ public class HomeFragment extends Fragment {
                 String checkOutDate = dateFormat.format(currentTime);
                 String checkOutTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getPhone(), checkOutDate, checkOutTime, "", type, "");
+                Record record = new Record(user.getPhone(), checkOutDate, checkOutTime, "", type, currentLocation);
 
                 recordRef.child(checkOutDate).child(type).setValue(record);
 
@@ -854,8 +873,7 @@ public class HomeFragment extends Fragment {
                         long diffHours = TimeUnit.MILLISECONDS.toHours(diff);
                         long addMinutes = diffMinutes - (diffHours * 60);
                         //long diffHours = diff / (60 * 60 * 1000) % 24;
-                        System.out.println(addMinutes);
-                        System.out.println(diffHours);
+
 
                         String diffDate = diffHours + ":" + addMinutes;
 
@@ -877,7 +895,6 @@ public class HomeFragment extends Fragment {
                                 statisticRef.child(currentYear).child(currentMonth).child("hourWorked").setValue(totalHourWorked);
 
                                 String hourWorked = empStatistic.getHourWorked();
-                                System.out.println(hourWorked);
                                 hourWorked = calTime(diffDate, hourWorked);
 
                                 System.out.println(hourWorked);
@@ -923,14 +940,40 @@ public class HomeFragment extends Fragment {
     }
 
     private void getLocation() {
+        Log.d("TAG","getDeviceLocation");
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                locationListener = new MyLocationListener();
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+                fusedLocationProviderClient.getLastLocation()
+                        .addOnSuccessListener(new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                if(location != null){
+                                    Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+                                    List<Address> addressList;
+                                    try {
+                                        addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                        if (addressList != null && addressList.size() != 0) {
 
+                                            currentLocation = addressList.get(0).getAddressLine(0);
+                                            Log.d("Latitude", String.valueOf(location.getLatitude()));
+                                            Log.d("Longitude", String.valueOf(location.getLongitude()));
+                                            Log.d("city", addressList.get(0).getLocality());
+                                            Log.d("country", addressList.get(0).getCountryName());
+                                            Log.d("knownName ", addressList.get(0).getFeatureName());
+
+                                            Toast.makeText(getActivity(), "add: " + currentLocation, Toast.LENGTH_SHORT).show();
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
             } else {
                 Toast.makeText(getActivity(), "Enable GPS!!", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
@@ -938,6 +981,86 @@ public class HomeFragment extends Fragment {
         } else {
             RequestPermissions();
         }
+
+    }
+
+    public void DialogSaveQrCode(){
+        AlertDialog.Builder dialogSaveQRCode = new AlertDialog.Builder(getActivity());
+        dialogSaveQRCode.setMessage("The qr code has been refreshed, do you want to save it?");
+        dialogSaveQRCode.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveImg();
+            }
+        });
+
+        dialogSaveQRCode.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        dialogSaveQRCode.setCancelable(false);
+        dialogSaveQRCode.show();
+    }
+
+    public void saveImg() {
+        String imageName = user.getUuid() + "_" + System.currentTimeMillis();
+
+        Uri imageCollection;
+        ContentResolver contentResolver = getActivity().getContentResolver();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            imageCollection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        } else {
+            imageCollection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        }
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, imageName + ".jpg");
+        contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/*");
+        Uri imageUri = contentResolver.insert(imageCollection, contentValues);
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference(user.getQrcode());
+        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Picasso.get().load(uri)
+                        .into(new Target() {
+                            @Override
+                            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+                                try {
+//                                    BitmapDrawable bitmapDrawable = (BitmapDrawable) idIVQRCode.getDrawable();
+//                                    Bitmap bitmap = bitmapDrawable.getBitmap();
+
+                                    OutputStream outputStream = contentResolver.openOutputStream(Objects.requireNonNull(imageUri));
+                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                                    Objects.requireNonNull(outputStream);
+
+                                    Toast.makeText(getActivity(), "Image Saved Successfully", Toast.LENGTH_SHORT).show();
+
+                                } catch (Exception e) {
+                                    Toast.makeText(getActivity(), "Image Saved Fail", Toast.LENGTH_SHORT).show();
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                            }
+
+                            @Override
+                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                            }
+                        });
+
+            }
+        });
+
 
     }
 
@@ -969,37 +1092,5 @@ public class HomeFragment extends Fragment {
             }
         }
     }
-
-    private class MyLocationListener implements LocationListener {
-        @Override
-        public void onLocationChanged(@NonNull Location location) {
-            Log.v("location", String.valueOf(location.getLongitude()));
-            Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
-            List<Address> addressList;
-            try {
-                addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                if (addressList != null) {
-                    currentLocation = addressList.get(0).getAddressLine(0);
-                    txtNameUser.setText(currentLocation);
-                    Toast.makeText(getActivity(), "add: " + currentLocation, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), "not found", Toast.LENGTH_SHORT).show();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onProviderEnabled(@NonNull String provider) {
-            LocationListener.super.onProviderEnabled(provider);
-        }
-
-        @Override
-        public void onProviderDisabled(@NonNull String provider) {
-            LocationListener.super.onProviderDisabled(provider);
-        }
-    }
-
 
 }

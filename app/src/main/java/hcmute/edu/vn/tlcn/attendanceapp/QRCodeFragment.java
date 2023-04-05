@@ -178,7 +178,7 @@ public class QRCodeFragment extends Fragment {
         MultiFormatWriter writer = new MultiFormatWriter();
         try {
             String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
-            BitMatrix matrix = writer.encode(user.getUuid() + "_" + user.getPassword() + "_" + timeStamp,
+            BitMatrix matrix = writer.encode(user.getUuid() + "_" + user.getPhone() + "_" + timeStamp,
                     BarcodeFormat.QR_CODE, 800, 800);
 
             BarcodeEncoder encoder = new BarcodeEncoder();
@@ -197,6 +197,7 @@ public class QRCodeFragment extends Fragment {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     idIVQRCode.setImageBitmap(bitmap);
+                    Toast.makeText(getActivity(), "The QR Code had renew", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override

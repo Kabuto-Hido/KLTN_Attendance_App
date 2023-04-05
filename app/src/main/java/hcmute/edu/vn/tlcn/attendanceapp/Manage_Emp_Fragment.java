@@ -249,7 +249,7 @@ public class Manage_Emp_Fragment extends Fragment {
                 dialog.dismiss();
             }
         });
-
+        dialogResetPass.setCancelable(false);
         dialogResetPass.show();
     }
 
@@ -382,6 +382,7 @@ public class Manage_Emp_Fragment extends Fragment {
                 dialog.dismiss();
             }
         });
+        dialogDelete.setCancelable(false);
         dialogDelete.show();
     }
 }

@@ -148,7 +148,7 @@ public class LoginActivity extends AppCompatActivity {
         MultiFormatWriter writer = new MultiFormatWriter();
         try {
             String timeStamp = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
-            BitMatrix matrix = writer.encode(user.getUuid() + "_" + user.getPassword() + "_" + timeStamp,
+            BitMatrix matrix = writer.encode(user.getUuid() + "_" + user.getPhone() + "_" + timeStamp,
                     BarcodeFormat.QR_CODE, 800, 800);
 
             BarcodeEncoder encoder = new BarcodeEncoder();
@@ -163,6 +163,7 @@ public class LoginActivity extends AppCompatActivity {
             String url = "images/" + user.getUuid() + "_qrcode";
 
             UploadTask uploadTask = ref.child(url).putBytes(byteArray);
+            user.setQrcode(url);
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
