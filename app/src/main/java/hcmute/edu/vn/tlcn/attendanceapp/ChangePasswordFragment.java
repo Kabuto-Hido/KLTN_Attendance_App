@@ -20,6 +20,11 @@ import androidx.fragment.app.Fragment;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
@@ -80,6 +85,7 @@ public class ChangePasswordFragment extends Fragment {
     User_singeton user_singeton;
     User user;
     SharedPreferences sharedPreferences;
+    Timer timer;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -143,15 +149,31 @@ public class ChangePasswordFragment extends Fragment {
                     return;
                 }
 
-                if (newPassword.length() < 6) {
+                if (!isValidPassword(newPassword)) {
                     progressDialog.dismiss();
-                    Toast.makeText(getActivity(), "Password too weak !", Toast.LENGTH_SHORT).show();
+                    edittextNewPassword.setError("Password must contain at least 8 characters, one digit, one upper case alphabet and one lower case alphabet!");
                 } else if (!newPassword.equals(confirmNewPassword)) {
                     progressDialog.dismiss();
                     Toast.makeText(getActivity(), "The confirm password does not match!!", Toast.LENGTH_SHORT).show();
                 } else {
                     progressDialog.dismiss();
-                    startActivity(new Intent(getActivity(), SendOTPActivity.class));
+
+                    String newHashPass = BCrypt.withDefaults().hashToString(12, newPassword.toCharArray());
+                    user.setPassword(newHashPass);
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef = database.getReference("users");
+                    myRef.child(user.getPhone()).setValue(user);
+                    Toast.makeText(getActivity(), "Change password successful.", Toast.LENGTH_SHORT).show();
+
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            logout();
+                        }
+                    }, 1000);
+
+                    //startActivity(new Intent(getActivity(), SendOTPActivity.class));
 
                 }
             }
@@ -163,19 +185,30 @@ public class ChangePasswordFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        sharedPreferences = this.getActivity().getSharedPreferences("isVerifyOtp", Context.MODE_MULTI_PROCESS);
-        boolean otp = sharedPreferences.getBoolean("otp", false);
-        if (otp) {
-            String newHashPass = BCrypt.withDefaults().hashToString(12, newPassword.toCharArray());
+//        sharedPreferences = this.getActivity().getSharedPreferences("isVerifyOtp", Context.MODE_MULTI_PROCESS);
+//        boolean otp = sharedPreferences.getBoolean("otp", false);
+//        if (otp) {
+//            String newHashPass = BCrypt.withDefaults().hashToString(12, newPassword.toCharArray());
+//            user.setPassword(newHashPass);
+//            FirebaseDatabase database = FirebaseDatabase.getInstance();
+//            DatabaseReference myRef = database.getReference("users");
+//            myRef.child(user.getPhone()).setValue(user);
+//            Toast.makeText(getActivity(), "Change password successful.", Toast.LENGTH_SHORT).show();
+//            logout();
+//        }
 
-            user.setPassword(newHashPass);
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference("users");
-            myRef.child(user.getPhone()).setValue(user);
-            Toast.makeText(getActivity(), "Change password successful.", Toast.LENGTH_SHORT).show();
-            logout();
+    }
+
+    public boolean isValidPassword(String password) {
+        //password must containing at least 8 characters and at most 20 characters,
+        // containing at least one digit, one upper case alphabet and one lower case alphabet1
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,20}$";
+        Pattern p = Pattern.compile(regex);
+        if (password == null) {
+            return false;
         }
-
+        Matcher m = p.matcher(password);
+        return m.matches();
     }
 
     private void logout() {

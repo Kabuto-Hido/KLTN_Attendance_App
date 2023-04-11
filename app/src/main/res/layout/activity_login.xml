@@ -35,7 +35,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginStart="80dp"
         android:layout_marginTop="20dp"
-        android:autofillHints="postalAddress"
+        android:autofillHints="username"
         android:background="@drawable/custom_login_input"
         android:drawableStart="@drawable/ic_emp_code"
         android:drawablePadding="10dp"

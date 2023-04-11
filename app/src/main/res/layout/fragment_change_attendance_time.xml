@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ChangeAttendanceTimeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#2196F3"
+            android:orientation="horizontal"
+            android:padding="6dp">
+            <ImageView
+                android:id="@+id/btnBackConfig"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:src="@drawable/baseline_arrow_back_white_24"
+                android:contentDescription="TODO" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:text="Config Attendance Time"
+                android:gravity="center_vertical"
+                android:textStyle="bold"
+                android:layout_marginStart="20dp"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:src="@drawable/config"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textSize="30sp"
+            android:textColor="@color/black"
+            android:text="Time Check In"
+            android:textStyle="bold"
+            android:layout_gravity="center"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edittextStartCheckIn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
+                android:autofillHints=""
+                android:background="@drawable/custom_login_input"
+                android:drawableStart="@drawable/ic_access_time"
+                android:drawablePadding="10dp"
+                android:hint="Start"
+                android:focusable="false"
+                android:inputType="text"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_arrow_forward"
+                app:tint="#2196F3" />
+
+            <EditText
+                android:id="@+id/edittextEndCheckIn"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:autofillHints=""
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/custom_login_input"
+                android:drawableStart="@drawable/ic_access_time"
+                android:drawablePadding="10dp"
+                android:hint="End"
+                android:focusable="false"
+                android:inputType="text"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edittextPeriod"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center"
+            android:autofillHints=""
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/custom_login_input"
+            android:drawableStart="@drawable/ic_timelapse"
+            android:drawablePadding="10dp"
+            android:hint="Period"
+            android:focusable="false"
+            android:inputType="text"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirmConfig"
+            android:layout_width="350sp"
+            android:layout_height="75sp"
+            android:layout_gravity="center"
+            android:layout_marginTop="80sp"
+            android:backgroundTint="#2196F3"
+            android:fontFamily="sans-serif-thin"
+            android:text="confirm"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:cornerRadius="30sp" />
+    </LinearLayout>
+
+
+</FrameLayout>

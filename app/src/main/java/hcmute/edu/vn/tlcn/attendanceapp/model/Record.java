@@ -8,9 +8,9 @@ public class Record implements Serializable {
     public String time;
     public String status; //on time - late - none
     public String type; //checkIn - checkOut
-    private String location;
+    private LocationRecord location;
 
-    public Record(String userPhone, String day, String time, String status, String type, String location) {
+    public Record(String userPhone, String day, String time, String status, String type, LocationRecord location) {
         this.userPhone = userPhone;
         this.day = day;
         this.time = time;
@@ -62,11 +62,12 @@ public class Record implements Serializable {
         this.status = status;
     }
 
-    public String getLocation() {
+    public LocationRecord getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(LocationRecord location) {
         this.location = location;
     }
+
 }

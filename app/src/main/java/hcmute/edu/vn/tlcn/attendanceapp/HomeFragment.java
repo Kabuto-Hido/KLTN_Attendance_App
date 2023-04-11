@@ -47,6 +47,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -91,9 +92,12 @@ import java.util.concurrent.TimeUnit;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import de.hdodenhof.circleimageview.CircleImageView;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Config;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
+import hcmute.edu.vn.tlcn.attendanceapp.model.LocationRecord;
+import hcmute.edu.vn.tlcn.attendanceapp.pattern.Config_singleton;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 /**
@@ -127,6 +131,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        //Locale.setDefault(new Locale("vi", "VN"));
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -140,12 +145,15 @@ public class HomeFragment extends Fragment {
     DigitalClock digitalClock;
     Button btnTimeIn, btnTimeOut;
     User_singeton user_singeton = User_singeton.getInstance();
+    Config_singleton config_singleton;
+    Config config;
     User user;
     String status;
     String type;
     String absent1 = "absent with permission";
     String absent2 = "absent without permission";
     boolean absent = false;
+    boolean firstLogin = false;
 
     Interpreter tflite;
     Bitmap bitmapOrigin;
@@ -165,7 +173,7 @@ public class HomeFragment extends Fragment {
     SimpleDateFormat monthFormat;
     SimpleDateFormat yearFormat;
     int count;
-    String currentLocation = "";
+    LocationRecord currentLocation;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
@@ -189,15 +197,14 @@ public class HomeFragment extends Fragment {
             Log.v("tflite", e.getMessage());
         }
         user = user_singeton.getUser();
-        checkPreviousAttendance();
-
-        if(currentLocation.equals("")){
-            getLocation();
-        }
+        config_singleton = Config_singleton.getInstance();
+        config = config_singleton.getConfig();
+        System.out.println(config.getPeriod());
 
         putDataToView();
 
-        DialogSaveQrCode();
+        currentLocation = new LocationRecord(null,null);
+        getLocation();
 
         btnTimeIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,53 +212,62 @@ public class HomeFragment extends Fragment {
                 type = "checkIn";
 
                 getLocation();
+                if(currentLocation.getLatitude() != null && currentLocation.getLongitude() != null){
+                    if(distance(currentLocation.getLatitude(), currentLocation.getLongitude()) < 1.0){
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(currentTime);
+                        //check in - sunday
+                        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                            dialog.setMessage("Today is sunday are you sure you want to take attendance ? ");
+                            dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    status = "on time";
+                                    takeAttendance();
+                                }
+                            });
+                            dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    btnTimeIn.setVisibility(View.INVISIBLE);
+                                    notifiDone.setText("Have a nice weekend!!");
+                                    notifiDone.setVisibility(View.VISIBLE);
+                                }
+                            });
+                            dialog.show();
+                        } else {
+                            checkIsTimeCheckIn();
+                            System.out.println(status);
+                            System.out.println(absent);
+                            if (absent) {
+                                btnTimeIn.setVisibility(View.INVISIBLE);
+                                notifiDone.setText("Check in time has passed!!");
+                                notifiDone.setTextColor(Color.parseColor("#ff0000"));
+                                notifiDone.setVisibility(View.VISIBLE);
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(currentTime);
-                //check in - sunday
-                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                    dialog.setMessage("Today is sunday are you sure you want to take attendance ? ");
-                    dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            status = "on time";
-                            takeAttendance();
+                                currentTime = Calendar.getInstance().getTime();
+                                String absentDate = dateFormat.format(currentTime);
+
+                                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                DatabaseReference recordRef = database.getReference("record")
+                                        .child(user.getPhone()).child(absentDate).child("absent");
+
+                                Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent",new LocationRecord(null,null));
+                                recordRef.setValue(absentRecord);
+                                updateStatistic(absent2);
+                                Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                takeAttendance();
+                            }
                         }
-                    });
-                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            btnTimeIn.setVisibility(View.INVISIBLE);
-                            notifiDone.setText("Have a nice weekend!!");
-                            notifiDone.setVisibility(View.VISIBLE);
-                        }
-                    });
-                    dialog.show();
-                } else {
-                    checkIsTimeCheckIn();
-                    if (absent) {
-                        btnTimeIn.setVisibility(View.INVISIBLE);
-                        notifiDone.setText("Check in time has passed!!");
-                        notifiDone.setTextColor(Color.parseColor("#ff0000"));
-                        notifiDone.setVisibility(View.VISIBLE);
-
-                        currentTime = Calendar.getInstance().getTime();
-                        String absentDate = dateFormat.format(currentTime);
-
-                        FirebaseDatabase database = FirebaseDatabase.getInstance();
-                        DatabaseReference recordRef = database.getReference("record")
-                                .child(user.getPhone()).child(absentDate).child("absent");
-
-                        Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent","location");
-                        recordRef.setValue(absentRecord);
-                        updateStatistic(absent2);
-                        Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        takeAttendance();
                     }
+                    else{
+                        Toast.makeText(getActivity(), "Can't check in with current location!!", Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(getActivity(), "Can't get your location!!", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
 
@@ -408,7 +424,7 @@ public class HomeFragment extends Fragment {
 
                         if (checkInRecord == null) {
                             if (absentRecord == null) {
-                                Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent", "");
+                                Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent", new LocationRecord(null, null));
                                 recordRef.child(user.getPhone()).child(dateAttend).child("absent").setValue(absent);
 
                                 count += 1;
@@ -456,7 +472,7 @@ public class HomeFragment extends Fragment {
                             }
                         } else {
                             if (checkOutRecord == null) {
-                                Record checkOut = new Record(user.getPhone(), dateAttend, "17:00", "", "checkOut", "");
+                                Record checkOut = new Record(user.getPhone(), dateAttend, "17:00", "", "checkOut", new LocationRecord(null, null));
                                 recordRef.child(user.getPhone()).child(dateAttend).child("checkOut").setValue(checkOut);
 
                                 try {
@@ -537,20 +553,25 @@ public class HomeFragment extends Fragment {
     }
 
     private void checkIsTimeCheckIn() {
+        String startTime = config.getStartCheckIn();
+        String endTime = config.getEndCheckIn();
+        String periodTIme = calPeriodTime(startTime, config.getPeriod());
+
         try {
-            Date nine = timeFormat.parse("09:00");
-            Date haftNine = timeFormat.parse("09:30");
+            //Date s = timeFormat.parse(startTime);
+            Date e = timeFormat.parse(endTime);
+            Date p =  timeFormat.parse(periodTIme);
 
             currentTime = Calendar.getInstance().getTime();
             String strCurTime = timeFormat.format(currentTime);
             Date dateCurTime = timeFormat.parse(strCurTime);
 
             if (dateCurTime != null) {
-                if (dateCurTime.before(nine)) {
+                if (dateCurTime.before(p)) {
                     status = "on time";
-                } else if (dateCurTime.after(nine) && dateCurTime.before(haftNine)) {
+                } else if (dateCurTime.after(p) && dateCurTime.before(e)) {
                     status = "late";
-                } else if (dateCurTime.after(haftNine)) {
+                } else if (dateCurTime.after(e)) {
                     absent = true;
                 }
             }
@@ -559,6 +580,30 @@ public class HomeFragment extends Fragment {
             e.printStackTrace();
             Log.v("convertTimeErr", e.getMessage());
         }
+    }
+
+    private String calPeriodTime(String startTime ,String period){
+        String[] cutTimeStart = startTime.split(":");
+
+        int newHour = Integer.parseInt(cutTimeStart[0]);
+        int newMinutes = Integer.parseInt(cutTimeStart[1]) + Integer.parseInt(period);
+        if (newMinutes >= 60) {
+            newHour++;
+            newMinutes = newMinutes % 60;
+        }
+        if (newHour < 10) {
+            if(newMinutes < 10){
+                return "0" + newHour + ":0" + newMinutes;
+            }
+            return "0" + newHour + ":" + newMinutes;
+        } else{
+            if(newMinutes < 10){
+                return newHour + ":0" + newMinutes;
+            }
+            return newHour + ":" + newMinutes;
+        }
+
+
     }
 
     private void takeAttendance() {
@@ -571,7 +616,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void putDataToView() {
-
         if (user == null) {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
@@ -641,6 +685,16 @@ public class HomeFragment extends Fragment {
             }
         });
 
+    }
+
+    @Override
+    public void onStart() {
+        if(!firstLogin){
+            DialogSaveQrCode();
+            checkPreviousAttendance();
+        }
+
+        super.onStart();
     }
 
     private void mapping() {
@@ -823,7 +877,6 @@ public class HomeFragment extends Fragment {
                 String checkInDate = dateFormat.format(currentTime);
                 String checkInTime = timeFormat.format(currentTime);
 
-
                 Record record = new Record(user.getPhone(), checkInDate, checkInTime, status, type, currentLocation);
 
                 recordRef.child(checkInDate).child(type).setValue(record);
@@ -959,14 +1012,14 @@ public class HomeFragment extends Fragment {
                                         addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                                         if (addressList != null && addressList.size() != 0) {
 
-                                            currentLocation = addressList.get(0).getAddressLine(0);
+                                            currentLocation.setLatitude(location.getLatitude());
+                                            currentLocation.setLongitude(location.getLongitude());
                                             Log.d("Latitude", String.valueOf(location.getLatitude()));
                                             Log.d("Longitude", String.valueOf(location.getLongitude()));
                                             Log.d("city", addressList.get(0).getLocality());
                                             Log.d("country", addressList.get(0).getCountryName());
-                                            Log.d("knownName ", addressList.get(0).getFeatureName());
+                                            Log.d("Locale ", String.valueOf(addressList.get(0).getLocale()));
 
-                                            Toast.makeText(getActivity(), "add: " + currentLocation, Toast.LENGTH_SHORT).show();
                                         }
                                     } catch (IOException e) {
                                         e.printStackTrace();
@@ -1002,6 +1055,7 @@ public class HomeFragment extends Fragment {
         });
 
         dialogSaveQRCode.setCancelable(false);
+        firstLogin = true;
         dialogSaveQRCode.show();
     }
 
@@ -1032,9 +1086,6 @@ public class HomeFragment extends Fragment {
                             @Override
                             public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
                                 try {
-//                                    BitmapDrawable bitmapDrawable = (BitmapDrawable) idIVQRCode.getDrawable();
-//                                    Bitmap bitmap = bitmapDrawable.getBitmap();
-
                                     OutputStream outputStream = contentResolver.openOutputStream(Objects.requireNonNull(imageUri));
                                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
                                     Objects.requireNonNull(outputStream);
@@ -1062,6 +1113,24 @@ public class HomeFragment extends Fragment {
         });
 
 
+    }
+
+    private double distance(double lat1, double lng1) {
+        Location location1 = new Location("location1");
+        location1.setLatitude(lat1);
+        location1.setLongitude(lng1);
+
+        Location location2 = new Location("location2");
+        double lat2 = Double.parseDouble(getActivity().getString(R.string.latitude_default));
+        double lng2 = Double.parseDouble(getActivity().getString(R.string.longitude_default));
+        location2.setLatitude(lat2);
+        location2.setLongitude(lng2);
+
+        float result = location1.distanceTo(location2);
+
+        System.out.println(result);
+
+        return result/1000; // output distance, in MILES
     }
 
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;

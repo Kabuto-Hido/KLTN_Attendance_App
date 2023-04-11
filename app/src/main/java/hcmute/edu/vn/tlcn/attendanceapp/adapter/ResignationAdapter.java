@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,9 +19,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.R;
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
+import hcmute.edu.vn.tlcn.attendanceapp.model.LocationRecord;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
@@ -129,7 +128,7 @@ public class ResignationAdapter extends BaseAdapter {
                                         DataSnapshot dataSnapshot = snapshot.child(phone).child(day).child("checkIn");
                                         Record checkInRecord = dataSnapshot.getValue(Record.class);
                                         if (checkInRecord == null) {
-                                            Record absentRecord = new Record(phone, day, "", "absent with permission", "absent","");
+                                            Record absentRecord = new Record(phone, day, "", "absent with permission", "absent",new LocationRecord(null, null));
                                             recordRef.child(phone).child(day).child("absent").setValue(absentRecord);
 
                                             String currentMonth = day.substring(5,7);

@@ -1,8 +1,11 @@
 <resources>
-    <string name="app_name">Attendance App</string>
+    <string name="app_name" translatable="false">Attendance App</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="regexPhone">^[0-9]{10}$</string>
+    <string name="latitude_default" translatable="false">10.8506377</string>
+    <string name="longitude_default" translatable="false">106.7693382</string>
+    <string name="regexPhone" translatable="false">^[0-9]{10}$</string>
     <string name="checkin_time">Checkin time:</string>
     <string name="checkout_time">Checkout time:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

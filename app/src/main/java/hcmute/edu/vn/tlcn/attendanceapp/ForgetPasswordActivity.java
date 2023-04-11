@@ -71,7 +71,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                 String newPass = edtNewResetPassword.getText().toString();
                 String confirmNewPass = edtConfirmResetNewPassword.getText().toString();
 
-                if (isValidPassword(newPass)) {
+                if (!isValidPassword(newPass)) {
                     progressDialog.dismiss();
                     edtNewResetPassword.setError("Password must contain at least 8 characters, one digit, one upper case alphabet and one lower case alphabet!");
                 } else if (!newPass.equals(confirmNewPass)) {
