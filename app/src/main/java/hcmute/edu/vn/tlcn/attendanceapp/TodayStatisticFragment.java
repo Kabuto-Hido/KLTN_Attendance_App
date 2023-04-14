@@ -158,9 +158,10 @@ public class TodayStatisticFragment extends Fragment {
                 result = new ArrayList<>();
                 for (User u : arrUser) {
                     if (u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
-                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())) {
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getPhone().contains(keyword.trim())) {
                         for (Record r : recordArrayList) {
-                            if (r.getUserPhone().equals(u.getPhone())) {
+                            if (r.getUserUUID().equals(u.getUuid())) {
                                 result.add(r);
                             }
                         }
@@ -198,11 +199,11 @@ public class TodayStatisticFragment extends Fragment {
                     arrUser.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         countEmp++;
-                        String phone = dataSnapshot.getKey();
+                        String uuid = dataSnapshot.getKey();
                         User getUser = dataSnapshot.getValue(User.class);
                         arrUser.add(getUser);
 
-                        DatabaseReference recordRef = database.getReference("record").child(phone);
+                        DatabaseReference recordRef = database.getReference("record").child(uuid);
                         recordRef.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {

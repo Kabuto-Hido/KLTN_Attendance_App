@@ -149,7 +149,8 @@ public class Manage_Emp_Fragment extends Fragment {
                 result = new ArrayList<>();
                 for (User u : empList) {
                     if (u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
-                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())) {
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getPhone().contains(keyword)) {
                         result.add(u);
                     }
                 }
@@ -159,7 +160,6 @@ public class Manage_Emp_Fragment extends Fragment {
         });
 
         getListEmp();
-
         return view;
     }
 
@@ -207,12 +207,12 @@ public class Manage_Emp_Fragment extends Fragment {
 
     public void dialogResetPass(User user) {
         AlertDialog.Builder dialogResetPass = new AlertDialog.Builder(getActivity());
-        dialogResetPass.setMessage("Do you sure want to reset password for employee have phone " + user.getPhone() + " ?");
+        dialogResetPass.setMessage("Do you sure want to reset password for employee " + user.getUuid() + " ?");
         dialogResetPass.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //reset pass emp - default: 123456
-                String defaultPassword = "123456";
+                //reset pass emp - default: Kltn2023*
+                String defaultPassword = "Kltn2023*";
                 String hashPass = BCrypt.withDefaults().hashToString(12, defaultPassword.toCharArray());
                 user.setPassword(hashPass);
 
@@ -221,15 +221,15 @@ public class Manage_Emp_Fragment extends Fragment {
                 userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.hasChild(user.getPhone())) {
-                            userRef.child(user.getPhone()).setValue(user);
-                            Toast.makeText(getActivity(), "New " + user.getPhone()
+                        if (snapshot.hasChild(user.getUuid())) {
+                            userRef.child(user.getUuid()).setValue(user);
+                            Toast.makeText(getActivity(), "New " + user.getUuid()
                                     + "'s password is 123456", Toast.LENGTH_SHORT).show();
 
                             dialog.dismiss();
 
                         } else {
-                            Toast.makeText(getContext(), "User not exist !", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "User not exist!", Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
                         }
                     }
@@ -255,7 +255,7 @@ public class Manage_Emp_Fragment extends Fragment {
 
     public void DialogEmpDelete(User user) {
         AlertDialog.Builder dialogDelete = new AlertDialog.Builder(getActivity());
-        dialogDelete.setMessage("Do you want to delete employee have phone " + user.getPhone() + " ?");
+        dialogDelete.setMessage("Do you want to delete employee have phone " + user.getUuid() + " ?");
         dialogDelete.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -268,8 +268,8 @@ public class Manage_Emp_Fragment extends Fragment {
                                 FirebaseDatabase database = FirebaseDatabase.getInstance();
 
                                 DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
-                                dayOffReportRef.orderByChild("userPhone")
-                                        .startAt(user.getPhone())
+                                dayOffReportRef.orderByChild("userUUID")
+                                        .startAt(user.getUuid())
                                         .addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -286,10 +286,10 @@ public class Manage_Emp_Fragment extends Fragment {
                                         });
 
                                 DatabaseReference recordRef = database.getReference("record");
-                                recordRef.child(user.getPhone()).removeValue();
+                                recordRef.child(user.getUuid()).removeValue();
 
                                 DatabaseReference statisticRef = database.getReference("statistic");
-                                statisticRef.child(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                statisticRef.child(user.getUuid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         for (DataSnapshot yearSnapshot : snapshot.getChildren()) {
@@ -323,7 +323,7 @@ public class Manage_Emp_Fragment extends Fragment {
                                                                     monthStatistic.setAbsentWithoutPer(totalAbsentWithoutPer);
 
                                                                     statisticRef.child(year).child(month).setValue(monthStatistic);
-                                                                    statisticRef.child(user.getPhone()).removeValue();
+                                                                    statisticRef.child(user.getUuid()).removeValue();
                                                                 }
                                                             }
 
@@ -345,11 +345,10 @@ public class Manage_Emp_Fragment extends Fragment {
                                 });
 
                                 DatabaseReference ref = database.getReference("users");
-                                ref.child(user.getPhone()).removeValue()
+                                ref.child(user.getUuid()).removeValue()
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void unused) {
-
                                                 getListEmp();
                                                 dialog.dismiss();
                                                 Toast.makeText(getActivity(), "Delete successful!!", Toast.LENGTH_SHORT).show();

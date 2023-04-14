@@ -15,15 +15,29 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorBlue">
+            android:background="@color/colorBlue"
+            android:orientation="horizontal">
 
             <ImageView
                 android:contentDescription="avatar"
                 android:id="@+id/btnBackProfile"
-                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:padding="15dp"
                 android:src="@drawable/baseline_arrow_back_white_24" />
+
+            <TextView
+                android:id="@+id/txtUserID"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="uuid"
+                android:layout_weight="4"
+                android:textAlignment="center"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
 
         </LinearLayout>
         <RelativeLayout
@@ -43,10 +57,11 @@
                 android:id="@+id/txtGender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
                 android:text="Gender: "
                 android:textColor="@color/white"
                 android:layout_marginStart="20dp"
-                android:layout_toEndOf="@id/imgProfile"
+                android:layout_toEndOf="@+id/imgProfile"
                 android:textStyle="bold"
                 android:includeFontPadding="false"
                 android:textSize="20sp" />
@@ -55,7 +70,7 @@
                 android:id="@+id/rMale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
+                android:layout_marginStart="20dp"
                 android:layout_below="@+id/txtGender"
                 android:layout_toEndOf="@+id/imgProfile"
                 android:buttonTint="#0dd1fc"
@@ -94,7 +109,7 @@
                     android:drawableStart="@drawable/profile_person"
                     android:drawablePadding="10dp"
                     android:textSize="20sp"
-                    android:text="fullnameuser"/>
+                    android:text="fullname"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -110,8 +125,7 @@
                     android:drawableStart="@drawable/ic_phone2"
                     android:drawablePadding="10dp"
                     android:textSize="20sp"
-                    android:text="phonenumber"
-                    android:focusable="false" />
+                    android:text="phonenumber" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout

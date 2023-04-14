@@ -45,7 +45,6 @@
         android:padding="15dp"
         android:textColorHint="#AA4B5151"
         android:textStyle="bold"
-        android:focusable="false"
         android:autofillHints="" />
 
     <EditText

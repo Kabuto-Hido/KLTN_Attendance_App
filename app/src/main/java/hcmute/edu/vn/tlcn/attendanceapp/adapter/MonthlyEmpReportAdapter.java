@@ -99,7 +99,7 @@ public class MonthlyEmpReportAdapter extends BaseAdapter {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
 
-        myRef.child(statistic.getUserPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child(statistic.getUserUUID()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {

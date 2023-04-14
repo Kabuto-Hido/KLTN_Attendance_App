@@ -14,16 +14,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import hcmute.edu.vn.tlcn.attendanceapp.Utility.InternetCheckService;
+import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
 public class ForgetPasswordActivity extends AppCompatActivity {
@@ -81,7 +86,22 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                     String newHashPass = BCrypt.withDefaults().hashToString(12, newPass.toCharArray());
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference("users");
-                    myRef.child(getPhone).child("password").setValue(newHashPass);
+                    myRef.orderByChild("phone").equalTo(getPhone).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                                User user = dataSnapshot.getValue(User.class);
+                                myRef.child(user.getUuid()).child("password").setValue(newHashPass);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+
 
                     Toast.makeText(ForgetPasswordActivity.this, "Change password successful.", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();

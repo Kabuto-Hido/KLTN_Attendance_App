@@ -96,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference("users");
 
-                    myRef.orderByChild("uuid").equalTo(code).addValueEventListener(new ValueEventListener() {
+                    myRef.child(code).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             User_singeton isUser = User_singeton.getInstance();
@@ -106,32 +106,31 @@ public class LoginActivity extends AppCompatActivity {
                                 progressDialog.dismiss();
                                 Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
                             }
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                User loginUser = dataSnapshot.getValue(User.class);
-                                String hashPass = loginUser.getPassword();
-                                BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), hashPass);
+                            User loginUser = snapshot.getValue(User.class);
+                            String hashPass = loginUser.getPassword();
+                            BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), hashPass);
 
-                                if (result.verified) {
-                                    generateQR(loginUser);
-                                    myRef.child(loginUser.getPhone()).setValue(loginUser);
-                                    User_singeton user_singeton = User_singeton.getInstance();
-                                    user_singeton.setUser(loginUser);
+                            if (result.verified) {
+                                generateQR(loginUser);
+                                myRef.child(loginUser.getUuid()).setValue(loginUser);
+                                User_singeton user_singeton = User_singeton.getInstance();
+                                user_singeton.setUser(loginUser);
 
 
-                                    progressDialog.dismiss();
-                                    Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
-                                    if (loginUser.getRole() == 1) {
-                                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                    } else {
-                                        startActivity(new Intent(LoginActivity.this, AdminMainActivity.class));
-                                    }
-                                    finish();
+                                progressDialog.dismiss();
+                                Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
+                                if (loginUser.getRole() == 1) {
+                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 } else {
-                                    progressDialog.dismiss();
-                                    Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(LoginActivity.this, AdminMainActivity.class));
                                 }
-                                Log.d("tag", loginUser.getPhone());
+                                finish();
+                            } else {
+                                progressDialog.dismiss();
+                                Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
                             }
+                            Log.d("tag", loginUser.getPhone());
+
                         }
 
                         @Override

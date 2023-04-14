@@ -160,7 +160,7 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference recordRef = database.getReference("record");
                 int finalI = i;
-                recordRef.child(user.getPhone()).addValueEventListener(new ValueEventListener() {
+                recordRef.child(user.getUuid()).addValueEventListener(new ValueEventListener() {
                     @SuppressLint("NotifyDataSetChanged")
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -238,7 +238,6 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
         if (!dayText.equals("")) {
             DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM");
             String yearMonth = selectedDate.format(dateFormat);
-            System.out.println(yearMonth);
             String dateSelect;
             if (dayText.length() == 1) {
                 dateSelect = yearMonth + "-0" + dayText;
@@ -264,7 +263,7 @@ public class AttendanceCalendarFragment extends Fragment implements CalendarAdap
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference recordRef = database.getReference("record");
-            recordRef.child(user.getPhone()).addValueEventListener(new ValueEventListener() {
+            recordRef.child(user.getUuid()).addValueEventListener(new ValueEventListener() {
                 @SuppressLint("SetTextI18n")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {

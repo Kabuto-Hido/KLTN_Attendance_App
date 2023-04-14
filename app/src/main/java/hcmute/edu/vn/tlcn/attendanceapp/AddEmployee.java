@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -125,6 +126,7 @@ public class AddEmployee extends Fragment {
         mapping();
 
         checkMale.setChecked(true);
+        edtPassword1.setBackgroundColor(Color.parseColor("#D9D9D9"));
 
         btnCancelAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,7 +213,6 @@ public class AddEmployee extends Fragment {
                 String birthday = edtBirthday1.getText().toString();
                 String password = edtPassword1.getText().toString();
                 boolean sex = !checkFemale.isChecked();
-                String code = "ATD";
 
                 ProgressDialog progressDialog = new ProgressDialog(getActivity());
                 progressDialog.setTitle("Checking...");
@@ -242,10 +243,10 @@ public class AddEmployee extends Fragment {
                                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                                     DatabaseReference userRef = database.getReference("users");
 
-                                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    userRef.orderByChild("phone").equalTo(phoneNumber).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            if (snapshot.hasChild(user.getPhone())) {
+                                            if (snapshot.exists()) {
                                                 Toast.makeText(getContext(), "Phone number is already taken !", Toast.LENGTH_SHORT).show();
                                                 progressDialog.dismiss();
                                             } else {
@@ -258,8 +259,8 @@ public class AddEmployee extends Fragment {
                                                                 String getNum = latestUser.getUuid().substring(3, 8);
                                                                 user.setUuid("ATD" + increaseOneUnit(getNum));
                                                             }
-                                                            user.setAvatar("images/" + user.getPhone() + "_avatar");
-                                                            userRef.child(user.getPhone()).setValue(user);
+                                                            user.setAvatar("images/" + user.getUuid() + "_avatar");
+                                                            userRef.child(user.getUuid()).setValue(user);
 
                                                             progressDialog.dismiss();
                                                             Toast.makeText(getContext(), "New employee added", Toast.LENGTH_SHORT).show();
@@ -371,14 +372,16 @@ public class AddEmployee extends Fragment {
     }
 
     private boolean validate(String phoneNumber, String fullName, String birthday, String password, Boolean isFace) {
-        if (phoneNumber.equals("") || fullName.equals("") || birthday.equals("") || password.equals("")) {
+        if (fullName.equals("") || birthday.equals("") || password.equals("")) {
             Toast.makeText(getActivity(), "Invalid input !", Toast.LENGTH_SHORT).show();
             return false;
         }
 
-        if (phoneNumber.length() != 10 || !phoneNumber.matches(getString(R.string.regexPhone))) {
-            edtPhonenum.setError("Invalid phone !");
-            return false;
+        if(!phoneNumber.equals("")) {
+            if (phoneNumber.length() != 10 || !phoneNumber.matches(getString(R.string.regexPhone))) {
+                edtPhonenum.setError("Invalid phone !");
+                return false;
+            }
         }
 
         if (!isValidPassword(password)) {

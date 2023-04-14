@@ -21,6 +21,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -103,6 +104,7 @@ public class ProfileInformationFragment extends Fragment {
     Button btn_update;
     CircleImageView imgProfile;
     RadioButton rMale, rFemale;
+    TextView txtUserID;
     EditText edittext_name, edittext_phone, edittext_description, edittext_birthday;
     User_singeton user_singeton = User_singeton.getInstance();
     User user;
@@ -213,6 +215,12 @@ public class ProfileInformationFragment extends Fragment {
                 String fullName = edittext_name.getText().toString();
                 String birthday = edittext_birthday.getText().toString();
                 String description = edittext_description.getText().toString();
+                String regionPhone = edittext_phone.getText().toString();
+                String phone = "";
+                if(!regionPhone.equals("")) {
+                    phone = "0"+regionPhone.substring(3);
+                }
+
                 boolean sex = !rFemale.isChecked();
 
                 ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -232,6 +240,14 @@ public class ProfileInformationFragment extends Fragment {
                     return;
                 }
 
+                if(!phone.equals("")){
+                    if (phone.length() != 10 || !phone.matches(getString(R.string.regexPhone))) {
+                        edittext_phone.setError("Invalid phone !");
+                        return;
+                    }
+                    user.setPhone(phone);
+                }
+
                 user.setFullName(fullName);
                 user.setBirthday(birthday);
                 user.setDescription(description);
@@ -248,14 +264,14 @@ public class ProfileInformationFragment extends Fragment {
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] imageInByte = stream.toByteArray();
 
-                        uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(imageInByte);
+                        uploadTask = ref.child("images/" + user.getUuid() + "_avatar").putBytes(imageInByte);
                     }
 
                     else if(isCamera){
-                        uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(byteArray);
+                        uploadTask = ref.child("images/" + user.getUuid() + "_avatar").putBytes(byteArray);
                     }
                     else {
-                        uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putFile(filePath);
+                        uploadTask = ref.child("images/" + user.getUuid() + "_avatar").putFile(filePath);
                     }
 
                 }
@@ -265,7 +281,7 @@ public class ProfileInformationFragment extends Fragment {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     byte[] imageInByte = stream.toByteArray();
 
-                    uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(imageInByte);
+                    uploadTask = ref.child("images/" + user.getUuid() + "_avatar").putBytes(imageInByte);
                 }
 
                 uploadTask
@@ -275,7 +291,7 @@ public class ProfileInformationFragment extends Fragment {
                                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                                 DatabaseReference userRef = database.getReference("users");
 
-                                userRef.child(user.getPhone()).setValue(user);
+                                userRef.child(user.getUuid()).setValue(user);
                                 user_singeton.setUser(user);
 
                                 putDataToView();
@@ -357,6 +373,7 @@ public class ProfileInformationFragment extends Fragment {
             getActivity().finish();
         }
 
+        txtUserID.setText(user.getUuid());
         edittext_name.setText(user.getFullName());
         edittext_description.setText(user.getDescription());
         edittext_birthday.setText(user.getBirthday());
@@ -396,6 +413,7 @@ public class ProfileInformationFragment extends Fragment {
         edittext_description = (EditText) view.findViewById(R.id.edittext_description);
         edittext_birthday = (EditText) view.findViewById(R.id.edittext_birthday);
         btn_update = (Button) view.findViewById(R.id.btn_update);
+        txtUserID = (TextView) view.findViewById(R.id.txtUserID);
     }
 
     public static final int REQUEST_AUDIO_PERMISSION_CODE = 1;

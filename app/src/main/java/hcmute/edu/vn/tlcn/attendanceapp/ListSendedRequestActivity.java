@@ -81,7 +81,7 @@ public class ListSendedRequestActivity extends AppCompatActivity {
             public void onClick(View v) {
                 database = FirebaseDatabase.getInstance();
                 DatabaseReference waitingRef = database.getReference("dayoffreport");
-                waitingRef.orderByChild("userPhone").startAt(user.getPhone()).addValueEventListener(new ValueEventListener() {
+                waitingRef.orderByChild("userUUID").startAt(user.getUuid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         arrSentReq.clear();
@@ -180,10 +180,10 @@ public class ListSendedRequestActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     DayOffRequest dayOff = dataSnapshot.getValue(DayOffRequest.class);
-                    String phone = dayOff.getUserPhone();
+                    String uuid = dayOff.getUserUUID();
                     String day = dayOff.getDateOff();
 
-                    if (phone.equals(waitingReq.getUserPhone())
+                    if (uuid.equals(waitingReq.getUserUUID())
                             && day.equals(waitingReq.getDateOff())) {
                         String reqId = dataSnapshot.getKey();
                         dayOffReportRef.child(reqId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {

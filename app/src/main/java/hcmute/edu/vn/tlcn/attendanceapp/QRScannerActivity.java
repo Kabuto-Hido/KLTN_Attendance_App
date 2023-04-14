@@ -183,7 +183,7 @@ public class QRScannerActivity extends AppCompatActivity {
         String[] cutString = data.split("_");
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
-        myRef.child(cutString[1]).addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child(cutString[0]).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User_singeton isUser = User_singeton.getInstance();
@@ -214,7 +214,7 @@ public class QRScannerActivity extends AppCompatActivity {
                                                     if (results != null && results.equals(data)) {
                                                         mCodeScanner.releaseResources();
                                                         generateQR(loginUser);
-                                                        myRef.child(loginUser.getPhone()).setValue(loginUser);
+                                                        myRef.child(loginUser.getUuid()).setValue(loginUser);
 
                                                         User_singeton user_singeton = User_singeton.getInstance();
                                                         user_singeton.setUser(loginUser);

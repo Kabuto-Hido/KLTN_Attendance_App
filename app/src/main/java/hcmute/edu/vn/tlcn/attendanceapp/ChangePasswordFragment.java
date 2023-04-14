@@ -162,7 +162,7 @@ public class ChangePasswordFragment extends Fragment {
                     user.setPassword(newHashPass);
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference myRef = database.getReference("users");
-                    myRef.child(user.getPhone()).setValue(user);
+                    myRef.child(user.getUuid()).setValue(user);
                     Toast.makeText(getActivity(), "Change password successful.", Toast.LENGTH_SHORT).show();
 
                     timer = new Timer();

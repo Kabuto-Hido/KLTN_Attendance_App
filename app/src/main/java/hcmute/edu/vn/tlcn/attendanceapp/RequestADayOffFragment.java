@@ -145,7 +145,7 @@ public class RequestADayOffFragment extends Fragment {
                 }
                 final String reqId = UUID.randomUUID().toString();
 
-                DayOffRequest dayOffRequest = new DayOffRequest(user.getPhone(), reason, "waiting", dateDayOff);
+                DayOffRequest dayOffRequest = new DayOffRequest(user.getUuid(), reason, "waiting", dateDayOff);
 
                 database = FirebaseDatabase.getInstance();
                 DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
@@ -181,7 +181,7 @@ public class RequestADayOffFragment extends Fragment {
             database = FirebaseDatabase.getInstance();
             DatabaseReference dayOffRef = database.getReference("dayoffreport");
 
-            dayOffRef.orderByChild("userPhone").startAt(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+            dayOffRef.orderByChild("userUUID").startAt(user.getUuid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -194,7 +194,7 @@ public class RequestADayOffFragment extends Fragment {
                             break;
                         } else {
                             database = FirebaseDatabase.getInstance();
-                            DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
+                            DatabaseReference recordRef = database.getReference("record").child(user.getUuid());
                             recordRef.addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {

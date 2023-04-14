@@ -173,9 +173,10 @@ public class MonthlyEmpReportFragment extends Fragment {
                 result = new ArrayList<>();
                 for (User u : arrUser) {
                     if (u.getUuid().toLowerCase().contains(keyword.toLowerCase()) ||
-                            u.getFullName().toLowerCase().contains(keyword.toLowerCase())) {
+                            u.getFullName().toLowerCase().contains(keyword.toLowerCase()) ||
+                            u.getPhone().contains(keyword.trim())) {
                         for (Statistic s : arrStatistic) {
-                            if (s.getUserPhone().equals(u.getPhone())) {
+                            if (s.getUserUUID().equals(u.getUuid())) {
                                 result.add(s);
                             }
                         }
@@ -246,11 +247,11 @@ public class MonthlyEmpReportFragment extends Fragment {
                     arrStatistic.clear();
                     arrUser.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        String phone = dataSnapshot.getKey();
+                        String uuid = dataSnapshot.getKey();
                         User getUser = dataSnapshot.getValue(User.class);
                         arrUser.add(getUser);
 
-                        DatabaseReference statisticRef = database.getReference("statistic").child(phone);
+                        DatabaseReference statisticRef = database.getReference("statistic").child(uuid);
                         statisticRef.addValueEventListener(new ValueEventListener() {
                             @SuppressLint("SetTextI18n")
                             @Override
@@ -323,7 +324,7 @@ public class MonthlyEmpReportFragment extends Fragment {
         Collections.reverse(arrStatistic);
         for (Statistic s : arrStatistic) {
             for (User u : arrUser) {
-                if (s.getUserPhone().equals(u.getPhone())) {
+                if (s.getUserUUID().equals(u.getUuid())) {
                     table.addCell(new Cell().add(new Paragraph(u.getUuid())));
                     table.addCell(new Cell().add(new Paragraph(u.getFullName())));
                 }

@@ -204,6 +204,7 @@ public class EditEmpFragment extends Fragment {
             public void onClick(View v) {
                 String fullName = edtName.getText().toString();
                 String birthday = edtBirthday1.getText().toString();
+                String phone = edtPhonenum.getText().toString();
                 boolean sex = !radioFemale.isChecked();
 
                 ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -227,6 +228,14 @@ public class EditEmpFragment extends Fragment {
                 editUser.setBirthday(birthday);
                 editUser.setSex(sex);
 
+                if(!phone.equals("")){
+                    if (phone.length() != 10 || !phone.matches(getString(R.string.regexPhone))) {
+                        edtPhonenum.setError("Invalid phone !");
+                        return;
+                    }
+                    editUser.setPhone(phone);
+                }
+
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference ref = storage.getReference();
 
@@ -238,11 +247,11 @@ public class EditEmpFragment extends Fragment {
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                         byte[] imageInByte = stream.toByteArray();
 
-                        uploadTask = ref.child("images/" + editUser.getPhone() + "_avatar").putBytes(imageInByte);
+                        uploadTask = ref.child("images/" + editUser.getUuid()+ "_avatar").putBytes(imageInByte);
                     } else if (isCamera) {
-                        uploadTask = ref.child("images/" + editUser.getPhone() + "_avatar").putBytes(byteArray);
+                        uploadTask = ref.child("images/" + editUser.getUuid() + "_avatar").putBytes(byteArray);
                     } else {
-                        uploadTask = ref.child("images/" + editUser.getPhone() + "_avatar").putFile(filePath);
+                        uploadTask = ref.child("images/" + editUser.getUuid() + "_avatar").putFile(filePath);
                     }
 
 
@@ -252,7 +261,7 @@ public class EditEmpFragment extends Fragment {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     byte[] imageInByte = stream.toByteArray();
 
-                    uploadTask = ref.child("images/" + editUser.getPhone() + "_avatar").putBytes(imageInByte);
+                    uploadTask = ref.child("images/" + editUser.getUuid() + "_avatar").putBytes(imageInByte);
                 }
 
                 uploadTask
@@ -261,7 +270,7 @@ public class EditEmpFragment extends Fragment {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                                 DatabaseReference userRef = database.getReference("users");
-                                userRef.child(editUser.getPhone()).setValue(editUser);
+                                userRef.child(editUser.getUuid()).setValue(editUser);
 
                                 progressDialog.dismiss();
                                 Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
@@ -303,7 +312,7 @@ public class EditEmpFragment extends Fragment {
         String getPhone = editUser.getPhone();
         String phone = "+84" + getPhone.substring(1);
         edtPhonenum.setText(phone);
-        edtPhonenum.setBackgroundColor(Color.parseColor("#D9D9D9"));
+        //edtPhonenum.setBackgroundColor(Color.parseColor("#D9D9D9"));
         if (editUser.getSex()) {
             radioMale.setChecked(true);
         } else {

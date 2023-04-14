@@ -81,7 +81,7 @@ public class ResignationAdapter extends BaseAdapter {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
-        myRef.child(dayOffRequest.getUserPhone()).addValueEventListener(new ValueEventListener() {
+        myRef.child(dayOffRequest.getUserUUID()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
@@ -108,10 +108,10 @@ public class ResignationAdapter extends BaseAdapter {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for(DataSnapshot dataSnapshot: snapshot.getChildren()){
                             DayOffRequest dayOff = dataSnapshot.getValue(DayOffRequest.class);
-                            String phone = dayOff.getUserPhone();
+                            String uuid = dayOff.getUserUUID();
                             String day = dayOff.getDateOff();
 
-                            if(phone.equals(dayOffRequest.getUserPhone())
+                            if(uuid.equals(dayOffRequest.getUserUUID())
                                     && day.equals(dayOffRequest.getDateOff())){
 
                                 String reqId = dataSnapshot.getKey();
@@ -125,11 +125,11 @@ public class ResignationAdapter extends BaseAdapter {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         //check if user not check in
-                                        DataSnapshot dataSnapshot = snapshot.child(phone).child(day).child("checkIn");
+                                        DataSnapshot dataSnapshot = snapshot.child(uuid).child(day).child("checkIn");
                                         Record checkInRecord = dataSnapshot.getValue(Record.class);
                                         if (checkInRecord == null) {
-                                            Record absentRecord = new Record(phone, day, "", "absent with permission", "absent",new LocationRecord(null, null));
-                                            recordRef.child(phone).child(day).child("absent").setValue(absentRecord);
+                                            Record absentRecord = new Record(uuid, day, "", "absent with permission", "absent",new LocationRecord(null, null));
+                                            recordRef.child(uuid).child(day).child("absent").setValue(absentRecord);
 
                                             String currentMonth = day.substring(5,7);
                                             String currentYear = day.substring(0,4);
@@ -142,7 +142,7 @@ public class ResignationAdapter extends BaseAdapter {
                                                     DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
                                                     Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
 
-                                                    DataSnapshot dataSnapshot2 = snapshot.child(phone).child(currentYear).child(currentMonth);
+                                                    DataSnapshot dataSnapshot2 = snapshot.child(uuid).child(currentYear).child(currentMonth);
                                                     Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
 
@@ -150,28 +150,23 @@ public class ResignationAdapter extends BaseAdapter {
                                                     if(monthStatistic == null){
                                                         Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,"","00:00");
                                                         statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
-
-
                                                     }
                                                     else{
                                                         countAbsentWithPer = monthStatistic.getAbsentWithPer();
                                                         countAbsentWithPer++;
                                                         monthStatistic.setAbsentWithPer(countAbsentWithPer);
-
                                                         statisticRef.child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
-
                                                     }
 
                                                     if(empStatistic == null){
-                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,phone,"00:00");
-                                                        statisticRef.child(phone).child(currentYear).child(currentMonth).setValue(newStatistic);
+                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,uuid,"00:00");
+                                                        statisticRef.child(uuid).child(currentYear).child(currentMonth).setValue(newStatistic);
                                                     }
                                                     else{
                                                         countAbsentWithPer = empStatistic.getAbsentWithPer();
                                                         countAbsentWithPer++;
                                                         empStatistic.setAbsentWithPer(countAbsentWithPer);
-
-                                                        statisticRef.child(phone).child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
+                                                        statisticRef.child(uuid).child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
                                                     }
                                                 }
 
@@ -213,10 +208,10 @@ public class ResignationAdapter extends BaseAdapter {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for(DataSnapshot dataSnapshot: snapshot.getChildren()){
                             DayOffRequest dayOff = dataSnapshot.getValue(DayOffRequest.class);
-                            String phone = dayOff.getUserPhone();
+                            String uuid = dayOff.getUserUUID();
                             String day = dayOff.getDateOff();
 
-                            if(phone.equals(dayOffRequest.getUserPhone())
+                            if(uuid.equals(dayOffRequest.getUserUUID())
                                     && day.equals(dayOffRequest.getDateOff())){
                                 String reqId = dataSnapshot.getKey();
                                 dayOffReportRef.child(reqId).child("status").setValue("Deny");

@@ -94,11 +94,10 @@ public class SendOTPActivity extends AppCompatActivity {
 
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference("users");
-                myRef.addValueEventListener(new ValueEventListener() {
+                myRef.orderByChild("phone").equalTo(getPhone).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        DataSnapshot dataSnapshot = snapshot.child(getPhone);
-                        if (!dataSnapshot.exists()) {
+                        if (!snapshot.exists()) {
                             Toast.makeText(SendOTPActivity.this, "This phone number doesn't exist!", Toast.LENGTH_SHORT).show();
                         } else {
                             phone = "+84" + getPhone.substring(1);

@@ -199,7 +199,6 @@ public class HomeFragment extends Fragment {
         user = user_singeton.getUser();
         config_singleton = Config_singleton.getInstance();
         config = config_singleton.getConfig();
-        System.out.println(config.getPeriod());
 
         putDataToView();
 
@@ -238,8 +237,6 @@ public class HomeFragment extends Fragment {
                             dialog.show();
                         } else {
                             checkIsTimeCheckIn();
-                            System.out.println(status);
-                            System.out.println(absent);
                             if (absent) {
                                 btnTimeIn.setVisibility(View.INVISIBLE);
                                 notifiDone.setText("Check in time has passed!!");
@@ -251,9 +248,9 @@ public class HomeFragment extends Fragment {
 
                                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                                 DatabaseReference recordRef = database.getReference("record")
-                                        .child(user.getPhone()).child(absentDate).child("absent");
+                                        .child(user.getUuid()).child(absentDate).child("absent");
 
-                                Record absentRecord = new Record(user.getPhone(), absentDate, "", absent2, "absent",new LocationRecord(null,null));
+                                Record absentRecord = new Record(user.getUuid(), absentDate, "", absent2, "absent",new LocationRecord(null,null));
                                 recordRef.setValue(absentRecord);
                                 updateStatistic(absent2);
                                 Toast.makeText(getActivity(), "Attendance time has passed!!", Toast.LENGTH_SHORT).show();
@@ -301,7 +298,7 @@ public class HomeFragment extends Fragment {
                 DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
                 Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
 
-                DataSnapshot dataSnapshot2 = snapshot.child(user.getPhone()).child(currentYear).child(currentMonth);
+                DataSnapshot dataSnapshot2 = snapshot.child(user.getUuid()).child(currentYear).child(currentMonth);
                 Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
                 int countOnTime;
@@ -353,8 +350,8 @@ public class HomeFragment extends Fragment {
                         countAbsentWithoutPer = 1;
                     }
 
-                    Statistic newStatistic = new Statistic(countOnTime, countLate, 0, countAbsentWithoutPer, currentMonth, currentYear, user.getPhone(), "00:00");
-                    statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
+                    Statistic newStatistic = new Statistic(countOnTime, countLate, 0, countAbsentWithoutPer, currentMonth, currentYear, user.getUuid(), "00:00");
+                    statisticRef.child(user.getUuid()).child(currentYear).child(currentMonth).setValue(newStatistic);
                 } else {
                     countOnTime = empStatistic.getOnTime();
                     countLate = empStatistic.getLate();
@@ -369,7 +366,7 @@ public class HomeFragment extends Fragment {
                         countAbsentWithoutPer += 1;
                         empStatistic.setAbsentWithoutPer(countAbsentWithoutPer);
                     }
-                    statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(empStatistic);
+                    statisticRef.child(user.getUuid()).child(currentYear).child(currentMonth).setValue(empStatistic);
                 }
             }
 
@@ -411,7 +408,7 @@ public class HomeFragment extends Fragment {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference recordRef = database.getReference("record");
             if (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-                recordRef.child(user.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+                recordRef.child(user.getUuid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         //check-in
@@ -424,8 +421,8 @@ public class HomeFragment extends Fragment {
 
                         if (checkInRecord == null) {
                             if (absentRecord == null) {
-                                Record absent = new Record(user.getPhone(), dateAttend, "", absent2, "absent", new LocationRecord(null, null));
-                                recordRef.child(user.getPhone()).child(dateAttend).child("absent").setValue(absent);
+                                Record absent = new Record(user.getUuid(), dateAttend, "", absent2, "absent", new LocationRecord(null, null));
+                                recordRef.child(user.getUuid()).child(dateAttend).child("absent").setValue(absent);
 
                                 count += 1;
 
@@ -441,7 +438,7 @@ public class HomeFragment extends Fragment {
                                         Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
                                         int countAbsentWithoutPer;
 
-                                        DataSnapshot dataSnapshot2 = snapshot.child(user.getPhone()).child(currentYear).child(currentMonth);
+                                        DataSnapshot dataSnapshot2 = snapshot.child(user.getUuid()).child(currentYear).child(currentMonth);
                                         Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
                                         if (monthStatistic == null) {
@@ -454,12 +451,12 @@ public class HomeFragment extends Fragment {
                                         }
 
                                         if (empStatistic == null) {
-                                            Statistic newStatistic = new Statistic(0, 0, 0, count, currentMonth, currentYear, user.getPhone(), "00:00");
-                                            statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).setValue(newStatistic);
+                                            Statistic newStatistic = new Statistic(0, 0, 0, count, currentMonth, currentYear, user.getUuid(), "00:00");
+                                            statisticRef.child(user.getUuid()).child(currentYear).child(currentMonth).setValue(newStatistic);
                                         } else {
                                             countAbsentWithoutPer = empStatistic.getAbsentWithoutPer();
                                             countAbsentWithoutPer += count;
-                                            statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
+                                            statisticRef.child(user.getUuid()).child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
                                         }
                                     }
 
@@ -472,8 +469,8 @@ public class HomeFragment extends Fragment {
                             }
                         } else {
                             if (checkOutRecord == null) {
-                                Record checkOut = new Record(user.getPhone(), dateAttend, "17:00", "", "checkOut", new LocationRecord(null, null));
-                                recordRef.child(user.getPhone()).child(dateAttend).child("checkOut").setValue(checkOut);
+                                Record checkOut = new Record(user.getUuid(), dateAttend, "17:00", "", "checkOut", new LocationRecord(null, null));
+                                recordRef.child(user.getUuid()).child(dateAttend).child("checkOut").setValue(checkOut);
 
                                 try {
                                     Date timeOut = timeFormat.parse("17:00");
@@ -511,7 +508,7 @@ public class HomeFragment extends Fragment {
                                                 DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
                                                 Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
 
-                                                DataSnapshot dataSnapshot2 = snapshot.child(user.getPhone()).child(currentYear).child(currentMonth);
+                                                DataSnapshot dataSnapshot2 = snapshot.child(user.getUuid()).child(currentYear).child(currentMonth);
                                                 Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
                                                 String totalHourWorked = monthStatistic.getHourWorked();
@@ -523,7 +520,7 @@ public class HomeFragment extends Fragment {
                                                 String hourWorked = empStatistic.getHourWorked();
                                                 hourWorked = calTime(hourWorked, hoursGet);
                                                 //hourWorked += hoursGet;
-                                                statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).child("hourWorked").setValue(hourWorked);
+                                                statisticRef.child(user.getUuid()).child(currentYear).child(currentMonth).child("hourWorked").setValue(hourWorked);
 
                                             }
 
@@ -643,7 +640,7 @@ public class HomeFragment extends Fragment {
         });
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
+        DatabaseReference recordRef = database.getReference("record").child(user.getUuid());
 
         String currentDate = dateFormat.format(currentTime);
         recordRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -869,7 +866,7 @@ public class HomeFragment extends Fragment {
         System.out.println("Distance: " + dis);
         if (dis < 1.0f) {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
+            DatabaseReference recordRef = database.getReference("record").child(user.getUuid());
             if (type.equals("checkIn")) {
                 Toast.makeText(getActivity(), "Check In Successfully", Toast.LENGTH_SHORT).show();
 
@@ -877,7 +874,7 @@ public class HomeFragment extends Fragment {
                 String checkInDate = dateFormat.format(currentTime);
                 String checkInTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getPhone(), checkInDate, checkInTime, status, type, currentLocation);
+                Record record = new Record(user.getUuid(), checkInDate, checkInTime, status, type, currentLocation);
 
                 recordRef.child(checkInDate).child(type).setValue(record);
                 updateStatistic(status);
@@ -892,7 +889,7 @@ public class HomeFragment extends Fragment {
                 String checkOutDate = dateFormat.format(currentTime);
                 String checkOutTime = timeFormat.format(currentTime);
 
-                Record record = new Record(user.getPhone(), checkOutDate, checkOutTime, "", type, currentLocation);
+                Record record = new Record(user.getUuid(), checkOutDate, checkOutTime, "", type, currentLocation);
 
                 recordRef.child(checkOutDate).child(type).setValue(record);
 
@@ -910,7 +907,7 @@ public class HomeFragment extends Fragment {
 
     private void recordTimeWorked(String day, String timeCheckOut) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference recordRef = database.getReference("record").child(user.getPhone());
+        DatabaseReference recordRef = database.getReference("record").child(user.getUuid());
         recordRef.child(day).child("checkIn").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -940,7 +937,7 @@ public class HomeFragment extends Fragment {
                                 DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
                                 Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
 
-                                DataSnapshot dataSnapshot2 = snapshot.child(user.getPhone()).child(currentYear).child(currentMonth);
+                                DataSnapshot dataSnapshot2 = snapshot.child(user.getUuid()).child(currentYear).child(currentMonth);
                                 Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
                                 String totalHourWorked = monthStatistic.getHourWorked();
@@ -951,7 +948,7 @@ public class HomeFragment extends Fragment {
                                 hourWorked = calTime(diffDate, hourWorked);
 
                                 System.out.println(hourWorked);
-                                statisticRef.child(user.getPhone()).child(currentYear).child(currentMonth).child("hourWorked").setValue(hourWorked);
+                                statisticRef.child(user.getUuid()).child(currentYear).child(currentMonth).child("hourWorked").setValue(hourWorked);
 
                             }
 

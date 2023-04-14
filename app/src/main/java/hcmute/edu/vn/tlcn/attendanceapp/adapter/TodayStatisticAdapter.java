@@ -108,7 +108,7 @@ public class TodayStatisticAdapter extends BaseAdapter {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
 
-        myRef.child(record.getUserPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child(record.getUserUUID()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {

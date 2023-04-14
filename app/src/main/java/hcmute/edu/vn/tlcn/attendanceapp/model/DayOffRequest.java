@@ -3,13 +3,13 @@ package hcmute.edu.vn.tlcn.attendanceapp.model;
 import java.io.Serializable;
 
 public class DayOffRequest implements Serializable {
-    public String userPhone;
+    public String userUUID;
     public String reason;
     public String status;
     public String dateOff;
 
-    public DayOffRequest(String userPhone, String reason, String status, String dateOff) {
-        this.userPhone = userPhone;
+    public DayOffRequest(String userUUID, String reason, String status, String dateOff) {
+        this.userUUID = userUUID;
         this.reason = reason;
         this.status = status;
         this.dateOff = dateOff;
@@ -18,12 +18,12 @@ public class DayOffRequest implements Serializable {
     public DayOffRequest() {
     }
 
-    public String getUserPhone() {
-        return userPhone;
+    public String getUserUUID() {
+        return userUUID;
     }
 
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone;
+    public void setUserUUID(String userUUID) {
+        this.userUUID = userUUID;
     }
 
     public String getReason() {
