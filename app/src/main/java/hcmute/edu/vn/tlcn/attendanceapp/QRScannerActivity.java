@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -58,6 +59,8 @@ import com.squareup.picasso.Target;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -200,55 +203,49 @@ public class QRScannerActivity extends AppCompatActivity {
                 storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        Picasso.get().load(uri)
-                                .into(new Target() {
-                                    @Override
-                                    public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                                        InputImage img = InputImage.fromBitmap(bitmap, 0);
-                                        Task<List<Barcode>> results = scanner.process(img);
-                                        results.addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
-                                            @Override
-                                            public void onSuccess(List<Barcode> barcodes) {
-                                                for (Barcode barcode : barcodes) {
-                                                    String results = barcode.getDisplayValue();
-                                                    if (results != null && results.equals(data)) {
-                                                        mCodeScanner.releaseResources();
-                                                        generateQR(loginUser);
-                                                        myRef.child(loginUser.getUuid()).setValue(loginUser);
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    URL url = new URL(uri.toString());
+                                    Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                    InputImage img = InputImage.fromBitmap(bitmap, 0);
+                                    Task<List<Barcode>> results = scanner.process(img);
+                                    results.addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                                        @Override
+                                        public void onSuccess(List<Barcode> barcodes) {
+                                            for (Barcode barcode : barcodes) {
+                                                String results = barcode.getDisplayValue();
+                                                if (results != null && results.equals(data)) {
+                                                    mCodeScanner.releaseResources();
+                                                    generateQR(loginUser);
+                                                    myRef.child(loginUser.getUuid()).setValue(loginUser);
 
-                                                        User_singeton user_singeton = User_singeton.getInstance();
-                                                        user_singeton.setUser(loginUser);
-                                                        progressDialog.dismiss();
-                                                        Toast.makeText(QRScannerActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
+                                                    User_singeton user_singeton = User_singeton.getInstance();
+                                                    user_singeton.setUser(loginUser);
+                                                    progressDialog.dismiss();
+                                                    Toast.makeText(QRScannerActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
 
-                                                        if (loginUser.getRole() == 1) {
-                                                            startActivity(new Intent(QRScannerActivity.this, MainActivity.class));
-                                                        } else {
-                                                            startActivity(new Intent(QRScannerActivity.this, AdminMainActivity.class));
-                                                        }
-                                                        finish();
-                                                        break;
+                                                    if (loginUser.getRole() == 1) {
+                                                        startActivity(new Intent(QRScannerActivity.this, MainActivity.class));
                                                     } else {
-                                                        Toast.makeText(QRScannerActivity.this, "Invalid QR Code!", Toast.LENGTH_SHORT).show();
-                                                        progressDialog.dismiss();
+                                                        startActivity(new Intent(QRScannerActivity.this, AdminMainActivity.class));
                                                     }
+                                                    finish();
+                                                    break;
+                                                } else {
+                                                    Toast.makeText(QRScannerActivity.this, "Invalid QR Code!", Toast.LENGTH_SHORT).show();
+                                                    progressDialog.dismiss();
                                                 }
                                             }
-                                        });
-
-                                    }
-
-                                    @Override
-                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                                    }
-
-                                    @Override
-                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                    }
-                                });
-
+                                        }
+                                    });
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        thread.start();
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
