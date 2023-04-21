@@ -17,4 +17,11 @@
         <item name="android:editTextColor">@color/white</item>
         <item name="android:textColorHint">#f2f2f2</item>
     </style>
+
+    <style name="buttonStyle">
+        <item name="android:textSize">15sp</item>
+        <item name="backgroundTint">#434343</item>
+        <item name="android:textColor">@color/button_text_state_color</item>
+    </style>
+
 </resources>

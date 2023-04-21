@@ -119,7 +119,9 @@ public class EditEmpFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_edit_emp, container, false);
 
         mapping();
-        editUser = (User) getArguments().getSerializable("edtUser");
+        if (getArguments() != null) {
+            editUser = (User) getArguments().getSerializable("edtUser");
+        }
 
         putDataToView();
 

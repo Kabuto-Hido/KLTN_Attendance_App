@@ -128,14 +128,49 @@ public class ResignationAdapter extends BaseAdapter {
                                         DataSnapshot dataSnapshot = snapshot.child(uuid).child(day).child("checkIn");
                                         Record checkInRecord = dataSnapshot.getValue(Record.class);
                                         if (checkInRecord == null) {
-                                            Record absentRecord = new Record(uuid, day, "", "absent with permission", "absent",new LocationRecord(null, null));
-                                            recordRef.child(uuid).child(day).child("absent").setValue(absentRecord);
-
                                             String currentMonth = day.substring(5,7);
                                             String currentYear = day.substring(0,4);
 
+                                            Record absentRecord;
+                                            DataSnapshot absentSnapshot = snapshot.child(uuid).child(day).child("absent");
+
                                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                                             DatabaseReference statisticRef = database.getReference("statistic");
+                                            if(!absentSnapshot.exists()){
+                                                absentRecord = new Record(uuid, day, "", "absent with permission", "absent",new LocationRecord(null, null));
+                                                recordRef.child(uuid).child(day).child("absent").setValue(absentRecord);
+                                            }else {
+                                                absentRecord = dataSnapshot.getValue(Record.class);
+                                                if(absentRecord.getStatus().equals("absent without permission")){
+                                                    statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                            DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
+                                                            Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
+
+                                                            DataSnapshot dataSnapshot2 = snapshot.child(uuid).child(currentYear).child(currentMonth);
+                                                            Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
+
+                                                            int countAbsentWithoutPer;
+                                                            countAbsentWithoutPer = monthStatistic.getAbsentWithoutPer();
+                                                            countAbsentWithoutPer--;
+                                                            statisticRef.child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
+
+                                                            //emp statistic
+                                                            countAbsentWithoutPer = empStatistic.getAbsentWithoutPer();
+                                                            countAbsentWithoutPer--;
+                                                            statisticRef.child(uuid).child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
+
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                                        }
+                                                    });
+                                                }
+                                            }
+
                                             statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -145,7 +180,6 @@ public class ResignationAdapter extends BaseAdapter {
                                                     DataSnapshot dataSnapshot2 = snapshot.child(uuid).child(currentYear).child(currentMonth);
                                                     Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
-
                                                     int countAbsentWithPer;
                                                     if(monthStatistic == null){
                                                         Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,"","00:00");
@@ -154,7 +188,6 @@ public class ResignationAdapter extends BaseAdapter {
                                                     else{
                                                         countAbsentWithPer = monthStatistic.getAbsentWithPer();
                                                         countAbsentWithPer++;
-                                                        monthStatistic.setAbsentWithPer(countAbsentWithPer);
                                                         statisticRef.child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
                                                     }
 
@@ -165,7 +198,6 @@ public class ResignationAdapter extends BaseAdapter {
                                                     else{
                                                         countAbsentWithPer = empStatistic.getAbsentWithPer();
                                                         countAbsentWithPer++;
-                                                        empStatistic.setAbsentWithPer(countAbsentWithPer);
                                                         statisticRef.child(uuid).child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
                                                     }
                                                 }
@@ -175,6 +207,7 @@ public class ResignationAdapter extends BaseAdapter {
 
                                                 }
                                             });
+
                                         }
                                     }
 

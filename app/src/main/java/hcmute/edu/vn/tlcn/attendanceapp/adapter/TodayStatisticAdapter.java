@@ -3,11 +3,14 @@ package hcmute.edu.vn.tlcn.attendanceapp.adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +29,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import hcmute.edu.vn.tlcn.attendanceapp.AdminMainActivity;
+import hcmute.edu.vn.tlcn.attendanceapp.EditRecordFragment;
 import hcmute.edu.vn.tlcn.attendanceapp.R;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Record;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Statistic;
@@ -65,7 +70,8 @@ public class TodayStatisticAdapter extends BaseAdapter {
 
     private class ViewHolder{
         CircleImageView empImageView;
-        TextView txtEmpName, txtStatus;
+        ImageView btnEditRecord;
+        TextView txtEmpCode, txtEmpName, txtStatus;
     }
 
     @Override
@@ -79,6 +85,8 @@ public class TodayStatisticAdapter extends BaseAdapter {
             holder.empImageView = (CircleImageView) convertView.findViewById(R.id.empImageView);
             holder.txtEmpName = (TextView) convertView.findViewById(R.id.txtEmpName);
             holder.txtStatus = (TextView) convertView.findViewById(R.id.txtStatus);
+            holder.txtEmpCode = (TextView) convertView.findViewById(R.id.txtEmpCode);
+            holder.btnEditRecord = (ImageView) convertView.findViewById(R.id.btnEditRecord);
 
             convertView.setTag(holder);
         }
@@ -91,9 +99,11 @@ public class TodayStatisticAdapter extends BaseAdapter {
         switch (record.getStatus()) {
             case "on time":
                 holder.txtStatus.setTextColor(Color.parseColor("#00FF00"));
+                holder.btnEditRecord.setVisibility(View.GONE);
                 break;
             case "late":
                 holder.txtStatus.setTextColor(Color.parseColor("#ffff33"));
+                holder.btnEditRecord.setVisibility(View.GONE);
                 break;
             case "absent without permission":
                 holder.txtStatus.setTextColor(Color.parseColor("#FF3131"));
@@ -102,12 +112,11 @@ public class TodayStatisticAdapter extends BaseAdapter {
                 holder.txtStatus.setTextColor(Color.parseColor("#00ffff"));
                 break;
         }
-
         holder.txtStatus.setText(record.getStatus());
+        holder.txtEmpCode.setText(record.getUserUUID());
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
-
         myRef.child(record.getUserUUID()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -134,6 +143,17 @@ public class TodayStatisticAdapter extends BaseAdapter {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        holder.btnEditRecord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("editRecord",record);
+                EditRecordFragment editRecordFragment = new EditRecordFragment();
+                editRecordFragment.setArguments(bundle);
+                ((AdminMainActivity)context).getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, editRecordFragment).commit();
             }
         });
 

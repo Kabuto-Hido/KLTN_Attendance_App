@@ -1,16 +1,32 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.mlkit.vision.common.InputImage;
+
+import java.io.IOException;
+
+import hcmute.edu.vn.tlcn.attendanceapp.adapter.ResignationAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -62,10 +78,13 @@ public class SettingsFragment extends Fragment {
     }
 
     View view;
-    TextView txtProfile, txtChangePassword, txtLogOut, txtDay_off, txtQRCode;
+    TextView txtProfile, txtChangePassword, txtLogOut, txtDay_off, txtQRCode, txtFeedback;
     User_singeton user_singeton;
     User user;
     SharedPreferences sharedPreferences;
+    private final int PICK_IMAGE1_REQUEST = 25;
+    private final int PICK_IMAGE2_REQUEST = 26;
+    ViewHolder holder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -132,7 +151,121 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        txtFeedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog();
+            }
+        });
+
         return view;
+    }
+
+    private static class ViewHolder{
+        EditText edtDetails, edtContact;
+        ImageView img1,img2, deleteImg1, deleteImg2;
+        Button btn_cancelFeedback, btn_sendFeedback;
+    }
+
+    private void showDialog(){
+        holder = new ViewHolder();
+        AlertDialog dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View layout_dialog = inflater.inflate(R.layout.dialog_send_feedback, null);
+        layout_dialog.setTag(holder);
+        builder.setView(layout_dialog);
+
+        holder.edtDetails = layout_dialog.findViewById(R.id.edtDetails);
+        holder.img1 = layout_dialog.findViewById(R.id.img1);
+        holder.img2 = layout_dialog.findViewById(R.id.img2);
+        holder.deleteImg1 = layout_dialog.findViewById(R.id.deleteImg1);
+        holder.deleteImg2 = layout_dialog.findViewById(R.id.deleteImg2);
+        holder.edtContact = layout_dialog.findViewById(R.id.edtContact);
+        holder.btn_cancelFeedback = layout_dialog.findViewById(R.id.btn_cancelFeedback);
+        holder.btn_sendFeedback = layout_dialog.findViewById(R.id.btn_sendFeedback);
+
+        dialog = builder.create();
+        dialog.getWindow().setGravity(Gravity.CENTER);
+        dialog.setCancelable(false);
+        dialog.show();
+
+        holder.img1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select image..."), PICK_IMAGE1_REQUEST);
+            }
+        });
+
+        holder.img2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select image..."), PICK_IMAGE2_REQUEST);
+            }
+        });
+
+        holder.deleteImg1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.img1.setImageResource(R.drawable.ic_add_image);
+                holder.deleteImg1.setVisibility(View.GONE);
+            }
+        });
+
+        holder.deleteImg2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.img2.setImageResource(R.drawable.ic_add_image);
+                holder.deleteImg2.setVisibility(View.GONE);
+            }
+        });
+
+        holder.edtDetails.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                holder.btn_sendFeedback.setEnabled(holder.edtDetails.getText().toString().length() != 0);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        holder.btn_cancelFeedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE1_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            Uri filePath1 = data.getData();
+            holder.img1.setImageURI(filePath1);
+            holder.deleteImg1.setVisibility(View.VISIBLE);
+        }
+        else if (requestCode == PICK_IMAGE2_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            Uri filePath2 = data.getData();
+            holder.img2.setImageURI(filePath2);
+            holder.deleteImg2.setVisibility(View.VISIBLE);
+        }
     }
 
     private void mapping() {
@@ -141,5 +274,6 @@ public class SettingsFragment extends Fragment {
         txtLogOut = (TextView) view.findViewById(R.id.txtLogOut);
         txtDay_off = (TextView) view.findViewById(R.id.txtDay_off);
         txtQRCode = (TextView) view.findViewById(R.id.txtQRCode);
+        txtFeedback = (TextView) view.findViewById(R.id.txtFeedback);
     }
 }

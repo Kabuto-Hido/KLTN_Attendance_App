@@ -224,7 +224,7 @@ public class Manage_Emp_Fragment extends Fragment {
                         if (snapshot.hasChild(user.getUuid())) {
                             userRef.child(user.getUuid()).setValue(user);
                             Toast.makeText(getActivity(), "New " + user.getUuid()
-                                    + "'s password is 123456", Toast.LENGTH_SHORT).show();
+                                    + "'s password is Kltn2023*", Toast.LENGTH_SHORT).show();
 
                             dialog.dismiss();
 

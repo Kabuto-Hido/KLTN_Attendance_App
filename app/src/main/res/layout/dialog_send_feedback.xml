@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#434343">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Feedback"
+        android:layout_marginTop="30sp"
+        android:layout_marginStart="20dp"
+        android:layout_gravity="start"
+        android:textColor="@color/white"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:id="@+id/edtDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:autofillHints=""
+        android:background="#565656"
+        android:drawablePadding="15sp"
+        android:hint="Please write details"
+        android:inputType="textMultiLine|text"
+        android:lines="6"
+        android:maxLines="6"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:textColor="@color/white"
+        android:textColorHint="#7D7D7D"
+        android:textSize="18sp"
+        tools:ignore="TextContrastCheck" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp">
+
+        <ImageView
+            android:id="@+id/img1"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginStart="20dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_add_image"/>
+
+        <ImageView
+            android:id="@+id/deleteImg1"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="70dp"
+            android:visibility="invisible"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_dangerous_24"/>
+
+        <ImageView
+            android:id="@+id/img2"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_toEndOf="@+id/img1"
+            android:layout_marginStart="5dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_add_image"/>
+
+        <ImageView
+            android:id="@+id/deleteImg2"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="145dp"
+            android:visibility="invisible"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_dangerous_24"/>
+
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/edtContact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:autofillHints=""
+        android:background="#565656"
+        android:drawablePadding="15sp"
+        android:hint="Optional"
+        android:inputType="text"
+        android:padding="15dp"
+        android:textColor="@color/white"
+        android:textColorHint="#7D7D7D"
+        android:textSize="18sp"
+        tools:ignore="TextContrastCheck" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="end"
+        android:layout_marginBottom="10dp">
+
+        <Button
+            android:id="@+id/btn_cancelFeedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#434343"
+            android:layout_marginEnd="50dp"
+            android:text="cancel"
+            android:textSize="15sp"
+            android:textAllCaps="true"/>
+
+        <Button
+            android:id="@+id/btn_sendFeedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/buttonStyle"
+            android:layout_marginEnd="20dp"
+            android:enabled="false"
+            android:text="send"
+            android:textAllCaps="true"/>
+
+    </LinearLayout>
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>
