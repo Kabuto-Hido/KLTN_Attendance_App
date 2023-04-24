@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ListFeedbackFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/linearLay"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#2196F3"
+            android:padding="6dp">
+            <ImageView
+                android:id="@+id/btnBackFeedback"
+                android:layout_width="40dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/baseline_arrow_back_white_24"
+                android:contentDescription="TODO" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="List Feedback"
+                android:gravity="center_vertical"
+                android:textStyle="bold"
+                android:layout_marginStart="30dp"
+                android:textColor="@color/white"
+                android:textSize="25sp"
+                android:layout_marginBottom="2dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtNotification"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/linearLay"
+            android:text="No Feedback"
+            android:gravity="center"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:visibility="invisible" />
+
+        <ListView
+            android:id="@+id/listviewFeedback"
+            android:divider="#F8F8F8"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/linearLay" />
+
+    </RelativeLayout>
+</FrameLayout>

@@ -7,5 +7,4 @@
     <string name="regexPhone" translatable="false">^[0-9]{10}$</string>
     <string name="checkin_time">Checkin time:</string>
     <string name="checkout_time">Checkout time:</string>
-
 </resources>

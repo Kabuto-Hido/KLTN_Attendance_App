@@ -2,6 +2,7 @@ package hcmute.edu.vn.tlcn.attendanceapp;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,15 +19,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.mlkit.vision.common.InputImage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.UUID;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.ResignationAdapter;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Feedback;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 import hcmute.edu.vn.tlcn.attendanceapp.pattern.User_singeton;
 
@@ -85,6 +96,8 @@ public class SettingsFragment extends Fragment {
     private final int PICK_IMAGE1_REQUEST = 25;
     private final int PICK_IMAGE2_REQUEST = 26;
     ViewHolder holder;
+    Uri filePath1;
+    Uri filePath2;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -214,6 +227,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 holder.img1.setImageResource(R.drawable.ic_add_image);
+                filePath1 = null;
                 holder.deleteImg1.setVisibility(View.GONE);
             }
         });
@@ -222,6 +236,7 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 holder.img2.setImageResource(R.drawable.ic_add_image);
+                filePath2 = null;
                 holder.deleteImg2.setVisibility(View.GONE);
             }
         });
@@ -249,6 +264,51 @@ public class SettingsFragment extends Fragment {
                 dialog.dismiss();
             }
         });
+
+        holder.btn_sendFeedback.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("UseCompatLoadingForDrawables")
+            @Override
+            public void onClick(View v) {
+                String details = holder.edtDetails.getText().toString();
+                String contact = "";
+                if(holder.edtContact.getText().toString().length() != 0){
+                    contact = holder.edtContact.getText().toString();
+                }
+                Feedback newFeedback = new Feedback(user.getUuid(), details, contact);
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference feedbackRef = database.getReference("feedback");
+                final String fbId = UUID.randomUUID().toString();
+
+                ArrayList<Uri> listUri =  new ArrayList<>();
+                ArrayList<String> imgs = new ArrayList<>();
+                if(filePath1 != null){
+                    listUri.add(filePath1);
+                }
+                if(filePath2 != null){
+                    listUri.add(filePath2);
+                }
+
+                if(listUri.size() != 0) {
+                    FirebaseStorage storage = FirebaseStorage.getInstance();
+                    StorageReference ref = storage.getReference();
+                    for (int i = 0; i < listUri.size(); i++) {
+                        Uri individualImg = listUri.get(i);
+                        int pos = i + 1;
+                        ref.child("images/feedback/" + fbId + "_" + pos).putFile(individualImg);
+
+                        imgs.add("images/feedback/" + fbId + "_" + pos);
+                    }
+                    newFeedback.setImages(imgs);
+                }
+                feedbackRef.child(fbId).setValue(newFeedback);
+
+                filePath1 = null;
+                filePath2 = null;
+
+                Toast.makeText(getActivity(), "Thank you sent us feedback!", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -256,13 +316,13 @@ public class SettingsFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE1_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
-            Uri filePath1 = data.getData();
+            filePath1 = data.getData();
             holder.img1.setImageURI(filePath1);
             holder.deleteImg1.setVisibility(View.VISIBLE);
         }
         else if (requestCode == PICK_IMAGE2_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
-            Uri filePath2 = data.getData();
+            filePath2 = data.getData();
             holder.img2.setImageURI(filePath2);
             holder.deleteImg2.setVisibility(View.VISIBLE);
         }

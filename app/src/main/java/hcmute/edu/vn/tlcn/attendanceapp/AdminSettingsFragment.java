@@ -69,7 +69,8 @@ public class AdminSettingsFragment extends Fragment {
 
     View view;
     TextView txtEmployee, txtAdminProfile, txtAdminChangePassword, txtConfig,
-            txtAdminLogOut, txtListResignations, txtQuantityResignation, txtAdminQRCode;
+            txtAdminLogOut, txtListResignations, txtQuantityResignation, txtAdminQRCode,
+            txtListFeedback, txtAmountFeedback;
     User_singeton user_singeton;
     SharedPreferences sharedPreferences;
 
@@ -129,6 +130,14 @@ public class AdminSettingsFragment extends Fragment {
             }
         });
 
+        txtListFeedback.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ListFeedbackFragment listFeedbackFragment = new ListFeedbackFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, listFeedbackFragment).commit();
+            }
+        });
+
         txtListResignations.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -160,7 +169,6 @@ public class AdminSettingsFragment extends Fragment {
     private void getData() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
-
         dayOffReportRef.orderByChild("status").startAt("waiting").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -168,6 +176,23 @@ public class AdminSettingsFragment extends Fragment {
                 if (amountWaitingForm != 0L) {
                     txtQuantityResignation.setText(String.valueOf(amountWaitingForm));
                     txtQuantityResignation.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference FeedbackRef = database.getReference("feedback");
+        FeedbackRef.orderByChild("seen").equalTo(false).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long amountNotSeen = snapshot.getChildrenCount();
+                if (amountNotSeen != 0L) {
+                    txtAmountFeedback.setText(String.valueOf(amountNotSeen));
+                    txtAmountFeedback.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -187,5 +212,7 @@ public class AdminSettingsFragment extends Fragment {
         txtQuantityResignation = (TextView) view.findViewById(R.id.txtQuantityResignation);
         txtAdminQRCode = (TextView) view.findViewById(R.id.txtAdminQRCode);
         txtConfig = (TextView) view.findViewById(R.id.txtConfig);
+        txtListFeedback = (TextView) view.findViewById(R.id.txtListFeedback);
+        txtAmountFeedback = (TextView) view.findViewById(R.id.txtAmountFeedback);
     }
 }

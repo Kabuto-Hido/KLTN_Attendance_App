@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    android:background="@color/white"
+    android:id="@+id/backgroundRow">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/empFeedbackImg"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/person_white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/txtDetail"/>
+
+    <TextView
+        android:layout_marginStart="15dp"
+        android:id="@+id/txtEmpUUID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Code"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize= "20sp"
+        app:layout_constraintLeft_toRightOf="@id/empFeedbackImg"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_marginStart="15dp"
+        android:id="@+id/txtDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:text="Date"
+        android:textSize= "18sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtDetail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:text=""
+        android:singleLine="false"
+        android:lines="2"
+        android:maxLines="2"
+        android:textColor="@color/black"
+        android:layout_marginStart="15dp"
+        app:layout_constraintLeft_toRightOf="@id/empFeedbackImg"
+        app:layout_constraintTop_toBottomOf="@id/txtEmpUUID"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -232,9 +232,9 @@ public class AddEmployee extends Fragment {
                     }
                     UploadTask uploadTask;
                     if (isCamera) {
-                        uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putBytes(byteArray);
+                        uploadTask = ref.child("images/" + user.getUuid() + "_avatar").putBytes(byteArray);
                     } else {
-                        uploadTask = ref.child("images/" + user.getPhone() + "_avatar").putFile(filePath);
+                        uploadTask = ref.child("images/" + user.getUuid() + "_avatar").putFile(filePath);
                     }
                     uploadTask
                             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

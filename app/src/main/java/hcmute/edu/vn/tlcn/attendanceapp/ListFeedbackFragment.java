@@ -1,16 +1,16 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.os.Bundle;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,15 +20,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import hcmute.edu.vn.tlcn.attendanceapp.adapter.ResignationAdapter;
+import hcmute.edu.vn.tlcn.attendanceapp.adapter.FeedbackAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
+import hcmute.edu.vn.tlcn.attendanceapp.model.Feedback;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ListResignationFragment#newInstance} factory method to
+ * Use the {@link ListFeedbackFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ListResignationFragment extends Fragment {
+public class ListFeedbackFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,7 +40,7 @@ public class ListResignationFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public ListResignationFragment() {
+    public ListFeedbackFragment() {
         // Required empty public constructor
     }
 
@@ -49,11 +50,11 @@ public class ListResignationFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ListResignationFragment.
+     * @return A new instance of fragment ListFeedbackFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ListResignationFragment newInstance(String param1, String param2) {
-        ListResignationFragment fragment = new ListResignationFragment();
+    public static ListFeedbackFragment newInstance(String param1, String param2) {
+        ListFeedbackFragment fragment = new ListFeedbackFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -71,23 +72,25 @@ public class ListResignationFragment extends Fragment {
     }
 
     View view;
-    TextView textviewNotifi;
-    ImageView btnBackResignation;
-    ListView listviewResignation;
-    ResignationAdapter adapter;
-    ArrayList<DayOffRequest> requestList = new ArrayList<>();
+    ImageView btnBackFeedback;
+    ListView listviewFeedback;
+    TextView txtNotification;
+    FeedbackAdapter feedbackAdapter;
+    ArrayList<Feedback> arrFeedback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_list_resignation, container, false);
+        view = inflater.inflate(R.layout.fragment_list_feedback, container, false);
 
         mapping();
 
-        adapter = new ResignationAdapter(getActivity(), R.layout.resignation_row, requestList);
-        listviewResignation.setAdapter(adapter);
+        arrFeedback = new ArrayList<>();
+        feedbackAdapter = new FeedbackAdapter(arrFeedback, getActivity(), R.layout.feedback_row);
+        listviewFeedback.setAdapter(feedbackAdapter);
+        putDataToView();
 
-        btnBackResignation.setOnClickListener(new View.OnClickListener() {
+        btnBackFeedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AdminSettingsFragment adminSettingsFragment = new AdminSettingsFragment();
@@ -95,43 +98,42 @@ public class ListResignationFragment extends Fragment {
             }
         });
 
-        putDataToView();
-
         return view;
     }
 
     private void putDataToView() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
-        dayOffReportRef.orderByChild("status").startAt("waiting").addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference feedbackRef = database.getReference("feedback");
+        feedbackRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                requestList.clear();
+                arrFeedback.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    DayOffRequest dayOffRequest = dataSnapshot.getValue(DayOffRequest.class);
-                    requestList.add(dayOffRequest);
+                    Feedback feedback = dataSnapshot.getValue(Feedback.class);
+                    arrFeedback.add(feedback);
                 }
-                adapter.notifyDataSetChanged();
+                feedbackAdapter.notifyDataSetChanged();
 
-                if (requestList.size() == 0) {
-                    textviewNotifi.setVisibility(View.VISIBLE);
-                    listviewResignation.setVisibility(View.INVISIBLE);
+                if (arrFeedback.size() == 0) {
+                    txtNotification.setVisibility(View.VISIBLE);
+                    listviewFeedback.setVisibility(View.GONE);
                 } else {
-                    textviewNotifi.setVisibility(View.INVISIBLE);
-                    listviewResignation.setVisibility(View.VISIBLE);
+                    txtNotification.setVisibility(View.INVISIBLE);
+                    listviewFeedback.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.v("", error.getMessage());
+
             }
         });
+
     }
 
     private void mapping() {
-        btnBackResignation = (ImageView) view.findViewById(R.id.btnBackResignation);
-        listviewResignation = (ListView) view.findViewById(R.id.listviewResignation);
-        textviewNotifi = (TextView) view.findViewById(R.id.textviewNotifi);
+        btnBackFeedback = (ImageView) view.findViewById(R.id.btnBackFeedback);
+        listviewFeedback = (ListView) view.findViewById(R.id.listviewFeedback);
+        txtNotification = (TextView) view.findViewById(R.id.txtNotification);
     }
 }
