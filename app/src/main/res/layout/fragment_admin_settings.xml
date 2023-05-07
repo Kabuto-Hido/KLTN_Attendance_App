@@ -114,7 +114,7 @@
                 android:textSize="20sp"
                 android:background="@drawable/border_line"
                 android:drawablePadding="24dp"
-                app:drawableStartCompat="@drawable/ic_baseline_access_time_filled_24" />
+                app:drawableStartCompat="@drawable/ic_feedback" />
 
             <TextView
                 android:id="@+id/txtAmountFeedback"
@@ -182,6 +182,23 @@
             android:textSize="20sp"
             android:drawablePadding="24dp"
             app:drawableStartCompat="@drawable/ic_baseline_profile_person" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#AEAEAE"/>
+
+        <TextView
+            android:id="@+id/txtListHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="History"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:background="@drawable/border_line"
+            android:textSize="20sp"
+            android:drawablePadding="24dp"
+            app:drawableStartCompat="@drawable/ic_history" />
 
         <TextView
             android:layout_width="match_parent"

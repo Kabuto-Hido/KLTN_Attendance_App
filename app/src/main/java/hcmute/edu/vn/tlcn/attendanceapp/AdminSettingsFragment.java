@@ -70,7 +70,7 @@ public class AdminSettingsFragment extends Fragment {
     View view;
     TextView txtEmployee, txtAdminProfile, txtAdminChangePassword, txtConfig,
             txtAdminLogOut, txtListResignations, txtQuantityResignation, txtAdminQRCode,
-            txtListFeedback, txtAmountFeedback;
+            txtListFeedback, txtAmountFeedback, txtListHistory;
     User_singeton user_singeton;
     SharedPreferences sharedPreferences;
 
@@ -163,6 +163,14 @@ public class AdminSettingsFragment extends Fragment {
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, changeAttendanceTimeFragment).commit();
             }
         });
+
+        txtListHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UpdateHistoryFragment updateHistoryFragment = new UpdateHistoryFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flAdminFragment, updateHistoryFragment).commit();
+            }
+        });
         return view;
     }
 
@@ -214,5 +222,6 @@ public class AdminSettingsFragment extends Fragment {
         txtConfig = (TextView) view.findViewById(R.id.txtConfig);
         txtListFeedback = (TextView) view.findViewById(R.id.txtListFeedback);
         txtAmountFeedback = (TextView) view.findViewById(R.id.txtAmountFeedback);
+        txtListHistory = (TextView) view.findViewById(R.id.txtListHistory);
     }
 }

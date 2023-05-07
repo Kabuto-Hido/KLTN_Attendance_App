@@ -1,15 +1,12 @@
 package hcmute.edu.vn.tlcn.attendanceapp.adapter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,15 +29,15 @@ import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import hcmute.edu.vn.tlcn.attendanceapp.R;
-import hcmute.edu.vn.tlcn.attendanceapp.model.Feedback;
+import hcmute.edu.vn.tlcn.attendanceapp.model.UpdateHistory;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
 
-public class FeedbackAdapter extends BaseAdapter {
-    private ArrayList<Feedback> feedbackArrayList;
+public class UpdateHistoryAdapter extends BaseAdapter {
+    private ArrayList<UpdateHistory> feedbackArrayList;
     private Context context;
     private int layout;
 
-    public FeedbackAdapter(ArrayList<Feedback> feedbackArrayList, Context context, int layout) {
+    public UpdateHistoryAdapter(ArrayList<UpdateHistory> feedbackArrayList, Context context, int layout) {
         this.feedbackArrayList = feedbackArrayList;
         this.context = context;
         this.layout = layout;
@@ -62,9 +59,7 @@ public class FeedbackAdapter extends BaseAdapter {
     }
 
     private class ViewHolder{
-        CircleImageView empFeedbackImg;
-        TextView txtEmpUUID, txtDetail, txtDate;
-        ConstraintLayout backgroundRow;
+        TextView txtPerformer, txtPerformDate;
     }
 
     @Override
@@ -75,55 +70,31 @@ public class FeedbackAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(layout,null);
 
-            holder.empFeedbackImg = (CircleImageView) convertView.findViewById(R.id.empFeedbackImg);
-            holder.txtEmpUUID = (TextView) convertView.findViewById(R.id.txtEmpUUID);
-            holder.txtDetail = (TextView) convertView.findViewById(R.id.txtDetail);
-            holder.txtDate = (TextView) convertView.findViewById(R.id.txtDate);
-            holder.backgroundRow = (ConstraintLayout) convertView.findViewById(R.id.backgroundRow);
+            holder.txtPerformer = (TextView) convertView.findViewById(R.id.txtPerformer);
+            holder.txtPerformDate = (TextView) convertView.findViewById(R.id.txtPerformDate);
 
             convertView.setTag(holder);
         }
         else{
             holder = (ViewHolder) convertView.getTag();
         }
-        Feedback feedback = feedbackArrayList.get(position);
-        holder.txtEmpUUID.setText(feedback.getUserUUID());
-        holder.txtDetail.setText(feedback.getDetail());
 
-        Date createAt = feedback.getCreateAt();
+        UpdateHistory history = feedbackArrayList.get(position);
+
+        Date createAt = history.getImplDate();
         SimpleDateFormat dayFormat = new SimpleDateFormat("MMM-dd");
         SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
         String date = dayFormat.format(createAt) + " at " + timeFormat.format(createAt);
-        holder.txtDate.setText(date);
-
-        if(!feedback.isSeen()){
-            holder.backgroundRow.setBackgroundColor(Color.parseColor("#E7F3FF"));
-        }
-        else{
-            holder.backgroundRow.setBackgroundColor(context.getResources().getColor(R.color.white));
-        }
+        holder.txtPerformDate.setText(date);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("users");
-        myRef.child(feedback.getUserUUID()).addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.child(history.getPerformer()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
-
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageReference = storage.getReference(user.getAvatar());
-                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Picasso.get().load(uri).fit().centerCrop().into(holder.empFeedbackImg);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("TAG", "onFailure: " + e.getMessage());
-                        }
-                    });
+                    holder.txtPerformer.setText(user.getFullName());
                 }
             }
             @Override
@@ -131,7 +102,6 @@ public class FeedbackAdapter extends BaseAdapter {
 
             }
         });
-
         return convertView;
     }
 }

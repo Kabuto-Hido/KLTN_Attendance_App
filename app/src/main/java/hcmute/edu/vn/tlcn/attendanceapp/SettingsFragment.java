@@ -274,10 +274,12 @@ public class SettingsFragment extends Fragment {
                 if(holder.edtContact.getText().toString().length() != 0){
                     contact = holder.edtContact.getText().toString();
                 }
-                Feedback newFeedback = new Feedback(user.getUuid(), details, contact);
+
+                final String fbId = UUID.randomUUID().toString();
+                Feedback newFeedback = new Feedback(fbId,user.getUuid(), details, contact);
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference feedbackRef = database.getReference("feedback");
-                final String fbId = UUID.randomUUID().toString();
+
 
                 ArrayList<Uri> listUri =  new ArrayList<>();
                 ArrayList<String> imgs = new ArrayList<>();

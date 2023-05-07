@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Feedback implements Serializable {
+    private String id;
     private String userUUID;
     private String detail;
     private ArrayList<String> images;
@@ -12,7 +13,8 @@ public class Feedback implements Serializable {
     private Date createAt;
     private boolean seen;
 
-    public Feedback(String userUUID, String detail, ArrayList<String> images, String contact) {
+    public Feedback(String id, String userUUID, String detail, ArrayList<String> images, String contact) {
+        this.id = id;
         this.userUUID = userUUID;
         this.detail = detail;
         this.images = images;
@@ -21,7 +23,8 @@ public class Feedback implements Serializable {
         this.createAt = new Date();
     }
 
-    public Feedback(String userUUID, String detail, String contact) {
+    public Feedback(String id, String userUUID, String detail, String contact) {
+        this.id = id;
         this.userUUID = userUUID;
         this.detail = detail;
         this.contact = contact;
@@ -30,6 +33,14 @@ public class Feedback implements Serializable {
     }
 
     public Feedback() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUserUUID() {

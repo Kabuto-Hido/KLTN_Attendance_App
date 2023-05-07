@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UpdateHistoryFragment">
+
+    <LinearLayout
+        android:id="@+id/linearParam"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#2196F3"
+        android:padding="6dp">
+        <ImageView
+            android:id="@+id/btnBackHistory"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/baseline_arrow_back_white_24"
+            android:contentDescription="TODO" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Attendance Update History"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            android:layout_marginStart="20dp"
+            android:textColor="@color/white"
+            android:textSize="25sp"
+            android:layout_marginBottom="2dp"/>
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listviewHistory"
+        android:divider="#F8F8F8"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/linearParam" />
+
+</RelativeLayout>

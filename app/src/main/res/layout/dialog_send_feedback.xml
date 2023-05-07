@@ -78,6 +78,16 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please leave your email or phone number so we can contact you when needed."
+        android:layout_marginTop="20sp"
+        android:layout_marginStart="20dp"
+        android:layout_gravity="start"
+        android:textColor="@color/white"
+        android:textSize="15sp"/>
+
     <EditText
         android:id="@+id/edtContact"
         android:layout_width="match_parent"

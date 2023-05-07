@@ -4,12 +4,14 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class UpdateHistory implements Serializable {
+    private String id;
     private String performer;
     private Date implDate;
     private String description;
     private String reason;
 
-    public UpdateHistory(String performer, Date implDate, String description, String reason) {
+    public UpdateHistory(String id, String performer, Date implDate, String description, String reason) {
+        this.id = id;
         this.performer = performer;
         this.implDate = implDate;
         this.description = description;
@@ -17,6 +19,14 @@ public class UpdateHistory implements Serializable {
     }
 
     public UpdateHistory() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPerformer() {
