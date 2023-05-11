@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
 
+import hcmute.edu.vn.tlcn.attendanceapp.adapter.EmployeeAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.FeedbackAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Feedback;
 import hcmute.edu.vn.tlcn.attendanceapp.model.User;
@@ -98,9 +100,11 @@ public class ListFeedbackFragment extends Fragment {
     View view;
     ImageView btnBackFeedback;
     ListView listviewFeedback;
-    TextView txtNotification;
+    TextView txtNotification, labelFeedback;
     FeedbackAdapter feedbackAdapter;
     ArrayList<Feedback> arrFeedback;
+    ArrayList<Feedback> result;
+    SearchView searchFeedback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -122,6 +126,40 @@ public class ListFeedbackFragment extends Fragment {
             }
         });
 
+        searchFeedback.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                labelFeedback.setVisibility(View.GONE);
+            }
+        });
+
+        searchFeedback.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                labelFeedback.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
+
+        searchFeedback.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String keyword) {
+                result = new ArrayList<>();
+                for(Feedback f: arrFeedback){
+                    if(f.getUserUUID().contains(keyword.toLowerCase())){
+                        result.add(f);
+                    }
+                }
+                ((FeedbackAdapter) listviewFeedback.getAdapter()).update(result);
+                return false;
+            }
+        });
+
         listviewFeedback.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -140,6 +178,10 @@ public class ListFeedbackFragment extends Fragment {
     }
 
     private void putDataToView() {
+        if (result != null) {
+            result.clear();
+            ((FeedbackAdapter) listviewFeedback.getAdapter()).update(result);
+        }
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference feedbackRef = database.getReference("feedback");
         feedbackRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -242,7 +284,7 @@ public class ListFeedbackFragment extends Fragment {
             txtContactFeedback.setText(item.getContact());
         }
         Date createAt = item.getCreateAt();
-        SimpleDateFormat dayFormat = new SimpleDateFormat("MMM-dd");
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MMM-dd");
         SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
         String date = dayFormat.format(createAt) + " at " + timeFormat.format(createAt);
         txtCreateAt.setText(date);
@@ -348,5 +390,7 @@ public class ListFeedbackFragment extends Fragment {
         btnBackFeedback = (ImageView) view.findViewById(R.id.btnBackFeedback);
         listviewFeedback = (ListView) view.findViewById(R.id.listviewFeedback);
         txtNotification = (TextView) view.findViewById(R.id.txtNotification);
+        labelFeedback = (TextView) view.findViewById(R.id.labelFeedback);
+        searchFeedback= (SearchView) view.findViewById(R.id.searchFeedback);
     }
 }

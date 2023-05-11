@@ -46,6 +46,12 @@ public class FeedbackAdapter extends BaseAdapter {
         this.layout = layout;
     }
 
+    public void update(ArrayList<Feedback> result){
+        feedbackArrayList = new ArrayList<>();
+        feedbackArrayList.addAll(result);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         return feedbackArrayList.size();
@@ -91,7 +97,7 @@ public class FeedbackAdapter extends BaseAdapter {
         holder.txtDetail.setText(feedback.getDetail());
 
         Date createAt = feedback.getCreateAt();
-        SimpleDateFormat dayFormat = new SimpleDateFormat("MMM-dd");
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MMM-dd");
         SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
         String date = dayFormat.format(createAt) + " at " + timeFormat.format(createAt);
         holder.txtDate.setText(date);

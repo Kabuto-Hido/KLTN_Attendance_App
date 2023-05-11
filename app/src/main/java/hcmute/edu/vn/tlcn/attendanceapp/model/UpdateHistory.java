@@ -6,13 +6,15 @@ import java.util.Date;
 public class UpdateHistory implements Serializable {
     private String id;
     private String performer;
+    private String editedPerson;
     private Date implDate;
     private String description;
     private String reason;
 
-    public UpdateHistory(String id, String performer, Date implDate, String description, String reason) {
+    public UpdateHistory(String id, String performer, String editedPerson, Date implDate, String description, String reason) {
         this.id = id;
         this.performer = performer;
+        this.editedPerson = editedPerson;
         this.implDate = implDate;
         this.description = description;
         this.reason = reason;
@@ -35,6 +37,14 @@ public class UpdateHistory implements Serializable {
 
     public void setPerformer(String performer) {
         this.performer = performer;
+    }
+
+    public String getEditedPerson() {
+        return editedPerson;
+    }
+
+    public void setEditedPerson(String editedPerson) {
+        this.editedPerson = editedPerson;
     }
 
     public Date getImplDate() {

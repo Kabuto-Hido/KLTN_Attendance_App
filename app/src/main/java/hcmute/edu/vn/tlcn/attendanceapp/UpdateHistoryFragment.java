@@ -1,6 +1,8 @@
 package hcmute.edu.vn.tlcn.attendanceapp;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,8 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -21,7 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.UpdateHistoryAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.Feedback;
@@ -116,12 +122,34 @@ public class UpdateHistoryFragment extends Fragment {
         View layout_dialog = inflater.inflate(R.layout.dialog_history_detail, null);
         builder.setView(layout_dialog);
 
+        TextView txtEditedPerson = layout_dialog.findViewById(R.id.txtEditedPerson);
+        TextView txtEditedTime = layout_dialog.findViewById(R.id.txtEditedTime);
+        TextView txtDescription = layout_dialog.findViewById(R.id.txtDescription);
+        TextView textReason = layout_dialog.findViewById(R.id.textReason);
+        Button buttonOkay = layout_dialog.findViewById(R.id.buttonOkay);
 
+        txtEditedPerson.setText(selected.getEditedPerson());
+        txtDescription.setText(selected.getDescription());
+        textReason.setText(selected.getReason());
+
+        Date createAt = selected.getImplDate();
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MMM-dd");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+        String date = dayFormat.format(createAt) + " " + timeFormat.format(createAt);
+        txtEditedTime.setText(date);
 
         dialogDetail = builder.create();
+        dialogDetail.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialogDetail.getWindow().setGravity(Gravity.CENTER);
         dialogDetail.setCancelable(false);
         dialogDetail.show();
+
+        buttonOkay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogDetail.dismiss();
+            }
+        });
     }
 
     private void putDataToView() {

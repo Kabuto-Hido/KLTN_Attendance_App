@@ -214,7 +214,8 @@ public class EditRecordFragment extends Fragment {
                     final String historyId = UUID.randomUUID().toString();
                     String description = "User "+currentUser.getUuid() + " changed the time attendance status from "+
                             editRecord.getStatus() +" to " + newStatus;
-                    UpdateHistory updateHistory = new UpdateHistory(historyId,currentUser.getUuid(),new Date(),description,reason);
+                    UpdateHistory updateHistory = new UpdateHistory(historyId, currentUser.getUuid(),
+                            editRecord.getUserUUID(), new Date(), description, reason);
                     historyRef.child(historyId).setValue(updateHistory);
                 }
 

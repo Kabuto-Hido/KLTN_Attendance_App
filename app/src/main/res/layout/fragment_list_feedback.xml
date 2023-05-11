@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ListFeedbackFragment">
 
     <RelativeLayout
@@ -11,6 +12,7 @@
 
         <LinearLayout
             android:id="@+id/linearLay"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="#2196F3"
@@ -22,7 +24,8 @@
                 android:src="@drawable/baseline_arrow_back_white_24"
                 android:contentDescription="TODO" />
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/labelFeedback"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="List Feedback"
                 android:gravity="center_vertical"
@@ -31,6 +34,19 @@
                 android:textColor="@color/white"
                 android:textSize="25sp"
                 android:layout_marginBottom="2dp"/>
+
+            <SearchView
+                android:id="@+id/searchFeedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:iconifiedByDefault="false"
+                android:theme="@style/SearchViewStyle"
+                android:contextClickable="true"
+                android:queryHint="Type here for search"
+                android:closeIcon="@drawable/ic_close"
+                android:searchHintIcon="@drawable/ic_search"
+                android:layout_marginStart="120dp"
+                android:searchIcon="@drawable/ic_search"/>
         </LinearLayout>
 
         <TextView

@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/editedPersonString"
             android:padding="10dp"
-            android:text="Edited Code"
+            android:text="DETAILS"
             android:textAlignment="center"
             android:background="@drawable/date_information_background"
             android:textColor="@color/white"
@@ -44,7 +44,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editedPerson"
+            android:id="@+id/txtEditedPerson"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="20dp"
             android:text="Employee Code"
@@ -70,14 +70,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editedTime"
+            android:id="@+id/txtEditedTime"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="18dp"
             android:text="HH:MM:SS"
             android:textColor="@color/colorTextPrimary"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/editedPerson"
+            app:layout_constraintTop_toBottomOf="@id/txtEditedPerson"
             app:layout_constraintLeft_toRightOf="@id/editedTimeString"
             />
         <TextView
@@ -92,22 +92,24 @@
             android:textStyle="bold"
             android:textColor="@color/colorTextPrimary"
             android:textSize="16sp"
-
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/editedTimeString"
             app:layout_constraintLeft_toLeftOf="parent"
             />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/description"
+            android:id="@+id/txtDescription"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="18dp"
+            android:textAlignment="center"
             android:text="User APT001 changed the status from absent with permission to checked in"
             android:textColor="@color/colorTextPrimary"
             android:textSize="16sp"
             app:layout_constraintTop_toBottomOf="@id/descriptionString"
             app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
             />
         <TextView
             android:layout_width="match_parent"
@@ -122,24 +124,27 @@
             android:layout_marginBottom="40dp"
             android:textColor="@color/colorTextPrimary"
             android:textSize="16sp"
-            app:layout_constraintTop_toBottomOf="@id/description"
+            app:layout_constraintRight_toRightOf="parent"
+
+            app:layout_constraintTop_toBottomOf="@id/txtDescription"
             app:layout_constraintLeft_toLeftOf="parent"
             />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/reason"
+            android:id="@+id/textReason"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginTop="10dp"
+            android:textAlignment="center"
             android:text="Phone broken cannot checkout so i accept the feedback"
             android:layout_marginBottom="40dp"
             android:textColor="@color/colorTextPrimary"
             android:textSize="16sp"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/reasonString"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
+            app:layout_constraintLeft_toLeftOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

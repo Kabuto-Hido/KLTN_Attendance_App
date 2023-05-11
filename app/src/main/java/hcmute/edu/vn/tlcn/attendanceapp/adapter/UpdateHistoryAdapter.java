@@ -82,7 +82,7 @@ public class UpdateHistoryAdapter extends BaseAdapter {
         UpdateHistory history = feedbackArrayList.get(position);
 
         Date createAt = history.getImplDate();
-        SimpleDateFormat dayFormat = new SimpleDateFormat("MMM-dd");
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MMM-dd");
         SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
         String date = dayFormat.format(createAt) + " at " + timeFormat.format(createAt);
         holder.txtPerformDate.setText(date);
