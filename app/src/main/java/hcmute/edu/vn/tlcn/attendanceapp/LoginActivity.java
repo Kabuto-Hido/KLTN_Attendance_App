@@ -116,7 +116,6 @@ public class LoginActivity extends AppCompatActivity {
                                 User_singeton user_singeton = User_singeton.getInstance();
                                 user_singeton.setUser(loginUser);
 
-
                                 progressDialog.dismiss();
                                 Toast.makeText(LoginActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
                                 if (loginUser.getRole() == 1) {

@@ -3,19 +3,23 @@ package hcmute.edu.vn.tlcn.attendanceapp;
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -123,7 +128,7 @@ public class ChangeAttendanceTimeFragment extends Fragment {
             public void onClick(View v) {
                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
                 int minutes = calendar.get(Calendar.MINUTE);
-                TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
+                TimePickerDialog endDialog = new TimePickerDialog(getActivity(),
                         AlertDialog.THEME_HOLO_LIGHT,
                         new TimePickerDialog.OnTimeSetListener() {
                             @Override
@@ -140,7 +145,7 @@ public class ChangeAttendanceTimeFragment extends Fragment {
                                 }
                             }
                         },hour,minutes,true);
-                timePickerDialog.show();
+                endDialog.show();
             }
         });
 
@@ -181,26 +186,52 @@ public class ChangeAttendanceTimeFragment extends Fragment {
         edittextPeriod.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int minutes = calendar.get(Calendar.MINUTE);
-                TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(),
-                        AlertDialog.THEME_HOLO_LIGHT,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                calendar.set(0,0,0,0,minute,0);
+                AlertDialog dialog;
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                View layout_dialog = inflater.inflate(R.layout.dialog_minute, null);
+                builder.setView(layout_dialog);
 
-                                if(!checkPeriod(minute)){
-                                    Toast.makeText(getContext(), "The period is invalid!!", Toast.LENGTH_SHORT).show();
-                                    btnConfirmConfig.setClickable(false);
-                                }else{
-                                    btnConfirmConfig.setClickable(true);
-                                    edittextPeriod.setText(minute);
-                                }
-                            }
-                        },hour,minutes,true);
-                timePickerDialog.findViewById(Resources.getSystem().getIdentifier("hour", "id", "android")).setVisibility(View.GONE);
-                timePickerDialog.show();
+                NumberPicker minutePicker = layout_dialog.findViewById(R.id.minutePicker);
+                TextView btnCancelPeriod = layout_dialog.findViewById(R.id.btnCancelPeriod);
+                TextView btnOkPeriod = layout_dialog.findViewById(R.id.btnOkPeriod);
+
+                minutePicker.setMinValue(0);
+                minutePicker.setMaxValue(59);
+                minutePicker.setWrapSelectorWheel(true);
+
+                dialog = builder.create();
+                dialog.getWindow().setGravity(Gravity.CENTER);
+                dialog.show();
+
+                minutePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                    @Override
+                    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                        edittextPeriod.setText(String.valueOf(newVal));
+                    }
+                });
+
+                btnOkPeriod.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int minute = Integer.parseInt(edittextPeriod.getText().toString());
+                        if(!checkPeriod(minute)){
+                            Toast.makeText(getContext(), "The period is invalid!!", Toast.LENGTH_SHORT).show();
+                            btnConfirmConfig.setClickable(false);
+                        }else{
+                            btnConfirmConfig.setClickable(true);
+                        }
+                        dialog.dismiss();
+                    }
+                });
+
+                btnCancelPeriod.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        putDataToView();
+                        dialog.dismiss();
+                    }
+                });
             }
         });
 
@@ -224,7 +255,7 @@ public class ChangeAttendanceTimeFragment extends Fragment {
 
     private boolean checkPeriod(Integer period){
         String timeStart = edittextStartCheckIn.getText().toString();
-        String timeEnd = edittextStartCheckIn.getText().toString();
+        String timeEnd = edittextEndCheckIn.getText().toString();
         String[] cutTimeStart = timeStart.split(":");
         String[] cutTimeEnd = timeEnd.split(":");
 
@@ -237,6 +268,9 @@ public class ChangeAttendanceTimeFragment extends Fragment {
 
         if(newHour == Integer.parseInt(cutTimeEnd[0])
                 && newMinutes > Integer.parseInt(cutTimeEnd[1])){
+            return false;
+        }
+        if(newHour > Integer.parseInt(cutTimeEnd[0])){
             return false;
         }
 

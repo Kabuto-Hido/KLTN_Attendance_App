@@ -220,12 +220,6 @@ public class EditEmpFragment extends Fragment {
                     return;
                 }
 
-                if (!isRecognizeFace) {
-                    Toast.makeText(getActivity(), "Please take a photo with your face !", Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                    return;
-                }
-
                 editUser.setFullName(fullName);
                 editUser.setBirthday(birthday);
                 editUser.setSex(sex);
@@ -233,6 +227,7 @@ public class EditEmpFragment extends Fragment {
                 if(!phone.equals("")){
                     if (phone.length() != 10 || !phone.matches(getString(R.string.regexPhone))) {
                         edtPhonenum.setError("Invalid phone !");
+                        progressDialog.dismiss();
                         return;
                     }
                     editUser.setPhone(phone);
@@ -243,6 +238,11 @@ public class EditEmpFragment extends Fragment {
 
                 UploadTask uploadTask;
                 if (imgAvatarProfile.isSelected()) {
+                    if (!isRecognizeFace) {
+                        Toast.makeText(getActivity(), "Please take a photo with your face !", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                        return;
+                    }
                     if (filePath == null) {
                         Bitmap bitmap = ((BitmapDrawable) imgAvatarProfile.getDrawable()).getBitmap();
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -311,9 +311,7 @@ public class EditEmpFragment extends Fragment {
         labelCodeEmp.setText(editUser.getUuid());
         edtName.setText(editUser.getFullName());
         edtBirthday1.setText(editUser.getBirthday());
-        String getPhone = editUser.getPhone();
-        String phone = "+84" + getPhone.substring(1);
-        edtPhonenum.setText(phone);
+        edtPhonenum.setText(editUser.getPhone());
         //edtPhonenum.setBackgroundColor(Color.parseColor("#D9D9D9"));
         if (editUser.getSex()) {
             radioMale.setChecked(true);

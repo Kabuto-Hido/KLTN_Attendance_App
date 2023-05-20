@@ -232,9 +232,9 @@ public class AddEmployee extends Fragment {
                     }
                     UploadTask uploadTask;
                     if (isCamera) {
-                        uploadTask = ref.child("images/" + user.getUuid() + "_avatar").putBytes(byteArray);
+                        uploadTask = ref.child("images/" + user.getFullName() + "_avatar").putBytes(byteArray);
                     } else {
-                        uploadTask = ref.child("images/" + user.getUuid() + "_avatar").putFile(filePath);
+                        uploadTask = ref.child("images/" + user.getFullName() + "_avatar").putFile(filePath);
                     }
                     uploadTask
                             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -250,7 +250,7 @@ public class AddEmployee extends Fragment {
                                                 Toast.makeText(getContext(), "Phone number is already taken !", Toast.LENGTH_SHORT).show();
                                                 progressDialog.dismiss();
                                             } else {
-                                                userRef.orderByKey().limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                userRef.orderByKey().limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -259,7 +259,7 @@ public class AddEmployee extends Fragment {
                                                                 String getNum = latestUser.getUuid().substring(3, 8);
                                                                 user.setUuid("ATD" + increaseOneUnit(getNum));
                                                             }
-                                                            user.setAvatar("images/" + user.getUuid() + "_avatar");
+                                                            user.setAvatar("images/" + user.getFullName() + "_avatar");
                                                             userRef.child(user.getUuid()).setValue(user);
 
                                                             progressDialog.dismiss();

@@ -141,7 +141,7 @@ public class ListSendedRequestActivity extends AppCompatActivity {
     private void getWaitingData() {
         database = FirebaseDatabase.getInstance();
         DatabaseReference waitingRef = database.getReference("dayoffreport");
-        waitingRef.orderByChild("userPhone").startAt(user.getPhone()).addValueEventListener(new ValueEventListener() {
+        waitingRef.orderByChild("userUUID").startAt(user.getUuid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 arrSentReq.clear();

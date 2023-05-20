@@ -28,6 +28,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
@@ -46,6 +47,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -203,7 +207,6 @@ public class HomeFragment extends Fragment {
         putDataToView();
 
         currentLocation = new LocationRecord(null,null);
-        getLocation();
 
         btnTimeIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -389,7 +392,21 @@ public class HomeFragment extends Fragment {
         List<String> hoursList = new ArrayList<>();
 
         int n = Integer.parseInt(dayCurr);
-        for (int i = 1; i < n; i++) {
+
+        for (int i = 1; i <= n; i++) {
+            if(i == n){
+                try {
+                    Date six = timeFormat.parse("18:00");
+                    Date now = Calendar.getInstance().getTime();
+                    String strNow= timeFormat.format(now);
+                    Date dateNow = timeFormat.parse(strNow);
+                    if (dateNow.after(six)){
+                        updateStatistic("absent without permission");
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
             count = 0;
             String dateAttend;
             if (String.valueOf(i).length() == 1) {
@@ -686,6 +703,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onStart() {
+        getLocation();
         if(!firstLogin){
             DialogSaveQrCode();
             checkPreviousAttendance();
@@ -924,7 +942,6 @@ public class HomeFragment extends Fragment {
                         long addMinutes = diffMinutes - (diffHours * 60);
                         //long diffHours = diff / (60 * 60 * 1000) % 24;
 
-
                         String diffDate = diffHours + ":" + addMinutes;
 
                         String currentYear = day.substring(0, 4);
@@ -991,6 +1008,10 @@ public class HomeFragment extends Fragment {
 
     private void getLocation() {
         Log.d("TAG","getDeviceLocation");
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(2000);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
@@ -998,32 +1019,51 @@ public class HomeFragment extends Fragment {
             LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                fusedLocationProviderClient.getLastLocation()
-                        .addOnSuccessListener(new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if(location != null){
-                                    Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
-                                    List<Address> addressList;
-                                    try {
-                                        addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                                        if (addressList != null && addressList.size() != 0) {
-
-                                            currentLocation.setLatitude(location.getLatitude());
-                                            currentLocation.setLongitude(location.getLongitude());
-                                            Log.d("Latitude", String.valueOf(location.getLatitude()));
-                                            Log.d("Longitude", String.valueOf(location.getLongitude()));
-                                            Log.d("city", addressList.get(0).getLocality());
-                                            Log.d("country", addressList.get(0).getCountryName());
-                                            Log.d("Locale ", String.valueOf(addressList.get(0).getLocale()));
-
-                                        }
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        });
+//                fusedLocationProviderClient.getLastLocation()
+//                        .addOnSuccessListener(new OnSuccessListener<Location>() {
+//                            @Override
+//                            public void onSuccess(Location location) {
+//                                if(location != null){
+//                                    Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+//                                    List<Address> addressList;
+//                                    try {
+//                                        addressList = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+//                                        if (addressList != null && addressList.size() != 0) {
+//
+//                                            currentLocation.setLatitude(location.getLatitude());
+//                                            currentLocation.setLongitude(location.getLongitude());
+//                                            Log.d("Latitude", String.valueOf(location.getLatitude()));
+//                                            Log.d("Longitude", String.valueOf(location.getLongitude()));
+//                                            Log.d("city", addressList.get(0).getLocality());
+//                                            Log.d("country", addressList.get(0).getCountryName());
+//                                            Log.d("Locale ", String.valueOf(addressList.get(0).getLocale()));
+//
+//                                        }
+//                                    } catch (IOException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                                else{
+//                                    //Toast.makeText(getActivity(), "Null Received", Toast.LENGTH_SHORT).show();
+//                                }
+//                            }
+//                        });
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(@NonNull LocationResult locationResult) {
+                        super.onLocationResult(locationResult);
+                        fusedLocationProviderClient.removeLocationUpdates(this);
+                        if(locationResult != null && locationResult.getLocations().size() > 0){
+                            int index = locationResult.getLocations().size() - 1;
+                            double latitude = locationResult.getLocations().get(index).getLatitude();
+                            double longitude = locationResult.getLocations().get(index).getLongitude();
+//                            txtNameUser.setText(latitude +" "+ longitude);
+//                            Toast.makeText(getContext(), latitude +" "+ longitude, Toast.LENGTH_SHORT).show();
+                            currentLocation.setLatitude(latitude);
+                            currentLocation.setLongitude(longitude);
+                        }
+                    }
+                }, Looper.getMainLooper());
             } else {
                 Toast.makeText(getActivity(), "Enable GPS!!", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
