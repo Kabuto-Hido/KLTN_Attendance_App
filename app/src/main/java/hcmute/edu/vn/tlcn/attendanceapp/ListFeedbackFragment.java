@@ -42,6 +42,7 @@ import com.squareup.picasso.Picasso;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
 
@@ -184,7 +185,7 @@ public class ListFeedbackFragment extends Fragment {
         }
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference feedbackRef = database.getReference("feedback");
-        feedbackRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        feedbackRef.orderByChild("createAt/time").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 arrFeedback.clear();
@@ -192,6 +193,7 @@ public class ListFeedbackFragment extends Fragment {
                     Feedback feedback = dataSnapshot.getValue(Feedback.class);
                     arrFeedback.add(feedback);
                 }
+                Collections.reverse(arrFeedback);
                 feedbackAdapter.notifyDataSetChanged();
 
                 if (arrFeedback.size() == 0) {

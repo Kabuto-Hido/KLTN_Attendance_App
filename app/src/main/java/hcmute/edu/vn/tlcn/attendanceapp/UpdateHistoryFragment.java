@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.UpdateHistoryAdapter;
@@ -155,7 +156,7 @@ public class UpdateHistoryFragment extends Fragment {
     private void putDataToView() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference historyRef = database.getReference("updateHistory");
-        historyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        historyRef.orderByChild("implDate/time").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 arrHistory.clear();
@@ -163,6 +164,7 @@ public class UpdateHistoryFragment extends Fragment {
                     UpdateHistory history = dataSnapshot.getValue(UpdateHistory.class);
                     arrHistory.add(history);
                 }
+                Collections.reverse(arrHistory);
                 updateHistoryAdapter.notifyDataSetChanged();
 
                 if (arrHistory.size() == 0) {

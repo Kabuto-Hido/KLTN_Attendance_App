@@ -18,7 +18,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.ResignationAdapter;
 import hcmute.edu.vn.tlcn.attendanceapp.model.DayOffRequest;
@@ -103,7 +108,7 @@ public class ListResignationFragment extends Fragment {
     private void putDataToView() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dayOffReportRef = database.getReference("dayoffreport");
-        dayOffReportRef.orderByChild("status").startAt("waiting").addListenerForSingleValueEvent(new ValueEventListener() {
+        dayOffReportRef.orderByChild("status").equalTo("waiting").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 requestList.clear();
@@ -111,6 +116,26 @@ public class ListResignationFragment extends Fragment {
                     DayOffRequest dayOffRequest = dataSnapshot.getValue(DayOffRequest.class);
                     requestList.add(dayOffRequest);
                 }
+
+                requestList.sort(new Comparator<DayOffRequest>() {
+                    @Override
+                    public int compare(DayOffRequest o1, DayOffRequest o2) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        Date strDate1 = null;
+                        Date strDate2 = null;
+                        try {
+                            strDate1 = sdf.parse(o1.getDateOff());
+                            strDate2 = sdf.parse(o2.getDateOff());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        if (strDate1 != null && strDate2 != null) {
+                            return strDate1.compareTo(strDate2);
+                        }
+                        return 0;
+                    }
+                });
+                Collections.reverse(requestList);
                 adapter.notifyDataSetChanged();
 
                 if (requestList.size() == 0) {

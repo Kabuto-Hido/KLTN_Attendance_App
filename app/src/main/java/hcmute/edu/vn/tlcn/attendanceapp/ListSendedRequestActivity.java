@@ -21,7 +21,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 import hcmute.edu.vn.tlcn.attendanceapp.Utility.InternetCheckService;
 import hcmute.edu.vn.tlcn.attendanceapp.adapter.RespondedReqAdapter;
@@ -100,6 +105,25 @@ public class ListSendedRequestActivity extends AppCompatActivity {
                             txtNoRequest.setVisibility(View.INVISIBLE);
                             lstSentReq.setVisibility(View.VISIBLE);
                         }
+                        arrSentReq.sort(new Comparator<DayOffRequest>() {
+                            @Override
+                            public int compare(DayOffRequest o1, DayOffRequest o2) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                Date strDate1 = null;
+                                Date strDate2 = null;
+                                try {
+                                    strDate1 = sdf.parse(o1.getDateOff());
+                                    strDate2 = sdf.parse(o2.getDateOff());
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                                if (strDate1 != null && strDate2 != null) {
+                                    return strDate1.compareTo(strDate2);
+                                }
+                                return 0;
+                            }
+                        });
+                        Collections.reverse(arrSentReq);
                         lstSentReq.setAdapter(respondedReqAdapter);
                         respondedReqAdapter.notifyDataSetChanged();
                     }
@@ -150,7 +174,6 @@ public class ListSendedRequestActivity extends AppCompatActivity {
                     if (dayOffRequest.getStatus().equals("waiting")) {
                         arrSentReq.add(dayOffRequest);
                     }
-
                 }
                 if (arrSentReq.size() == 0) {
                     txtNoRequest.setText("No waiting request");
@@ -160,6 +183,25 @@ public class ListSendedRequestActivity extends AppCompatActivity {
                     txtNoRequest.setVisibility(View.INVISIBLE);
                     lstSentReq.setVisibility(View.VISIBLE);
                 }
+                arrSentReq.sort(new Comparator<DayOffRequest>() {
+                    @Override
+                    public int compare(DayOffRequest o1, DayOffRequest o2) {
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        Date strDate1 = null;
+                        Date strDate2 = null;
+                        try {
+                            strDate1 = sdf.parse(o1.getDateOff());
+                            strDate2 = sdf.parse(o2.getDateOff());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        if (strDate1 != null && strDate2 != null) {
+                            return strDate1.compareTo(strDate2);
+                        }
+                        return 0;
+                    }
+                });
+                Collections.reverse(arrSentReq);
                 lstSentReq.setAdapter(waitingRequestAdapter);
                 waitingRequestAdapter.notifyDataSetChanged();
             }
