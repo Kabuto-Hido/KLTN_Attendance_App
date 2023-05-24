@@ -403,6 +403,7 @@ public class HomeFragment extends Fragment {
                     if (dateNow.after(six)){
                         updateStatistic("absent without permission");
                     }
+                    break;
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
