@@ -1,2 +1,2 @@
-# TLCN
+# KLTN
 Attendance Checking App
