@@ -3,9 +3,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <!--10.8350285,106.7615712 home-->
     <!--10.8505499,106.7714137 school-->
-    <string name="latitude_default" translatable="false">10.8350285</string>
-    <string name="longitude_default" translatable="false">106.7615712</string>
+    <string name="latitude_default" translatable="false">10.8505499</string>
+    <string name="longitude_default" translatable="false">106.7714137</string>
     <string name="regexPhone" translatable="false">^[0-9]{10}$</string>
+    <!--language-->
     <string name="checkin_time">Checkin time:</string>
     <string name="checkout_time">Checkout time:</string>
 
