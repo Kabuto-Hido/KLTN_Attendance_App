@@ -419,7 +419,7 @@ public class AddEmployee extends Fragment {
         int n = Integer.parseInt(num) + 1;
         StringBuilder kq = new StringBuilder(String.valueOf(n));
         int len = kq.length();
-        if (len != 5) {
+        if (len < 5) {
             for (int i = 0; i < (5 - len); i++) {
                 kq.insert(0, 0);
             }

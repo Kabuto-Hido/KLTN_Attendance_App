@@ -392,8 +392,17 @@ public class HomeFragment extends Fragment {
         List<String> hoursList = new ArrayList<>();
 
         int n = Integer.parseInt(dayCurr);
-
         for (int i = 1; i <= n; i++) {
+
+            count = 0;
+            String dateAttend;
+            if (String.valueOf(i).length() == 1) {
+                dateAttend = YMCurr + "-0" + (i);
+            } else {
+                dateAttend = YMCurr + "-" + (i);
+            }
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference recordRef = database.getReference("record");
             if(i == n){
                 try {
                     Date six = timeFormat.parse("18:00");
@@ -403,17 +412,12 @@ public class HomeFragment extends Fragment {
                     if (dateNow.after(six)){
                         updateStatistic("absent without permission");
                     }
-                    break;
+                    else{
+                        break;
+                    }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-            }
-            count = 0;
-            String dateAttend;
-            if (String.valueOf(i).length() == 1) {
-                dateAttend = YMCurr + "-0" + (i);
-            } else {
-                dateAttend = YMCurr + "-" + (i);
             }
             Date getDate = null;
             try {
@@ -422,9 +426,6 @@ public class HomeFragment extends Fragment {
                 e.printStackTrace();
             }
             calendar.setTime(getDate);
-
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference recordRef = database.getReference("record");
             if (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
                 recordRef.child(user.getUuid()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

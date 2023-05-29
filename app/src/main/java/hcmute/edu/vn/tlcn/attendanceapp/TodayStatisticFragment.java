@@ -299,7 +299,7 @@ public class TodayStatisticFragment extends Fragment {
         Paragraph title = new Paragraph(d + "/" + m + "/" + y + " EMPLOYEE TIMESHEET")
                 .setBold().setFontSize(22).setTextAlignment(TextAlignment.CENTER);
 
-        float[] columnWidth = {80f, 150f, 150f, 80};
+        float[] columnWidth = {80f, 150f, 150f, 80f};
         Table table = new Table(columnWidth);
         table.setHorizontalAlignment(HorizontalAlignment.CENTER);
 

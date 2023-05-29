@@ -110,4 +110,5 @@ public class User implements Serializable {
     public void setQrcode(String qrcode) {
         this.qrcode = qrcode;
     }
+
 }
