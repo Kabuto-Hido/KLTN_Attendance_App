@@ -124,19 +124,7 @@ public class TodayStatisticAdapter extends BaseAdapter {
                     User user = snapshot.getValue(User.class);
                     holder.txtEmpName.setText(user.getFullName());
 
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageReference = storage.getReference(user.getAvatar());
-                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Picasso.get().load(uri).fit().centerCrop().into(holder.empImageView);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("TAG", "onFailure: " + e.getMessage());
-                        }
-                    });
+                    Picasso.get().load(Uri.parse(user.getAvatar())).fit().centerCrop().into(holder.empImageView);
                 }
             }
 

@@ -117,19 +117,7 @@ public class FeedbackAdapter extends BaseAdapter {
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
 
-                    FirebaseStorage storage = FirebaseStorage.getInstance();
-                    StorageReference storageReference = storage.getReference(user.getAvatar());
-                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Picasso.get().load(uri).fit().centerCrop().into(holder.empFeedbackImg);
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("TAG", "onFailure: " + e.getMessage());
-                        }
-                    });
+                    Picasso.get().load(Uri.parse(user.getAvatar())).fit().centerCrop().into(holder.empFeedbackImg);
                 }
             }
             @Override

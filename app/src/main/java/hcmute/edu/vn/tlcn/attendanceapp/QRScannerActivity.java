@@ -198,62 +198,50 @@ public class QRScannerActivity extends AppCompatActivity {
                 }
                 User loginUser = snapshot.getValue(User.class);
 
-                FirebaseStorage storage = FirebaseStorage.getInstance();
-                StorageReference storageReference = storage.getReference(loginUser.getQrcode());
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                Thread thread = new Thread(new Runnable() {
                     @Override
-                    public void onSuccess(Uri uri) {
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    URL url = new URL(uri.toString());
-                                    Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                                    InputImage img = InputImage.fromBitmap(bitmap, 0);
-                                    Task<List<Barcode>> results = scanner.process(img);
-                                    results.addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
-                                        @Override
-                                        public void onSuccess(List<Barcode> barcodes) {
-                                            for (Barcode barcode : barcodes) {
-                                                String results = barcode.getDisplayValue();
-                                                if (results != null && results.equals(data)) {
-                                                    mCodeScanner.releaseResources();
-                                                    generateQR(loginUser);
-                                                    myRef.child(loginUser.getUuid()).setValue(loginUser);
+                    public void run() {
+                        try {
+                            Uri uri = Uri.parse(loginUser.getQrcode());
+                            URL url = new URL(uri.toString());
+                            Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                            InputImage img = InputImage.fromBitmap(bitmap, 0);
+                            Task<List<Barcode>> results = scanner.process(img);
+                            results.addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
+                                @Override
+                                public void onSuccess(List<Barcode> barcodes) {
+                                    for (Barcode barcode : barcodes) {
+                                        String results = barcode.getDisplayValue();
+                                        if (results != null && results.equals(data)) {
+                                            mCodeScanner.releaseResources();
+                                            generateQR(loginUser);
+                                            myRef.child(loginUser.getUuid()).setValue(loginUser);
 
-                                                    User_singeton user_singeton = User_singeton.getInstance();
-                                                    user_singeton.setUser(loginUser);
-                                                    progressDialog.dismiss();
-                                                    Toast.makeText(QRScannerActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
+                                            User_singeton user_singeton = User_singeton.getInstance();
+                                            user_singeton.setUser(loginUser);
+                                            progressDialog.dismiss();
+                                            Toast.makeText(QRScannerActivity.this, "Login Successfully!", Toast.LENGTH_SHORT).show();
 
-                                                    if (loginUser.getRole() == 1) {
-                                                        startActivity(new Intent(QRScannerActivity.this, MainActivity.class));
-                                                    } else {
-                                                        startActivity(new Intent(QRScannerActivity.this, AdminMainActivity.class));
-                                                    }
-                                                    finish();
-                                                    break;
-                                                } else {
-                                                    Toast.makeText(QRScannerActivity.this, "Invalid QR Code!", Toast.LENGTH_SHORT).show();
-                                                    progressDialog.dismiss();
-                                                }
+                                            if (loginUser.getRole() == 1) {
+                                                startActivity(new Intent(QRScannerActivity.this, MainActivity.class));
+                                            } else {
+                                                startActivity(new Intent(QRScannerActivity.this, AdminMainActivity.class));
                                             }
+                                            finish();
+                                            break;
+                                        } else {
+                                            Toast.makeText(QRScannerActivity.this, "Invalid QR Code!", Toast.LENGTH_SHORT).show();
+                                            progressDialog.dismiss();
                                         }
-                                    });
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                    }
                                 }
-                            }
-                        });
-                        thread.start();
+                            });
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("TAG", "onFailure: " + e.getMessage());
-                        }
-                    });
-
+                    }
+                });
+                thread.start();
             }
 
             @Override
@@ -319,7 +307,15 @@ public class QRScannerActivity extends AppCompatActivity {
             uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    user.setQrcode(url);
+                    ref.child(url).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            user.setQrcode(uri.toString());
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference userRef = database.getReference("users");
+                            userRef.child(user.getUuid()).setValue(user);
+                        }
+                    });
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override

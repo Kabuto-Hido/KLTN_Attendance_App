@@ -26,6 +26,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -151,20 +153,8 @@ public class QRCodeFragment extends Fragment {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
         }
+        Picasso.get().load(Uri.parse(user.getQrcode())).fit().centerCrop().into(idIVQRCode);
 
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference(user.getQrcode());
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Picasso.get().load(uri).fit().centerCrop().into(idIVQRCode);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("TAG", "onFailure: " + e.getMessage());
-            }
-        });
     }
 
     private void mapping() {
@@ -197,6 +187,15 @@ public class QRCodeFragment extends Fragment {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     idIVQRCode.setImageBitmap(bitmap);
+                    ref.child(url).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            user.setQrcode(uri.toString());
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference userRef = database.getReference("users");
+                            userRef.child(user.getUuid()).setValue(user);
+                        }
+                    });
                     Toast.makeText(getActivity(), "The QR Code had renew", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(new OnFailureListener() {

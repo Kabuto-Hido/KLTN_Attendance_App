@@ -231,29 +231,16 @@ public class ListFeedbackFragment extends Fragment {
         ImageView img2Feedback = layout_dialog.findViewById(R.id.img2Feedback);
 
         //get data
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference;
         ArrayList<String> arrImg = item.getImages();
         if(arrImg != null) {
             for (int i = 0; i < arrImg.size(); i++) {
-                storageReference = storage.getReference(arrImg.get(i));
-                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        Picasso.get().load(uri).fit().centerCrop().into(img1Feedback);
-                        img2Feedback.setVisibility(View.GONE);
-                        if(arrImg.size() == 2) {
-                            img2Feedback.setVisibility(View.VISIBLE);
-                            Picasso.get().load(uri).fit().centerCrop().into(img2Feedback);
-                        }
+                Picasso.get().load(Uri.parse(arrImg.get(i))).fit().centerCrop().into(img1Feedback);
+                img2Feedback.setVisibility(View.GONE);
+                if(arrImg.size() == 2) {
+                    img2Feedback.setVisibility(View.VISIBLE);
+                    Picasso.get().load(Uri.parse(arrImg.get(1))).fit().centerCrop().into(img2Feedback);
+                }
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("TAG", "onFailure: " + e.getMessage());
-                    }
-                });
             }
         }
         else{
@@ -306,14 +293,14 @@ public class ListFeedbackFragment extends Fragment {
         img1Feedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ZoomImageDialog(img1Feedback.getDrawable(), arrImg.get(0));
+                ZoomImageDialog(img1Feedback.getDrawable(), item.getUserUUID()+"_1");
             }
         });
 
         img2Feedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ZoomImageDialog(img2Feedback.getDrawable(), arrImg.get(1));
+                ZoomImageDialog(img2Feedback.getDrawable(), item.getUserUUID()+"_2");
             }
         });
     }
@@ -353,8 +340,7 @@ public class ListFeedbackFragment extends Fragment {
         btnDownload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String []cut = url.split("/");
-                String imageName = cut[2] + "_" + System.currentTimeMillis();
+                String imageName = url + "_" + System.currentTimeMillis();
 
                 Uri imageCollection;
                 ContentResolver contentResolver = getActivity().getContentResolver();

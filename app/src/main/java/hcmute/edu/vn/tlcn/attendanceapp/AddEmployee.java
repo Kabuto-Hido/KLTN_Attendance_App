@@ -259,8 +259,15 @@ public class AddEmployee extends Fragment {
                                                                 String getNum = latestUser.getUuid().substring(3, 8);
                                                                 user.setUuid("ATD" + increaseOneUnit(getNum));
                                                             }
-                                                            user.setAvatar("images/" + user.getFullName() + "_avatar");
-                                                            userRef.child(user.getUuid()).setValue(user);
+
+                                                            //user.setAvatar(ref.getDownloadUrl().toString());
+                                                            ref.child("images/" + user.getUuid() + "_avatar").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                                @Override
+                                                                public void onSuccess(Uri uri) {
+                                                                    user.setAvatar(uri.toString());
+                                                                    userRef.child(user.getUuid()).setValue(user);
+                                                                }
+                                                            });
 
                                                             progressDialog.dismiss();
                                                             Toast.makeText(getContext(), "New employee added", Toast.LENGTH_SHORT).show();

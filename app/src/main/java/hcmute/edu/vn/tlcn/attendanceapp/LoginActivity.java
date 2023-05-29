@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,8 +17,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -159,13 +163,19 @@ public class LoginActivity extends AppCompatActivity {
             StorageReference ref = storage.getReference();
 
             String url = "images/" + user.getUuid() + "_qrcode";
-
-            UploadTask uploadTask = ref.child(url).putBytes(byteArray);
-            user.setQrcode(url);
-            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            ref.child(url).putBytes(byteArray)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    user.setQrcode(url);
+                    ref.child(url).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            user.setQrcode(uri.toString());
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference userRef = database.getReference("users");
+                            userRef.child(user.getUuid()).setValue(user);
+                        }
+                    });
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override

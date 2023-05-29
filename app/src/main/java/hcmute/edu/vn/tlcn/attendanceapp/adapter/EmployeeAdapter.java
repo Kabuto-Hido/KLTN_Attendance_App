@@ -95,19 +95,7 @@ public class EmployeeAdapter extends BaseAdapter {
         User user = lstEmp.get(position);
 
         if(!user.getAvatar().equals("")){
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageReference = storage.getReference(user.getAvatar());
-            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Picasso.get().load(uri).fit().centerCrop().into(holder.empAvatar);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d("TAG", "onFailure: " + e.getMessage());
-                }
-            });
+            Picasso.get().load(Uri.parse(user.getAvatar())).fit().centerCrop().into(holder.empAvatar);
         }
         else{
             holder.empAvatar.setImageResource(R.drawable.man_placeholder);

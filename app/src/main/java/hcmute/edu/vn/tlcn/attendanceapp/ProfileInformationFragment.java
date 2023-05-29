@@ -234,12 +234,6 @@ public class ProfileInformationFragment extends Fragment {
                     return;
                 }
 
-                if(!isRecognizeFace){
-                    Toast.makeText(getActivity(), "Please take a photo with your face !", Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                    return;
-                }
-
                 if(!phone.equals("")){
                     if (phone.length() != 10 || !phone.matches(getString(R.string.regexPhone))) {
                         edittext_phone.setError("Invalid phone !");
@@ -258,6 +252,11 @@ public class ProfileInformationFragment extends Fragment {
 
                 UploadTask uploadTask;
                 if(imgProfile.isSelected()){
+                    if(!isRecognizeFace){
+                        Toast.makeText(getActivity(), "Please take a photo with your face !", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                        return;
+                    }
                     if(filePath == null){
                         Bitmap bitmap = ((BitmapDrawable) imgProfile.getDrawable()).getBitmap();
                         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -288,13 +287,19 @@ public class ProfileInformationFragment extends Fragment {
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                DatabaseReference userRef = database.getReference("users");
+                                ref.child("images/" + user.getUuid() + "_avatar").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        user.setAvatar(uri.toString());
+                                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                        DatabaseReference userRef = database.getReference("users");
+                                        userRef.child(user.getUuid()).setValue(user);
 
-                                userRef.child(user.getUuid()).setValue(user);
-                                user_singeton.setUser(user);
+                                        user_singeton.setUser(user);
+                                        putDataToView();
+                                    }
+                                });
 
-                                putDataToView();
                                 progressDialog.dismiss();
                                 Toast.makeText(getActivity(), "Update successful.", Toast.LENGTH_SHORT).show();
                             }
@@ -372,6 +377,7 @@ public class ProfileInformationFragment extends Fragment {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             getActivity().finish();
         }
+        user = user_singeton.getUser();
 
         txtUserID.setText(user.getUuid());
         edittext_name.setText(user.getFullName());
@@ -387,19 +393,7 @@ public class ProfileInformationFragment extends Fragment {
             rFemale.setChecked(true);
         }
 
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference(user.getAvatar());
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Picasso.get().load(uri).fit().centerCrop().into(imgProfile);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("TAG", "onFailure: " + e.getMessage());
-            }
-        });
+        Picasso.get().load(Uri.parse(user.getAvatar())).fit().centerCrop().into(imgProfile);
 
     }
 

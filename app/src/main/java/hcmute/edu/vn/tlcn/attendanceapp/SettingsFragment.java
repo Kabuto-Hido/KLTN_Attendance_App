@@ -298,7 +298,13 @@ public class SettingsFragment extends Fragment {
                         int pos = i + 1;
                         ref.child("images/feedback/" + fbId + "_" + pos).putFile(individualImg);
 
-                        imgs.add("images/feedback/" + fbId + "_" + pos);
+                        ref.child("images/feedback/" + fbId + "_" + pos).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                imgs.add(uri.toString());
+
+                            }
+                        });
                     }
                     newFeedback.setImages(imgs);
                 }

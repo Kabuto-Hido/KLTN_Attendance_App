@@ -33,8 +33,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -270,9 +273,15 @@ public class EditEmpFragment extends Fragment {
                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                DatabaseReference userRef = database.getReference("users");
-                                userRef.child(editUser.getUuid()).setValue(editUser);
+                                ref.child("images/" + editUser.getUuid() + "_avatar").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        editUser.setAvatar(uri.toString());
+                                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                        DatabaseReference userRef = database.getReference("users");
+                                        userRef.child(editUser.getUuid()).setValue(editUser);
+                                    }
+                                });
 
                                 progressDialog.dismiss();
                                 Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
@@ -294,30 +303,29 @@ public class EditEmpFragment extends Fragment {
     }
 
     private void putDataToView() {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference(editUser.getAvatar());
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference userRef = database.getReference("users");
+        userRef.child(editUser.getUuid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onSuccess(Uri uri) {
-                Picasso.get().load(uri).fit().centerCrop().into(imgAvatarProfile);
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User u = snapshot.getValue(User.class);
+                edtName.setText(u.getFullName());
+                edtBirthday1.setText(u.getBirthday());
+                edtPhonenum.setText(u.getPhone());
+                if (u.getSex()) {
+                    radioMale.setChecked(true);
+                } else {
+                    radioFemale.setChecked(true);
+                }
+                Picasso.get().load(Uri.parse(u.getAvatar())).fit().centerCrop().into(imgAvatarProfile);
             }
-        }).addOnFailureListener(new OnFailureListener() {
+
             @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("TAG", "onFailure: " + e.getMessage());
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
-
         labelCodeEmp.setText(editUser.getUuid());
-        edtName.setText(editUser.getFullName());
-        edtBirthday1.setText(editUser.getBirthday());
-        edtPhonenum.setText(editUser.getPhone());
-        //edtPhonenum.setBackgroundColor(Color.parseColor("#D9D9D9"));
-        if (editUser.getSex()) {
-            radioMale.setChecked(true);
-        } else {
-            radioFemale.setChecked(true);
-        }
 
     }
 

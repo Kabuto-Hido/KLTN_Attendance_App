@@ -643,19 +643,7 @@ public class HomeFragment extends Fragment {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         txtDayNow.setText(format.format(today.getTime()));
 
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference(user.getAvatar());
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Picasso.get().load(uri).fit().centerCrop().into(avatarUser);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("TAG", "onFailure: " + e.getMessage());
-            }
-        });
+        Picasso.get().load(Uri.parse(user.getAvatar())).fit().centerCrop().into(avatarUser);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference recordRef = database.getReference("record").child(user.getUuid());
