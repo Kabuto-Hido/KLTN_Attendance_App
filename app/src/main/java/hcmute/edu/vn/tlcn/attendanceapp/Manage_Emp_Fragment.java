@@ -327,7 +327,9 @@ public class Manage_Emp_Fragment extends Fragment {
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                                     String reqId = dataSnapshot.getKey();
-                                                    dayOffReportRef.child(reqId).removeValue();
+                                                    if (reqId != null) {
+                                                        dayOffReportRef.child(reqId).removeValue();
+                                                    }
                                                 }
                                             }
 
@@ -343,8 +345,10 @@ public class Manage_Emp_Fragment extends Fragment {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                                    String reqId = dataSnapshot.getKey();
-                                                    dayOffReportRef.child(reqId).removeValue();
+                                                    String feedbackId = dataSnapshot.getKey();
+                                                    if (feedbackId != null) {
+                                                        feedbackRef.child(feedbackId).removeValue();
+                                                    }
                                                 }
                                             }
 
