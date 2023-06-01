@@ -1104,7 +1104,7 @@ public class HomeFragment extends Fragment {
         Uri imageUri = contentResolver.insert(imageCollection, contentValues);
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference(user.getQrcode());
+        StorageReference storageReference = storage.getReferenceFromUrl(user.getQrcode());
         storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
