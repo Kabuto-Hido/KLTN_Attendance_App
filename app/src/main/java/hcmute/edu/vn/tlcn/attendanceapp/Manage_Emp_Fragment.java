@@ -595,9 +595,11 @@ public class Manage_Emp_Fragment extends Fragment {
     private void generatePDF(String y, String m, String d, User user) throws FileNotFoundException {
         int dayNow = Integer.parseInt(d);
         String file_name = "Employees_"+user.getFullName()+"_"+user.getPhone() + "_Report_";
+        String sub_title2_name = "";
         if(dayNow < 10){
             int previousMonth = Integer.parseInt(m) - 1;
-            file_name += m +"&" + previousMonth + "_" + y + ".pdf";
+            file_name += previousMonth +"&" + m + "_" + y + ".pdf";
+            sub_title2_name += previousMonth+"&";
         }
         else{
             file_name += m + "_" + y + ".pdf";
@@ -611,7 +613,7 @@ public class Manage_Emp_Fragment extends Fragment {
 
         pdfDocument.setDefaultPageSize(PageSize.A4);
 
-        Paragraph title1 = new Paragraph(m + "/" + y + " EMPLOYEE " +user.getFullName() +" - "+user.getPhone())
+        Paragraph title1 = new Paragraph(sub_title2_name + m + "/" + y + " EMPLOYEE " +user.getFullName() +" - "+user.getPhone())
                 .setBold().setFontSize(20).setTextAlignment(TextAlignment.CENTER);
 
         float[] columnWidth1 = {80f, 80f, 150f, 80f};

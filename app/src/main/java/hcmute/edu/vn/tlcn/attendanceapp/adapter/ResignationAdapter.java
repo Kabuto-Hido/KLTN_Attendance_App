@@ -17,6 +17,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import hcmute.edu.vn.tlcn.attendanceapp.R;
@@ -95,6 +99,19 @@ public class ResignationAdapter extends BaseAdapter {
         });
 
         holder.txtDayResignation.setText(dayOffRequest.getDateOff());
+        Date currentTime = Calendar.getInstance().getTime();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String now = sdf.format(currentTime);
+        try {
+            Date requestDate  = sdf.parse(dayOffRequest.getDateOff());
+            Date nowDate  = sdf.parse(now);
+            if(requestDate.before(nowDate)){
+                holder.btnAccept.setVisibility(View.INVISIBLE);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         holder.txtReason.setText(dayOffRequest.getReason());
 
         holder.btnAccept.setOnClickListener(new View.OnClickListener() {
@@ -125,88 +142,57 @@ public class ResignationAdapter extends BaseAdapter {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         //check if user not check in
-                                        DataSnapshot dataSnapshot = snapshot.child(uuid).child(day).child("checkIn");
-                                        Record checkInRecord = dataSnapshot.getValue(Record.class);
+                                        DataSnapshot checkInSnapshot = snapshot.child(uuid).child(day).child("checkIn");
+                                        DataSnapshot absentSnapshot = snapshot.child(uuid).child(day).child("absent");
+                                        Record checkInRecord = checkInSnapshot.getValue(Record.class);
                                         if (checkInRecord == null) {
                                             String currentMonth = day.substring(5,7);
                                             String currentYear = day.substring(0,4);
 
                                             Record absentRecord;
-                                            DataSnapshot absentSnapshot = snapshot.child(uuid).child(day).child("absent");
-
                                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                                             DatabaseReference statisticRef = database.getReference("statistic");
                                             if(!absentSnapshot.exists()){
                                                 absentRecord = new Record(uuid, day, "", "absent with permission", "absent",new LocationRecord(null, null));
                                                 recordRef.child(uuid).child(day).child("absent").setValue(absentRecord);
-                                            }else {
-                                                absentRecord = dataSnapshot.getValue(Record.class);
-                                                if(absentRecord.getStatus().equals("absent without permission")){
-                                                    statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                            DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
-                                                            Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
 
-                                                            DataSnapshot dataSnapshot2 = snapshot.child(uuid).child(currentYear).child(currentMonth);
-                                                            Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
+                                                statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                        DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
+                                                        Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
 
-                                                            int countAbsentWithoutPer;
-                                                            countAbsentWithoutPer = monthStatistic.getAbsentWithoutPer();
-                                                            countAbsentWithoutPer--;
-                                                            statisticRef.child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
+                                                        DataSnapshot dataSnapshot2 = snapshot.child(uuid).child(currentYear).child(currentMonth);
+                                                        Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
 
-                                                            //emp statistic
-                                                            countAbsentWithoutPer = empStatistic.getAbsentWithoutPer();
-                                                            countAbsentWithoutPer--;
-                                                            statisticRef.child(uuid).child(currentYear).child(currentMonth).child("absentWithoutPer").setValue(countAbsentWithoutPer);
-
+                                                        int countAbsentWithPer;
+                                                        if(monthStatistic == null){
+                                                            Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,"","00:00");
+                                                            statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
+                                                        }
+                                                        else{
+                                                            countAbsentWithPer = monthStatistic.getAbsentWithPer();
+                                                            countAbsentWithPer++;
+                                                            statisticRef.child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
                                                         }
 
-                                                        @Override
-                                                        public void onCancelled(@NonNull DatabaseError error) {
-
+                                                        if(empStatistic == null){
+                                                            Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,uuid,"00:00");
+                                                            statisticRef.child(uuid).child(currentYear).child(currentMonth).setValue(newStatistic);
                                                         }
-                                                    });
-                                                }
+                                                        else{
+                                                            countAbsentWithPer = empStatistic.getAbsentWithPer();
+                                                            countAbsentWithPer++;
+                                                            statisticRef.child(uuid).child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                    }
+                                                });
                                             }
-
-                                            statisticRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                    DataSnapshot dataSnapshot = snapshot.child(currentYear).child(currentMonth);
-                                                    Statistic monthStatistic = dataSnapshot.getValue(Statistic.class);
-
-                                                    DataSnapshot dataSnapshot2 = snapshot.child(uuid).child(currentYear).child(currentMonth);
-                                                    Statistic empStatistic = dataSnapshot2.getValue(Statistic.class);
-
-                                                    int countAbsentWithPer;
-                                                    if(monthStatistic == null){
-                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,"","00:00");
-                                                        statisticRef.child(currentYear).child(currentMonth).setValue(newStatistic);
-                                                    }
-                                                    else{
-                                                        countAbsentWithPer = monthStatistic.getAbsentWithPer();
-                                                        countAbsentWithPer++;
-                                                        statisticRef.child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
-                                                    }
-
-                                                    if(empStatistic == null){
-                                                        Statistic newStatistic = new Statistic(0,0,1,0,currentMonth,currentYear,uuid,"00:00");
-                                                        statisticRef.child(uuid).child(currentYear).child(currentMonth).setValue(newStatistic);
-                                                    }
-                                                    else{
-                                                        countAbsentWithPer = empStatistic.getAbsentWithPer();
-                                                        countAbsentWithPer++;
-                                                        statisticRef.child(uuid).child(currentYear).child(currentMonth).child("absentWithPer").setValue(countAbsentWithPer);
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                                }
-                                            });
 
                                         }
                                     }

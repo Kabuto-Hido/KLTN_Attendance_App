@@ -201,7 +201,7 @@ public class EditRecordFragment extends Fragment {
                                 empStatistic.setAbsentWithPer(countAbsentWithPer);
                             }
                             statisticRef.child(currentYear).child(currentMonth).setValue(monthStatistic);
-                            statisticRef.child(editRecord.getUserUUID()).child(currentYear).child(currentMonth).setValue(monthStatistic);
+                            statisticRef.child(editRecord.getUserUUID()).child(currentYear).child(currentMonth).setValue(empStatistic);
 
                         }
 
