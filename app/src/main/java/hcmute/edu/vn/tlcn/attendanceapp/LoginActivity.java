@@ -109,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                             if (!snapshot.exists()) {
                                 progressDialog.dismiss();
                                 Toast.makeText(LoginActivity.this, "Wrong account or password!", Toast.LENGTH_SHORT).show();
+                                return;
                             }
                             User loginUser = snapshot.getValue(User.class);
                             String hashPass = loginUser.getPassword();
